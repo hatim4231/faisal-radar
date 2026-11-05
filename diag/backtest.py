@@ -31,6 +31,12 @@ def consol_metrics(df):
             "top": c["top"], "dry": avg10 < avg50 * 0.7}
 
 
+def stats(df_future, entry):
+    """عائد بعد 10 جلسات، وأقصى صعود، وأقصى نزول."""
+    return (float(df_future["Close"].iloc[-1]) / entry - 1, float(df_future["High"].max()) / entry - 1,
+            float(df_future["Low"].min()) / entry - 1)
+
+
 def outcome(df_future, entry, stop):
     for _, r in df_future.iterrows():
         if r["Low"] < stop:
@@ -62,8 +68,9 @@ def run_one(args):
         date = str(hist.index[-1].date())
         p = a["plan"]
         stop_base = p["stop"] or price * 0.9
-        res_rand = outcome(fut, price, price * 0.9)
-        out.append(("RANDOM", t, date, res_rand))
+        st10 = stats(fut, price)
+        fixed = outcome(fut, price, price * 0.9)
+        out.append(("RANDOM", t, date, fixed, fixed, *st10))
         st = a["irtikaz"]["status"]
         cm = consol_metrics(hist)
         # (ب) سقف التماسك ليس مقاومة
@@ -92,7 +99,7 @@ def run_one(args):
                 continue  # نفس السهم ما يتكرر خلال 10 جلسات
             last_sig[s] = end
             stop = (cm["support"] * 0.97) if s.startswith("CONSOL") and cm else stop_base
-            out.append((s, t, date, outcome(fut, price, stop)))
+            out.append((s, t, date, outcome(fut, price, stop), outcome(fut, price, price * 0.9), *st10))
     return out
 
 
@@ -112,20 +119,26 @@ def main():
             rows += r
             if i % 100 == 0:
                 print(i, round(time.time() - t0), flush=True)
-    df = pd.DataFrame(rows, columns=["sig", "t", "date", "res"])
-    print("\n==== RESULTS (خلال 10 جلسات: +20% قبل الوقف) ====")
-    g = df.groupby("sig")["res"].value_counts().unstack(fill_value=0)
-    for col in ("hit", "fail", "none"):
-        if col not in g:
-            g[col] = 0
-    g["n"] = g.sum(axis=1)
-    g["hit%"] = (g["hit"] / g["n"] * 100).round(1)
-    g["fail%"] = (g["fail"] / g["n"] * 100).round(1)
-    print(g[["n", "hit", "fail", "none", "hit%", "fail%"]].sort_index().to_string())
+    df = pd.DataFrame(rows, columns=["sig", "t", "date", "res", "res10", "ret10", "maxup", "maxdn"])
+    for col, title in (("res", "وقف الإشارة نفسها"), ("res10", "وقف موحد -10% للكل")):
+        print(f"\n==== {title}: +20% قبل الوقف خلال 10 جلسات ====")
+        g = df.groupby("sig")[col].value_counts().unstack(fill_value=0)
+        for c in ("hit", "fail", "none"):
+            if c not in g:
+                g[c] = 0
+        g["n"] = g.sum(axis=1)
+        g["hit%"] = (g["hit"] / g["n"] * 100).round(1)
+        g["fail%"] = (g["fail"] / g["n"] * 100).round(1)
+        print(g[["n", "hit%", "fail%"]].sort_index().to_string())
+    print("\n==== العائد بعد 10 جلسات ====")
+    agg = df.groupby("sig").agg(n=("ret10", "size"), median_ret=("ret10", "median"), mean_ret=("ret10", "mean"),
+                                win_rate=("ret10", lambda x: (x > 0).mean()), maxup_med=("maxup", "median"),
+                                up30=("maxup", lambda x: (x >= 0.30).mean()), maxdn_med=("maxdn", "median"))
+    print((agg * [1, 100, 100, 100, 100, 100, 100]).round(1).to_string())
     for s in sorted(set(df["sig"]) - {"RANDOM"}):
         sub = df[df.sig == s]
-        print(f"\n-- {s} أمثلة:", ", ".join(f"{r.t}@{r.date}:{r.res}" for r in sub.tail(25).itertuples()))
-    print("\n-- FLYE:", df[df.t == "FLYE"][["sig", "date", "res"]].to_string())
+        print(f"\n-- {s} أمثلة:", ", ".join(f"{r.t}@{r.date}:{r.ret10*100:+.0f}%" for r in sub.tail(12).itertuples()))
+    print("\n-- FLYE:", df[(df.t == "FLYE") & (df.sig != "RANDOM")][["sig", "date", "res", "ret10", "maxup"]].to_string())
 
 
 if __name__ == "__main__":
