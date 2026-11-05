@@ -47,6 +47,6 @@
     "info_workers": 8,
     "deep_scan_min_score": 45,
     "deep_scan_max": 60,
-    "report_min_score": 30
+    "report_min_score": 40
   }
 }

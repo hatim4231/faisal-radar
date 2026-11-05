@@ -184,7 +184,7 @@ def resistances_above(df: pd.DataFrame, price: float, lookback: int = 250) -> li
 # السلوك
 # ----------------------------------------------------------------------------
 
-def former_runner(df: pd.DataFrame, window: int = 30) -> dict:
+def former_runner(df: pd.DataFrame, window: int = 10) -> dict:
     """هل السهم سبق انفجر +100% خلال window جلسة؟ (Former Runner)"""
     lows = df["Low"].rolling(window, min_periods=1).min()
     ratio = df["High"] / lows
@@ -417,6 +417,8 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
     # --- بيانات الشركة
     mcap = info.get("marketCap")
     flt = info.get("floatShares")
+    if flt is not None and flt < 50_000:  # رقم غير منطقي من المصدر
+        flt = None
     shares_out = info.get("sharesOutstanding")
     short_shares = info.get("sharesShort")
     short_pct_float = info.get("shortPercentOfFloat")
@@ -641,12 +643,15 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
 
     score = max(0.0, min(100.0, base + sum(a[1] for a in adj)))
 
-    core_ok = all(x.ok for x in checks if x.key in ("support", "hold"))
+    # مطابق = لازم الدعم + فشل الهبوط + RSI مضغوط (فيصل ما يفضل RSI فوق 40)
+    core_ok = all(x.ok for x in checks if x.key in ("support", "hold", "rsi"))
+    near_ok = (dist_support is not None and dist_support <= IR["support_watch_pct"]
+               and not broke_stay and (rsi_now or 100) <= IR["rsi_reject_above"])
     if score >= 75 and core_ok:
         status = "ready"
-    elif score >= 55:
+    elif score >= 60 and near_ok:
         status = "near"
-    elif score >= 35:
+    elif score >= 40:
         status = "radar"
     else:
         status = "no"
