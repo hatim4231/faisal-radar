@@ -387,7 +387,26 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
     write_csv(rows)
     log(f"خلص المسح في {payload['seconds']} ثانية — {len(rows)} سهم في التقرير")
+    write_summary(rows)
     return payload
+
+
+def write_summary(rows):
+    """ملخص أفضل الأسهم في سجل التشغيل (ويظهر في صفحة GitHub Actions)."""
+    from collections import Counter
+    c = Counter(r["irtikaz"]["status"] for r in rows)
+    lines = [f"## رادار فيصل: مطابق {c['ready']} · قريب {c['near']} · رادار {c['radar']}", "",
+             "| السهم | السعر | الجاهزية | الحالة | RSI | عن الدعم | فلووت | السلوك |", "|---|---|---|---|---|---|---|---|"]
+    for r in rows[:20]:
+        flt = f"{r['float']/1e6:.1f}M" if r.get("float") else "-"
+        lines.append(f"| {r['symbol']} | {r['price']} | {r['irtikaz']['score']:.0f}% | {r['irtikaz']['status']} | "
+                     f"{r['rsi']} | {r['plan']['dist_support_pct']}% | {flt} | {'، '.join(r['tags'])} |")
+    txt = "\n".join(lines)
+    print(txt, flush=True)
+    sp = os.environ.get("GITHUB_STEP_SUMMARY")
+    if sp:
+        with open(sp, "a", encoding="utf-8") as f:
+            f.write(txt + "\n")
 
 
 def write_csv(rows):
