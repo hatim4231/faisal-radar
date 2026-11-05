@@ -34,3 +34,13 @@ for k in ("price", "rsi", "rsi_min10", "ma", "rel_volume", "change_pct", "gap_pc
           "pump_candles", "w", "sweep", "median_range_pct", "drawdown_pct"):
     print(f"  {k}: {a.get(k)}")
 print("== PLAN", json.dumps(a["plan"], default=str))
+
+print("\n\n######## AS OF PREVIOUS SESSION (before last candle) ########")
+for cut in (1, 2, 5):
+    dd = d.iloc[:-cut]
+    b = fr.analyze(dd, info, cfg)
+    print(f"--- date {dd.index[-1].date()} close {dd['Close'].iloc[-1]:.2f}: irtikaz {b['irtikaz']['status']} {b['irtikaz']['score']} | RSI {b['rsi']} min10 {b['rsi_min10']}")
+    print("    support", b["plan"]["support"], b["plan"]["support_kind"], "touches", b["plan"]["support_touches"], "dist", b["plan"]["dist_support_pct"], "t1", b["plan"]["t1"])
+    for c in b["irtikaz"]["checks"]:
+        print(f"    [{'OK' if c['ok'] else '--'}] {c['got']}/{c['weight']} {c['title']} :: {c['detail']}")
+    print("    adj", [(x['name'], x['pts']) for x in b["irtikaz"]["adjustments"]])
