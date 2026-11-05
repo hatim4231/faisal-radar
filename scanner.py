@@ -412,6 +412,9 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     if tickers is None:
         tickers = get_universe(cfg)
     tickers = [t.strip().upper() for t in tickers if t.strip()]
+    if not explicit:
+        # ناسداك: الرمز الخماسي اللي ينتهي بـ W/R/U = Warrant / Rights / Unit (مو سهم عادي)
+        tickers = [t for t in tickers if not (len(t) == 5 and t[-1] in "WRU") and "-" not in t]
     daily = download_daily(tickers, cfg)
     log(f"وصلت شارتات {len(daily)} سهم")
 
