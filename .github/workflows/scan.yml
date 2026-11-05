@@ -1,4 +1,4 @@
-name: رادار فيصل - مسح السوق
+name: رادار فيصل وعبدالله - مسح السوق
 
 on:
   schedule:
@@ -44,6 +44,9 @@ jobs:
 
       - name: نسخ ملف Excel
         run: cp output/latest.csv site/latest.csv
+
+      - name: رادار عبدالله
+        run: python abdullah/abdullah_scanner.py --no-open --out site/abdullah/index.html
 
       - uses: actions/upload-pages-artifact@v3
         with:
