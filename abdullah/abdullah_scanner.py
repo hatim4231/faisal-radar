@@ -32,6 +32,7 @@ sys.path.insert(0, str(HERE))
 
 import scanner as data  # noqa: E402  (أدوات جلب البيانات فقط)
 import abdullah_rules as ar  # noqa: E402
+import news_tools  # noqa: E402
 
 log = data.log
 CACHE = data.CACHE
@@ -178,18 +179,18 @@ def deep_scan(results: dict, cfg):
             n = data.parse_news(yf.Ticker(t).news)
         except Exception:
             n = []
-        for x in n:
-            x["title_ar"], x["summary_ar"] = data.translate_ar([x["title"], x["summary"]])
+        news_tools.enrich(n, data.translate_ar)
         return t, n
 
     with ThreadPoolExecutor(6) as ex:
         for t, n in ex.map(news, syms):
             r = results[t]
             r["news"] = n
-            dil = [x for x in n if DILUTION.search((x.get("title") or "") + " " + (x.get("summary") or ""))]
+            dil = [x for x in n if DILUTION.search((x.get("title") or "") + " " + (x.get("text") or x.get("summary") or ""))]
             if dil:
                 r["flags"].append(f"تمويل/تخفيف محتمل: {len(dil)} خبر عن طرح أو Warrants أو تمويل")
                 r["dilution_news"] = [x.get("title_ar") or x["title"] for x in dil[:3]]
+    news_tools.save_cache()
     try:
         h = yf.download(syms, period="60d", interval="1h", prepost=True, group_by="ticker",
                         auto_adjust=False, threads=True, progress=False)

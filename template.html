@@ -125,6 +125,10 @@ ul.clean{margin:0;padding-right:18px}
   .grid2{grid-template-columns:1fr}
   .plan{grid-template-columns:repeat(2,1fr)}
 }
+.sent{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.sent.positive{background:var(--good-bg);color:var(--good)} .sent.negative{background:var(--bad-bg);color:var(--bad)} .sent.neutral{background:var(--panel2);color:var(--muted)}
+.newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:420px;overflow-y:auto;padding-left:6px}
+.newsitem .why{font-size:12px;color:var(--muted);margin-top:2px}
 </style>
 </head>
 <body>
@@ -180,6 +184,21 @@ ul.clean{margin:0;padding-right:18px}
 </aside>
 
 <script>
+const SENT = {positive:["✅","إيجابي"], negative:["❌","سلبي"], neutral:["➖","محايد"]};
+function sentBadge(n){ const s = SENT[n.sentiment] || SENT.neutral; return `<span class="sent ${n.sentiment||"neutral"}">${s[0]} ${s[1]}</span>`; }
+function newsHTML(list){
+  if (!(list||[]).length) return `<div class="note">لا توجد أخبار حديثة لهذا السهم</div>`;
+  return list.map(n => {
+    const why = [...(n.why_pos||[]).map(w => "✅ " + w), ...(n.why_neg||[]).map(w => "❌ " + w)];
+    const body = n.text_ar || n.summary_ar || n.summary || "";
+    return `<div class="newsitem">
+      <div class="nt">${sentBadge(n)} ${esc(n.title_ar || n.title)}</div>
+      ${why.length ? `<div class="why">السبب: ${why.map(esc).join(" · ")}</div>` : ""}
+      ${body ? `<div class="newsfull">${esc(body)}</div>` : ""}
+      <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span>${n.full ? "" : " · (النص الكامل غير متاح — هذا الملخص)"}</div>
+    </div>`;
+  }).join("") + `<div class="note" style="margin-top:6px">✅/❌ تقدير آلي من كلمات الخبر — اقرأ الخبر بنفسك قبل القرار.</div>`;
+}
 const DATA = /*__DATA__*/null;
 const LIVE = /*__LIVE__*/false;
 const STATUS = {ready:"✅ مطابق", near:"🟡 قريب", radar:"👀 رادار", no:"غير مطابق"};
@@ -304,7 +323,7 @@ function render(){
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
-        ${(s.news||[]).length ? `<div class="left">📰 <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}
+        ${(s.news||[]).length ? `<div class="left">${sentBadge(s.news[0])} <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}
         <div class="tags">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
       </div>
       <div class="score">
@@ -382,7 +401,7 @@ function openDetail(sym){
   $("#dtitle").innerHTML = `<span class="sym ltr">${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · ${esc(s.country||"")} · بيانات ${esc(s.date)}</div>`;
   const rs = s.reverse_splits.length ? s.reverse_splits.map(r => `${r.ratio} (${r.date}، قبل ${r.days_ago} يوم)`).join("<br>") : "لا يوجد خلال سنتين";
   const h4 = s.h4 ? `RSI 4س: <b class="num">${s.h4.rsi}</b> · ${s.h4.new_low_recent ? "<span style='color:var(--bad)'>كسر قاع 5 جلسات</span>" : "ما كسر قاع 5 جلسات ✓"} · شموع 20%+: <span class="num">${s.h4.big_candles}</span>` : "يظهر للمرشحين فقط";
-  const news = (s.news||[]).length ? s.news.map(n => `<div class="newsitem"><div class="nt">${esc(n.title_ar || n.title)}</div>${(n.summary_ar || n.summary) ? `<div class="ns">${esc(n.summary_ar || n.summary)}</div>` : ""}<div class="note">${esc(n.source||"")} · <span class="num">${esc(dateTxt(n.time))}</span>${n.title_ar && n.title_ar !== n.title ? ` · <span class="ltr">${esc(n.title)}</span>` : ""}</div></div>`).join("") : `<div class="note">لا توجد أخبار حديثة لهذا السهم</div>`;
+  const news = newsHTML(s.news);
   $("#dbody").innerHTML = `
     <div class="card">
       <div class="grid2" style="align-items:center">

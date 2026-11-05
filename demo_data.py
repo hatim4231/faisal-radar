@@ -84,9 +84,13 @@ def build(cfg) -> dict:
     for sym, name, d, info in scenarios():
         a = fr.analyze(d, info, cfg)
         a.update({"symbol": sym, "name": name + " (تجريبي)", "sector": "Demo", "country": "-"})
-        a["news"] = [{"title": "Demo Corp announces new contract", "title_ar": "خبر تجريبي: الشركة تعلن عن عقد جديد",
-                      "summary": "", "summary_ar": "هذا ملخص تجريبي للخبر يظهر في الصفحة مباشرة بدون روابط.",
-                      "url": None, "source": "Demo", "time": "2026-11-04T13:00:00Z"}]
+        a["news"] = [{"title": "Demo Corp awarded new contract", "title_ar": "خبر تجريبي: الشركة تفوز بعقد جديد",
+                      "summary": "", "text_ar": "هذا نص الخبر الكامل (تجريبي).\n\nالفقرة الثانية من الخبر تظهر هنا كاملة بدون روابط.",
+                      "full": True, "sentiment": "positive", "why_pos": ["عقد/طلبية"], "why_neg": [],
+                      "url": None, "source": "Demo", "time": "2026-11-04T13:00:00Z"},
+                     {"title": "Demo Corp prices registered direct offering", "title_ar": "خبر تجريبي: الشركة تسعّر طرح أسهم مباشر",
+                      "summary": "", "text_ar": "نص تجريبي لخبر سلبي عن طرح أسهم.", "full": True, "sentiment": "negative",
+                      "why_pos": [], "why_neg": ["طرح أسهم (تخفيف)"], "url": None, "source": "Demo", "time": "2026-11-03T13:00:00Z"}]
         a["short_available"] = {"available": 10000, "fee": 12.5, "date": "2026-11-04"}
         rows.append(a)
     rows.sort(key=lambda r: -r["irtikaz"]["score"])

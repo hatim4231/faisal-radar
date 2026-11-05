@@ -30,6 +30,7 @@ from pathlib import Path
 import pandas as pd
 
 import faisal_rules as fr
+import news_tools
 import report
 
 ROOT = Path(__file__).resolve().parent
@@ -313,8 +314,7 @@ def deep_scan(results: dict, cfg):
             n = parse_news(yf.Ticker(t).news)
         except Exception:
             n = []
-        for x in n:
-            x["title_ar"], x["summary_ar"] = translate_ar([x["title"], x["summary"]])
+        news_tools.enrich(n, translate_ar)
         return t, n
 
     with ThreadPoolExecutor(6) as ex:
@@ -340,7 +340,11 @@ def deep_scan(results: dict, cfg):
 
     n_news = sum(len(results[t].get("news", [])) for t in syms)
     n_tr = sum(1 for t in syms for x in results[t].get("news", []) if x.get("title_ar") and x["title_ar"] != x["title"])
-    log(f"  أخبار: {n_news} (مترجم {n_tr})")
+    news_tools.save_cache()
+    allnews = [x for t in syms for x in results[t].get("news", [])]
+    log(f"  أخبار: {n_news} (مترجم {n_tr}) · كاملة {sum(1 for x in allnews if x.get('full'))} · "
+        f"إيجابي {sum(1 for x in allnews if x.get('sentiment') == 'positive')} · "
+        f"سلبي {sum(1 for x in allnews if x.get('sentiment') == 'negative')}")
 
     # فريم 4 ساعات (يشمل البري والأفتر)
     try:
