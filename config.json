@@ -20,7 +20,8 @@
     "entry_zone_above_support_pct": 10,
     "stop_below_support_pct": 3,
     "chase_from_low_pct": 50,
-    "min_upside_pct": 20
+    "min_upside_pct": 20,
+    "positive_candle_days": 10
   },
 
   "momentum": {

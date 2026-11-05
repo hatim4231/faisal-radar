@@ -303,8 +303,11 @@ def positive_candle(df: pd.DataFrame, support: float, days: int = 3) -> str | No
 
 def volume_read(df: pd.DataFrame) -> dict:
     """فوليوم الصعود مقابل فوليوم الهبوط، وهل فوليوم البيع يتناقص."""
-    d = df.tail(20).copy()
-    d["up"] = d["Close"] >= d["Open"]
+    # يوم صعود أو هبوط = مقارنة الإغلاق بإغلاق أمس (مو بافتتاح نفس اليوم:
+    # سهم يفتح بفجوة +57% ويغلق +37% شمعته حمراء لكنه يوم صعود)
+    d = df.tail(21).copy()
+    d["up"] = d["Close"] >= d["Close"].shift(1)
+    d = d.tail(20)
     last10, prev10 = d.tail(10), d.head(10)
     up_v = last10.loc[last10["up"], "Volume"].mean()
     dn_v = last10.loc[~last10["up"], "Volume"].mean()
@@ -425,6 +428,7 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
     if short_pct_float is not None and short_pct_float <= 1:
         short_pct_float *= 100
     short_value = short_shares * price if short_shares else None
+    short_avail = info.get("shortAvailable")  # من ملف IB (يضيفه scanner.py)
     short_to_mcap = (short_value / mcap * 100) if (short_value and mcap) else None
 
     # --- مستويات
@@ -464,7 +468,7 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
     broke_stay = broke_support_and_stayed(df, support)
     hl = higher_lows(df)
     held = no_new_low(df)
-    pc = positive_candle(df, support)
+    pc = positive_candle(df, support, days=IR.get("positive_candle_days", 10))
     vol = volume_read(df)
     w = w_pattern(df)
     low20 = float(df["Low"].tail(20).min())
@@ -631,7 +635,11 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
         adj.append(("سلوك قروبات", -10, f"{pumps} شموع ذيل علوي طويل مع فوليوم منفجر آخر 30 يوم"))
     if up_from_low is not None and up_from_low >= IR["chase_from_low_pct"]:
         adj.append(("لا تطارد", -15, f"صعد {up_from_low:.0f}% من قاع آخر 20 يوم — انتظر Retest"))
-    if short_pct_float is not None and short_pct_float >= BH["high_short_pct_float"]:
+    if short_avail is not None:
+        # طريقة فيصل: الشورت = المتاح للاقتراض (IB)، مو Short Interest الرسمي القديم
+        if short_avail > BH.get("max_short_shares", 50000):
+            adj.append(("شورت متاح مرتفع", -8, f"الشورت المتاح {short_avail:,.0f} سهم"))
+    elif short_pct_float is not None and short_pct_float >= BH["high_short_pct_float"]:
         adj.append(("شورت مرتفع", -8, f"الشورت {short_pct_float:.1f}% من الفلووت"))
     elif short_to_mcap is not None and short_to_mcap >= BH["high_short_value_to_mcap_pct"]:
         adj.append(("شورت مرتفع نسبة للقيمة", -6, f"قيمة الشورت {short_to_mcap:.1f}% من القيمة السوقية"))
@@ -715,9 +723,13 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
     mc("runner", "سلوك سابق (Former Runner)", 15, fr["max_pct"] >= BH["former_runner_pct"],
        15 if fr["max_pct"] >= BH["former_runner_pct"] else 15 * fr["max_pct"] / BH["former_runner_pct"] * 0.5,
        f"أكبر انفجار سابق +{fr['max_pct']:.0f}%")
-    short_ok = (short_pct_float is None or short_pct_float < 10)
-    mc("short", "شورت قليل", 5, short_ok, 5 if short_ok else 0,
-       f"{short_pct_float:.1f}% من الفلووت" if short_pct_float is not None else "غير متوفر")
+    if short_avail is not None:
+        short_ok = short_avail <= BH.get("max_short_shares", 50000)
+        s_txt = f"المتاح {short_avail:,.0f} سهم"
+    else:
+        short_ok = (short_pct_float is None or short_pct_float < 10)
+        s_txt = f"{short_pct_float:.1f}% من الفلووت" if short_pct_float is not None else "غير متوفر"
+    mc("short", "شورت قليل", 5, short_ok, 5 if short_ok else 0, s_txt)
     mc("news", "خبر / محفز اليوم", 10, False, 0, "يتم فحصه في التحليل العميق")
     m_score = sum(x.got for x in m_checks)
     m_warn = []

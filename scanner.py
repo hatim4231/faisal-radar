@@ -443,7 +443,10 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     results = {}
     for t, d in pre.items():
         try:
-            a = fr.analyze(d, infos.get(t), cfg)
+            inf_t = dict(infos.get(t) or {})
+            if t in ib_short and ib_short[t].get("available") is not None:
+                inf_t["shortAvailable"] = ib_short[t]["available"]
+            a = fr.analyze(d, inf_t, cfg)
         except Exception:
             log(f"  خطأ في تحليل {t}:", traceback.format_exc(limit=1).splitlines()[-1])
             continue
