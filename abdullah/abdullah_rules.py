@@ -246,6 +246,11 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
     if zone and price <= zone["high"] * (1 + A["zone_near_pct"] / 100):
         c.ok, c.got, c.progress = True, 20, 1
         c.detail = f"عند {zone['kind']} {fp(zone['low'])} – {fp(zone['high'])} · التصحيح {retrace:.0f}% من الموجة"
+    elif touched and price > zone["high"] * (1 + A["max_bounce_pct"] / 100):
+        c.got, c.progress = 8, 0.4
+        c.detail = (f"لمس {zone['kind']} {fp(zone['low'])} – {fp(zone['high'])} وارتد بقوة "
+                    f"(+{pct(price, low10):.0f}% من {fp(low10)}) — الحركة بدأت")
+        c.remaining = "لا تطارد — انتظر إعادة اختبار المنطقة أو تماسك جديد"
     elif touched:
         c.ok, c.got, c.progress = True, 20, 1
         c.detail = (f"صحح إلى {zone['kind']} {fp(zone['low'])} – {fp(zone['high'])} (أدنى سعر {fp(low10)}) "

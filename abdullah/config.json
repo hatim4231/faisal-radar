@@ -17,6 +17,8 @@
     "recent_sessions": 60,
     "wave_max_len": 60,
     "zone_near_pct": 8,
+    "max_bounce_pct": 25,
+    "_max_bounce_help": "إذا ارتد السعر أكثر من 25% فوق المنطقة = الحركة بدأت، لا تطارد",
     "invalidation_below_zone_pct": 4,
     "hold_sessions": 5,
     "vol_dry_ratio": 0.7,
