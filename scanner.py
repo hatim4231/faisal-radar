@@ -427,6 +427,28 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
                                                 "detail": "كسر أدنى قاع آخر 5 جلسات على فريم 4 ساعات"})
             r["irtikaz"]["score"] = max(0, r["irtikaz"]["score"] - 5)
 
+    # شرط الشورت: لا يرشح إلا سهم شورته 50 ألف أو أقل
+    max_sh = cfg["behavior"].get("max_short_shares")
+    if max_sh:
+        for t in list(results):
+            r = results[t]
+            sa = (r.get("short_available") or {}).get("available")
+            if sa is not None:
+                val, src = sa, "المتاح للاقتراض"
+            else:
+                val, src = r.get("short_shares"), "Short Interest"
+            r["short_used"] = {"value": val, "source": src, "max": max_sh}
+            if val is None:
+                # الشورت غير معروف: ما يترشح (حده الأعلى رادار)
+                r["irtikaz"]["adjustments"].append({"name": "الشورت غير معروف", "pts": 0,
+                                                    "detail": "ما يترشح لين يتأكد إن الشورت 50 ألف أو أقل"})
+                if r["irtikaz"]["status"] in ("ready", "near"):
+                    r["irtikaz"]["status"] = "radar"
+                if r["momentum"]["status"] != "no":
+                    r["momentum"]["status"] = "no"
+            elif val > max_sh and not explicit:
+                del results[t]
+
     min_s = cfg["scan"]["report_min_score"]
     rows = [r for r in results.values()
             if explicit or max(r["irtikaz"]["score"], r["momentum"]["score"]) >= min_s]
