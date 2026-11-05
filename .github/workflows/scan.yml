@@ -24,5 +24,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python diag/backtest.py
-        timeout-minutes: 80
+      - run: python diag/fintel.py
