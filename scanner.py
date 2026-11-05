@@ -345,6 +345,8 @@ def deep_scan(results: dict, cfg):
     log(f"  أخبار: {n_news} (مترجم {n_tr}) · كاملة {sum(1 for x in allnews if x.get('full'))} · "
         f"إيجابي {sum(1 for x in allnews if x.get('sentiment') == 'positive')} · "
         f"سلبي {sum(1 for x in allnews if x.get('sentiment') == 'negative')}")
+    for x in allnews[:40]:
+        print(f"    [{x.get('sentiment')}] {x['title'][:110]} | +{x.get('why_pos')} -{x.get('why_neg')}", flush=True)
 
     # فريم 4 ساعات (يشمل البري والأفتر)
     try:
