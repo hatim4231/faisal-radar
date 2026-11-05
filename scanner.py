@@ -243,6 +243,41 @@ def translate_ar(texts: list[str]) -> list[str]:
     return out
 
 
+def load_ib_short() -> dict[str, dict]:
+    """
+    الشورت المتاح للاقتراض لكل الأسهم الأمريكية دفعة وحدة، من ملف Interactive Brokers العام
+    (نفس المصدر اللي يستخدمه iBorrowDesk). يتحدث كل ~15 دقيقة.
+    """
+    from ftplib import FTP
+    buf = io.BytesIO()
+    ftp = FTP("ftp2.interactivebrokers.com", timeout=60)
+    ftp.login("shortstock", "")
+    ftp.retrbinary("RETR usa.txt", buf.write)
+    ftp.quit()
+    out, stamp = {}, ""
+    for line in buf.getvalue().decode("utf-8", "ignore").splitlines():
+        if line.startswith("#BOF"):
+            stamp = " ".join(line.split("|")[1:3])
+            continue
+        if line.startswith("#"):
+            continue
+        p = line.split("|")
+        if len(p) < 8:
+            continue
+        sym, fee, avail = p[0].strip(), p[6].strip(), p[7].strip()
+        try:
+            a = int(avail.lstrip(">").replace(",", "")) if avail else None
+        except ValueError:
+            a = None
+        try:
+            f = float(fee) if fee and fee.upper() != "NA" else None
+        except ValueError:
+            f = None
+        out[sym.replace(".", "-").replace(" ", "-")] = {"available": a, "fee": f, "date": stamp,
+                                                       "more_than": avail.startswith(">")}
+    return out
+
+
 def short_available(t: str) -> dict | None:
     """الشورت المتاح للاقتراض (اللي يقصده فيصل بـ "شورت 10 آلاف") من iBorrowDesk."""
     import requests
@@ -303,16 +338,9 @@ def deep_scan(results: dict, cfg):
                     c["detail"] = "يوجد خبر خلال آخر 36 ساعة" if fresh else ("آخر خبر قديم" if n else "لا توجد أخبار")
             m["score"] = round(min(100, m["score"] + (10 if fresh else 0)), 1)
 
-    # الشورت المتاح للاقتراض
-    with ThreadPoolExecutor(6) as ex:
-        for t, sa in zip(syms, ex.map(short_available, syms)):
-            if sa:
-                results[t]["short_available"] = sa
-
     n_news = sum(len(results[t].get("news", [])) for t in syms)
     n_tr = sum(1 for t in syms for x in results[t].get("news", []) if x.get("title_ar") and x["title_ar"] != x["title"])
-    n_sa = sum(1 for t in syms if results[t].get("short_available"))
-    log(f"  أخبار: {n_news} (مترجم {n_tr}) · شورت متاح: {n_sa}/{len(syms)} سهم")
+    log(f"  أخبار: {n_news} (مترجم {n_tr})")
 
     # فريم 4 ساعات (يشمل البري والأفتر)
     try:
@@ -397,6 +425,12 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     log(f"بعد فلتر السعر والفوليوم: {len(pre)} سهم")
 
     infos = get_info(list(pre), cfg)
+    try:
+        ib_short = load_ib_short()
+        log(f"الشورت المتاح (Interactive Brokers): {len(ib_short)} سهم")
+    except Exception as e:
+        ib_short = {}
+        log("الشورت المتاح ما اشتغل:", repr(e)[:150])
     results = {}
     for t, d in pre.items():
         try:
@@ -414,6 +448,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         a["sector"] = inf.get("sector") or inf.get("industry")
         a["country"] = inf.get("country")
         a["exchange"] = inf.get("exchange")
+        if t in ib_short:
+            a["short_available"] = ib_short[t]
         results[t] = a
 
     if deep and results:
