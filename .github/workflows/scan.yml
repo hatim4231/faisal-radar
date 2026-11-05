@@ -1,0 +1,60 @@
+name: رادار فيصل - مسح السوق
+
+on:
+  schedule:
+    # بتوقيت UTC، من الاثنين للجمعة (السوق الأمريكي)
+    - cron: "17 12 * * 1-5"   # قبل الافتتاح (بري ماركت)
+    - cron: "47 14 * * 1-5"   # بعد الافتتاح بساعة تقريباً
+    - cron: "17 17 * * 1-5"   # منتصف الجلسة
+    - cron: "37 20 * * 1-5"   # بعد الإغلاق
+  workflow_dispatch:          # زر Run workflow للتحديث اليدوي (حتى من الجوال)
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: كاش بيانات الشركات (يسرّع المسح)
+        uses: actions/cache@v4
+        with:
+          path: cache
+          key: info-${{ github.run_id }}
+          restore-keys: info-
+
+      - name: المسح
+        run: python scanner.py --no-open --out site/index.html
+
+      - name: نسخ ملف Excel
+        run: cp output/latest.csv site/latest.csv
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: scan
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,540 @@
+#!/usr/bin/env python3
+"""
+رادار طريقة فيصل — ماسح الأسهم الأمريكية الصغيرة (Penny / Small caps)
+
+الاستخدام:
+    python scanner.py                 # مسح كامل لسوق ناسداك وفتح التقرير
+    python scanner.py --serve         # يشغل موقع محلي http://127.0.0.1:8765 فيه زر تحديث
+    python scanner.py --tickers BJDX,GDHG,LFS     # فحص أسهم محددة فقط
+    python scanner.py --watchlist my_list.txt     # فحص قائمتك (سهم في كل سطر)
+    python scanner.py --demo          # تقرير تجريبي ببيانات وهمية (بدون إنترنت)
+
+المصدر: Yahoo Finance عبر مكتبة yfinance (مجانية، بتأخير ~15 دقيقة).
+"""
+from __future__ import annotations
+
+import argparse
+import io
+import json
+import os
+import sys
+import threading
+import time
+import traceback
+import webbrowser
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
+from pathlib import Path
+
+import pandas as pd
+
+import faisal_rules as fr
+import report
+
+ROOT = Path(__file__).resolve().parent
+CACHE = ROOT / "cache"
+OUT = ROOT / "output"
+CACHE.mkdir(exist_ok=True)
+OUT.mkdir(exist_ok=True)
+
+
+def log(*a):
+    print(datetime.now().strftime("%H:%M:%S"), *a, flush=True)
+
+
+def load_cfg(path: Path | None = None) -> dict:
+    p = path or ROOT / "config.json"
+    with open(p, encoding="utf-8") as f:
+        return json.load(f)
+
+
+# ----------------------------------------------------------------------------
+# 1) قائمة الأسهم (Universe)
+# ----------------------------------------------------------------------------
+
+YAHOO_EXCH = {"NASDAQ": ["NMS", "NCM", "NGM"], "NYSE_AMERICAN": ["ASE"], "NYSE": ["NYQ"]}
+
+
+def universe_from_yahoo_screener(cfg) -> list[str]:
+    """أسرع طريقة: فلتر ياهو نفسه (سعر/فوليوم/قيمة سوقية) قبل ما نحمل الشارتات."""
+    import yfinance as yf
+    from yfinance import EquityQuery as Q
+
+    U = cfg["universe"]
+    exch = sum((YAHOO_EXCH.get(e, []) for e in U["exchanges"]), [])
+    q = Q("and", [
+        Q("is-in", ["exchange", *exch]),
+        Q("lt", ["intradayprice", U["max_price"]]),
+        Q("gt", ["intradayprice", U["min_price"]]),
+        Q("gt", ["avgdailyvol3m", U["min_avg_volume"] * 0.5]),
+        Q("lt", ["intradaymarketcap", U["max_market_cap"] * 1.5]),
+    ])
+    out, offset = [], 0
+    while True:
+        res = yf.screen(q, size=250, offset=offset, sortField="intradaymarketcap", sortAsc=True)
+        quotes = res.get("quotes", []) if isinstance(res, dict) else []
+        out += [x["symbol"] for x in quotes if x.get("symbol")]
+        total = res.get("total", 0) if isinstance(res, dict) else 0
+        offset += 250
+        if not quotes or offset >= total or offset > 5000:
+            break
+    return sorted(set(out))
+
+
+def universe_from_nasdaqtrader(cfg) -> list[str]:
+    """البديل: قائمة كل أسهم ناسداك الرسمية ثم نفلتر السعر بأنفسنا."""
+    import requests
+    syms = []
+    bad_words = ("Warrant", "Unit", " Right", "Preferred", "Notes", "Debenture")
+    want = cfg["universe"]["exchanges"]
+    if "NASDAQ" in want:
+        txt = requests.get("https://www.nasdaqtrader.com/dynamic/SymDir/nasdaqlisted.txt", timeout=30).text
+        df = pd.read_csv(io.StringIO(txt), sep="|")
+        df = df[(df["Test Issue"] == "N") & (df["ETF"] == "N")]
+        df = df[~df["Security Name"].astype(str).str.contains("|".join(bad_words))]
+        syms += df["Symbol"].dropna().astype(str).tolist()
+    if any(e in want for e in ("NYSE", "NYSE_AMERICAN")):
+        txt = requests.get("https://www.nasdaqtrader.com/dynamic/SymDir/otherlisted.txt", timeout=30).text
+        df = pd.read_csv(io.StringIO(txt), sep="|")
+        codes = (["A"] if "NYSE_AMERICAN" in want else []) + (["N"] if "NYSE" in want else [])
+        df = df[(df["Test Issue"] == "N") & (df["ETF"] == "N") & (df["Exchange"].isin(codes))]
+        df = df[~df["Security Name"].astype(str).str.contains("|".join(bad_words))]
+        syms += df["ACT Symbol"].dropna().astype(str).tolist()
+    syms = [s.replace(".", "-") for s in syms if "$" not in s and s.isascii()]
+    return sorted(set(syms))
+
+
+def get_universe(cfg) -> list[str]:
+    try:
+        u = universe_from_yahoo_screener(cfg)
+        if len(u) >= 20:
+            log(f"قائمة الأسهم من فلتر ياهو: {len(u)} سهم")
+            return u
+        log("فلتر ياهو رجع نتائج قليلة، أجرب قائمة ناسداك الرسمية...")
+    except Exception as e:
+        log("فلتر ياهو ما اشتغل:", repr(e)[:200])
+    u = universe_from_nasdaqtrader(cfg)
+    log(f"قائمة الأسهم من nasdaqtrader: {len(u)} سهم (بيتم فلترة السعر بعد التحميل)")
+    return u
+
+
+# ----------------------------------------------------------------------------
+# 2) تحميل الشارتات اليومية + بيانات الشركة
+# ----------------------------------------------------------------------------
+
+def download_daily(tickers: list[str], cfg) -> dict[str, pd.DataFrame]:
+    import yfinance as yf
+    S = cfg["scan"]
+    out: dict[str, pd.DataFrame] = {}
+    bs = S["batch_size"]
+    for i in range(0, len(tickers), bs):
+        batch = tickers[i:i + bs]
+        log(f"تحميل الشارت اليومي {i + 1}-{i + len(batch)} من {len(tickers)}")
+        for attempt in range(3):
+            try:
+                data = yf.download(batch, period=S["history_period"], interval="1d",
+                                   group_by="ticker", actions=True, auto_adjust=False,
+                                   threads=True, progress=False)
+                break
+            except Exception as e:
+                log("  خطأ تحميل، إعادة المحاولة:", repr(e)[:120])
+                time.sleep(3 * (attempt + 1))
+        else:
+            continue
+        if data is None or data.empty:
+            continue
+        for t in batch:
+            try:
+                if isinstance(data.columns, pd.MultiIndex):
+                    if t not in data.columns.get_level_values(0):
+                        continue
+                    d = data[t].copy()
+                else:
+                    d = data.copy()
+                d = d.dropna(subset=["Close"])
+                if len(d) >= 60:
+                    d.index = pd.to_datetime(d.index).tz_localize(None)
+                    out[t] = d
+            except Exception:
+                pass
+    return out
+
+
+INFO_KEYS = ["marketCap", "floatShares", "sharesOutstanding", "sharesShort",
+             "shortPercentOfFloat", "shortRatio", "exchange", "longName", "shortName",
+             "sector", "industry", "country", "dateShortInterest"]
+
+
+def get_info(tickers: list[str], cfg) -> dict[str, dict]:
+    import yfinance as yf
+    day = datetime.now().strftime("%Y%m%d")
+    path = CACHE / f"info_{day}.json"
+    cache = {}
+    if path.exists():
+        try:
+            cache = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            cache = {}
+    need = [t for t in tickers if t not in cache]
+    if need:
+        log(f"تحميل بيانات الشركات (فلووت/شورت/قيمة سوقية) لـ {len(need)} سهم...")
+
+        def one(t):
+            for attempt in range(2):
+                try:
+                    inf = yf.Ticker(t).info or {}
+                    return t, {k: inf.get(k) for k in INFO_KEYS}
+                except Exception:
+                    time.sleep(1.5)
+            return t, {}
+
+        done = 0
+        with ThreadPoolExecutor(cfg["scan"]["info_workers"]) as ex:
+            for fut in as_completed([ex.submit(one, t) for t in need]):
+                t, inf = fut.result()
+                cache[t] = inf
+                done += 1
+                if done % 50 == 0:
+                    log(f"  {done}/{len(need)}")
+                    path.write_text(json.dumps(cache), encoding="utf-8")
+        path.write_text(json.dumps(cache), encoding="utf-8")
+    return {t: cache.get(t, {}) for t in tickers}
+
+
+# ----------------------------------------------------------------------------
+# 3) التحليل العميق للمرشحين: الأخبار، فريم 4 ساعات، الفواب
+# ----------------------------------------------------------------------------
+
+def parse_news(items) -> list[dict]:
+    out = []
+    for it in items or []:
+        c = it.get("content", it)
+        title = c.get("title")
+        if not title:
+            continue
+        url = (c.get("canonicalUrl") or {}).get("url") or c.get("link")
+        prov = (c.get("provider") or {}).get("displayName") or c.get("publisher")
+        ts = c.get("pubDate") or c.get("providerPublishTime")
+        if isinstance(ts, (int, float)):
+            ts = datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
+        out.append({"title": title, "url": url, "source": prov, "time": ts})
+    return out[:6]
+
+
+def deep_scan(results: dict, cfg):
+    import yfinance as yf
+    S = cfg["scan"]
+    cands = sorted(results.values(),
+                   key=lambda r: -max(r["irtikaz"]["score"], r["momentum"]["score"]))
+    cands = [r for r in cands if max(r["irtikaz"]["score"], r["momentum"]["score"]) >= S["deep_scan_min_score"]]
+    cands = cands[:S["deep_scan_max"]]
+    if not cands:
+        return
+    syms = [r["symbol"] for r in cands]
+    log(f"تحليل عميق (أخبار + فريم 4 ساعات) لأفضل {len(syms)} سهم...")
+
+    # الأخبار
+    def news(t):
+        try:
+            return t, parse_news(yf.Ticker(t).news)
+        except Exception:
+            return t, []
+
+    with ThreadPoolExecutor(6) as ex:
+        for t, n in ex.map(news, syms):
+            results[t]["news"] = n
+            fresh = False
+            for x in n:
+                try:
+                    ts = pd.Timestamp(x["time"])
+                    ts = ts.tz_convert(None) if ts.tzinfo else ts
+                    if (pd.Timestamp.utcnow().tz_localize(None) - ts).total_seconds() < 36 * 3600:
+                        fresh = True
+                except Exception:
+                    pass
+            m = results[t]["momentum"]
+            for c in m["checks"]:
+                if c["key"] == "news":
+                    c["ok"] = fresh
+                    c["got"] = 10 if fresh else 0
+                    c["progress"] = 1 if fresh else 0
+                    c["detail"] = "يوجد خبر خلال آخر 36 ساعة" if fresh else ("آخر خبر قديم" if n else "لا توجد أخبار")
+            m["score"] = round(min(100, m["score"] + (10 if fresh else 0)), 1)
+
+    # فريم 4 ساعات (يشمل البري والأفتر)
+    try:
+        h = yf.download(syms, period="60d", interval="1h", prepost=True, group_by="ticker",
+                        auto_adjust=False, threads=True, progress=False)
+        for t in syms:
+            try:
+                d = h[t] if isinstance(h.columns, pd.MultiIndex) else h
+                d = d.dropna(subset=["Close"])
+                d.index = pd.to_datetime(d.index)
+                d4 = d.resample("4h").agg({"Open": "first", "High": "max", "Low": "min",
+                                           "Close": "last", "Volume": "sum"}).dropna()
+                if len(d4) < 20:
+                    continue
+                r4 = fr.rsi(d4["Close"]).iloc[-1]
+                last30 = d4.tail(30)  # ~5 جلسات كاملة
+                lowest = float(last30["Low"].min())
+                broken = float(d4["Low"].tail(3).min()) < lowest * 1.0001 and \
+                    int(last30["Low"].values.argmin()) >= len(last30) - 3
+                # تذبذب 4 ساعات: هل فيه شموع طويلة بدون جسم تصل 20% (قروبات)؟
+                rng = ((d4["High"] - d4["Low"]) / d4["Close"] * 100).tail(60)
+                pumps4 = int((rng >= 20).sum())
+                results[t]["h4"] = {"rsi": round(float(r4), 1), "low5": round(lowest, 4),
+                                    "new_low_recent": bool(broken), "big_candles": pumps4}
+            except Exception:
+                pass
+    except Exception as e:
+        log("  فريم 4 ساعات ما اشتغل:", repr(e)[:120])
+
+    # الفواب لمرشحين الزخم (5 دقائق اليوم)
+    mom = [r["symbol"] for r in cands if r["momentum"]["status"] != "no"][:25]
+    if mom:
+        try:
+            m5 = yf.download(mom, period="1d", interval="5m", group_by="ticker",
+                             auto_adjust=False, threads=True, progress=False)
+            for t in mom:
+                try:
+                    d = m5[t] if isinstance(m5.columns, pd.MultiIndex) else m5
+                    d = d.dropna(subset=["Close"])
+                    if d.empty:
+                        continue
+                    tp = (d["High"] + d["Low"] + d["Close"]) / 3
+                    vwap = float((tp * d["Volume"]).cumsum().iloc[-1] / max(1, d["Volume"].sum()))
+                    last = float(d["Close"].iloc[-1])
+                    first5 = d.iloc[0]
+                    results[t]["vwap"] = {"vwap": round(vwap, 4), "above": last > vwap,
+                                          "first5_high": round(float(first5["High"]), 4)}
+                    m = results[t]["momentum"]
+                    m["checks"].append({"key": "vwap", "title": "السعر فوق الفواب (VWAP)", "weight": 10,
+                                        "got": 10 if last > vwap else 0, "ok": last > vwap,
+                                        "detail": f"VWAP {fr.fmt_price(vwap)} / السعر {fr.fmt_price(last)}",
+                                        "remaining": "" if last > vwap else f"باقي {fr.pct(vwap, last):.1f}% ليرجع فوق الفواب",
+                                        "progress": 1 if last > vwap else 0})
+                    if last <= vwap:
+                        m["score"] = round(max(0, m["score"] - 10), 1)
+                except Exception:
+                    pass
+        except Exception as e:
+            log("  الفواب ما اشتغل:", repr(e)[:120])
+
+
+# ----------------------------------------------------------------------------
+# 4) التشغيل الكامل
+# ----------------------------------------------------------------------------
+
+def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
+    t0 = time.time()
+    explicit = tickers is not None
+    if tickers is None:
+        tickers = get_universe(cfg)
+    tickers = [t.strip().upper() for t in tickers if t.strip()]
+    daily = download_daily(tickers, cfg)
+    log(f"وصلت شارتات {len(daily)} سهم")
+
+    U = cfg["universe"]
+    pre = {}
+    for t, d in daily.items():
+        last = float(d["Close"].iloc[-1])
+        avgv = float(d["Volume"].tail(30).mean())
+        if explicit or (U["min_price"] <= last <= U["max_price"] and avgv >= U["min_avg_volume"] * 0.7):
+            pre[t] = d
+    log(f"بعد فلتر السعر والفوليوم: {len(pre)} سهم")
+
+    infos = get_info(list(pre), cfg)
+    results = {}
+    for t, d in pre.items():
+        try:
+            a = fr.analyze(d, infos.get(t), cfg)
+        except Exception:
+            log(f"  خطأ في تحليل {t}:", traceback.format_exc(limit=1).splitlines()[-1])
+            continue
+        if not a:
+            continue
+        if a["gate_fail"] and not explicit:
+            continue
+        inf = infos.get(t) or {}
+        a["symbol"] = t
+        a["name"] = inf.get("shortName") or inf.get("longName") or t
+        a["sector"] = inf.get("sector") or inf.get("industry")
+        a["country"] = inf.get("country")
+        a["exchange"] = inf.get("exchange")
+        results[t] = a
+
+    if deep and results:
+        deep_scan(results, cfg)
+
+    # قرار نهائي على فريم 4 ساعات
+    for r in results.values():
+        h4 = r.get("h4")
+        if h4 and h4.get("new_low_recent"):
+            r["irtikaz"]["adjustments"].append({"name": "قاع جديد على 4 ساعات", "pts": -5,
+                                                "detail": "كسر أدنى قاع آخر 5 جلسات على فريم 4 ساعات"})
+            r["irtikaz"]["score"] = max(0, r["irtikaz"]["score"] - 5)
+
+    min_s = cfg["scan"]["report_min_score"]
+    rows = [r for r in results.values()
+            if explicit or max(r["irtikaz"]["score"], r["momentum"]["score"]) >= min_s]
+    rows.sort(key=lambda r: -r["irtikaz"]["score"])
+    payload = {
+        "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "source": "Yahoo Finance (yfinance) — تأخير ~15 دقيقة",
+        "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
+        "config": cfg, "stocks": rows,
+    }
+    (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
+    write_csv(rows)
+    log(f"خلص المسح في {payload['seconds']} ثانية — {len(rows)} سهم في التقرير")
+    return payload
+
+
+def write_csv(rows):
+    recs = []
+    for r in rows:
+        p = r["plan"]
+        recs.append({
+            "السهم": r["symbol"], "السعر": r["price"], "التغير%": r["change_pct"],
+            "جاهزية الارتكاز": r["irtikaz"]["score"], "حالة الارتكاز": r["irtikaz"]["status"],
+            "جاهزية الزخم": r["momentum"]["score"], "RSI": r["rsi"],
+            "الدعم": p["support"], "البعد عن الدعم%": p["dist_support_pct"],
+            "منطقة الطلب": f"{p['entry_zone'][0]} - {p['entry_zone'][1]}", "الوقف": p["stop"],
+            "الهدف الأول": p["t1"], "الأهداف الأربعة": " / ".join(str(x) for x in p["four_targets"]),
+            "فلووت(M)": round(r["float"] / 1e6, 2) if r.get("float") else None,
+            "RVOL": r["rel_volume"], "السلوك": "، ".join(r["tags"]),
+        })
+    pd.DataFrame(recs).to_csv(OUT / "latest.csv", index=False, encoding="utf-8-sig")
+
+
+# ----------------------------------------------------------------------------
+# 5) موقع محلي فيه زر تحديث
+# ----------------------------------------------------------------------------
+
+def serve(cfg, port: int, tickers, interval_min: int):
+    from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+
+    state = {"running": False, "last_error": None}
+    lock = threading.Lock()
+
+    def scan_bg():
+        with lock:
+            if state["running"]:
+                return
+            state["running"] = True
+        try:
+            p = run_scan(load_cfg(), tickers)
+            report.write(p, OUT / "faisal_report.html", live=True)
+            state["last_error"] = None
+        except Exception as e:
+            state["last_error"] = repr(e)
+            log("خطأ في المسح:", traceback.format_exc())
+        finally:
+            state["running"] = False
+
+    class H(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def _send(self, code, body: bytes, ctype="text/html; charset=utf-8"):
+            self.send_response(code)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            if self.path.startswith("/api/status"):
+                latest = OUT / "latest.json"
+                gen = None
+                if latest.exists():
+                    try:
+                        gen = json.loads(latest.read_text(encoding="utf-8"))["generated_at"]
+                    except Exception:
+                        pass
+                self._send(200, json.dumps({"running": state["running"], "generated_at": gen,
+                                            "error": state["last_error"]}).encode(), "application/json")
+            elif self.path.startswith("/api/rescan"):
+                threading.Thread(target=scan_bg, daemon=True).start()
+                self._send(200, b'{"ok":true}', "application/json")
+            else:
+                f = OUT / "faisal_report.html"
+                if not f.exists():
+                    self._send(200, report.waiting_page().encode())
+                else:
+                    self._send(200, f.read_bytes())
+
+    def loop():
+        while True:
+            scan_bg()
+            if not interval_min:
+                return
+            time.sleep(interval_min * 60)
+
+    threading.Thread(target=loop, daemon=True).start()
+    srv = ThreadingHTTPServer(("127.0.0.1", port), H)
+    url = f"http://127.0.0.1:{port}"
+    log(f"الموقع شغال: {url}   (Ctrl+C للإيقاف)")
+    try:
+        webbrowser.open(url)
+    except Exception:
+        pass
+    srv.serve_forever()
+
+
+def main():
+    ap = argparse.ArgumentParser(description="رادار طريقة فيصل")
+    ap.add_argument("--tickers", help="أسهم محددة مفصولة بفاصلة")
+    ap.add_argument("--watchlist", help="ملف فيه سهم بكل سطر")
+    ap.add_argument("--serve", action="store_true", help="تشغيل موقع محلي")
+    ap.add_argument("--port", type=int, default=8765)
+    ap.add_argument("--every", type=int, default=0, help="مع --serve: إعادة المسح كل X دقيقة")
+    ap.add_argument("--no-deep", action="store_true", help="بدون أخبار و4 ساعات (أسرع)")
+    ap.add_argument("--no-open", action="store_true", help="لا تفتح المتصفح")
+    ap.add_argument("--demo", action="store_true", help="تقرير تجريبي ببيانات وهمية")
+    ap.add_argument("--config", help="مسار ملف إعدادات بديل")
+    ap.add_argument("--out", help="مسار ملف التقرير (يستخدم في GitHub Pages)")
+    args = ap.parse_args()
+
+    cfg = load_cfg(Path(args.config) if args.config else None)
+    tickers = None
+    if args.tickers:
+        tickers = args.tickers.split(",")
+    if args.watchlist:
+        tickers = (tickers or []) + [l.strip() for l in Path(args.watchlist).read_text(encoding="utf-8").splitlines()
+                                     if l.strip() and not l.startswith("#")]
+
+    if args.demo:
+        import demo_data
+        payload = demo_data.build(cfg)
+        out = OUT / "faisal_report_demo.html"
+        report.write(payload, out)
+        log(f"التقرير التجريبي: {out}")
+        if not args.no_open:
+            webbrowser.open(out.as_uri())
+        return
+
+    if args.serve:
+        serve(cfg, args.port, tickers, args.every)
+        return
+
+    payload = run_scan(cfg, tickers, deep=not args.no_deep)
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    if repo:  # يشتغل على GitHub Actions: زر "تحديث الآن" يفتح صفحة تشغيل المسح
+        payload["actions_url"] = f"https://github.com/{repo}/actions/workflows/scan.yml"
+    out = Path(args.out) if args.out else OUT / "faisal_report.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    report.write(payload, out)
+    log(f"التقرير: {out}")
+    log(f"ملف Excel/CSV: {OUT / 'latest.csv'}")
+    if not args.no_open:
+        webbrowser.open(out.as_uri())
+
+
+if __name__ == "__main__":
+    if sys.platform == "win32":
+        try:
+            sys.stdout.reconfigure(encoding="utf-8")
+        except Exception:
+            pass
+    main()

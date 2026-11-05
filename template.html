@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار طريقة فيصل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --info:#5b5bd6; --info-bg:#ececfd;
+  --up:#16a36a; --down:#e04848; --ma20:#e39a1c; --ma50:#7c5cd6; --zone:rgba(19,149,92,.13);
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+    --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+  --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.demo{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{outline:2px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;background:var(--panel2);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:inherit;padding:6px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
+input[type=search]{flex:1;min-width:140px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;display:grid;grid-template-columns:150px 1fr 210px;gap:14px;align-items:center}
+.row:hover{border-color:var(--accent)}
+.sym{font-weight:700;font-size:17px}
+.name{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.px{font-size:14px}
+.up{color:var(--up)} .down{color:var(--down)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:600}
+.left{font-size:13px;margin-top:5px}
+.left .k{color:var(--warn);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.tag.g{background:var(--good-bg);color:var(--good);border-color:transparent}
+.tag.w{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.tag.b{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag.i{background:var(--info-bg);color:var(--info);border-color:transparent}
+.score{display:flex;flex-direction:column;gap:5px}
+.score .top{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.badge.ready{background:var(--good-bg);color:var(--good)}
+.badge.near{background:var(--warn-bg);color:var(--warn)}
+.badge.radar{background:var(--info-bg);color:var(--info)}
+.badge.no{background:var(--panel2);color:var(--muted)}
+.pct{font-size:20px;font-weight:700}
+.bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+/* detail */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20}
+.overlay.on{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(860px,100%);background:var(--bg);z-index:21;overflow-y:auto;transform:translateX(-102%);transition:transform .2s ease;border-right:1px solid var(--line)}
+.drawer.on{transform:none}
+.dhead{position:sticky;top:0;background:var(--bg);padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:2}
+#dtitle{min-width:0;flex:1} #dtitle .name{white-space:normal} #dclose{flex-shrink:0}
+.dbody{padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.check{display:grid;grid-template-columns:22px 1fr 60px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);align-items:start}
+.check:last-child{border-bottom:0}
+.check .ic{font-size:15px;line-height:1.4}
+.check .t{font-weight:600;font-size:14px}
+.check .d{color:var(--muted);font-size:13px}
+.check .r{color:var(--warn);font-size:13px;font-weight:500}
+.check .p{font-size:12px;color:var(--muted);text-align:left}
+.mini{height:5px;background:var(--panel2);border-radius:99px;margin-top:4px;overflow:hidden}
+.mini i{display:block;height:100%}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pbox{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.pbox span{display:block;color:var(--muted);font-size:12px}
+.pbox b{font-size:16px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.news a{color:var(--accent);text-decoration:none}
+.news li{margin-bottom:6px;font-size:13.5px}
+.links a{color:var(--accent);margin-left:14px;font-size:13.5px;text-decoration:none}
+.note{font-size:12.5px;color:var(--muted)}
+.disc{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+ul.clean{margin:0;padding-right:18px}
+@media (max-width:820px){
+  .row{grid-template-columns:1fr;gap:8px}
+  .name{max-width:none}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .plan{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>📡 رادار طريقة فيصل</h1>
+      <div class="sub" id="meta"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn primary" id="rescan" style="display:none">🔄 تحديث المسح</button>
+      <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
+      <button class="btn" id="theme" title="الوضع الليلي">🌓</button>
+    </div>
+  </header>
+  <div id="demo" class="demo" style="display:none">⚠ هذا تقرير تجريبي ببيانات وهمية (رموز DEMO). شغّل <span class="ltr">python scanner.py</span> على جهازك للبيانات الحقيقية.</div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="toolbar">
+    <div class="tabs" id="tabs">
+      <button data-t="irtikaz" class="on">أسهم الارتكاز</button>
+      <button data-t="momentum">أسهم الزخم</button>
+    </div>
+    <input type="search" id="q" placeholder="ابحث برمز السهم...">
+    <select id="sort">
+      <option value="score">الأعلى جاهزية</option>
+      <option value="support">الأقرب للدعم</option>
+      <option value="rsi">الأقل RSI</option>
+      <option value="rvol">الأعلى RVOL</option>
+      <option value="float">الأقل فلووت</option>
+      <option value="upside">الأكبر مساحة صعود</option>
+    </select>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="list" id="list"></div>
+
+  <div class="disc">
+    هذا الرادار أداة تعليمية تطبّق القواعد المكتوبة في دليل طريقة فيصل بشكل آلي (RSI، المتوسطات، الدعم، الفوليوم، السلوك السابق، التقسيم، الشورت...).
+    هو ليس توصية شراء أو بيع. الأسهم الصغيرة وذات الفلووت القليل عالية الخطورة، والبيانات المجانية فيها تأخير وأحياناً أخطاء (خصوصاً الفلووت والشورت).
+    القاعدة: <b>السلوك أولاً، الدعم ثانياً، الثبات ثالثاً، الدخول أخيراً</b> — ولا تدخل إلا إذا عرفت وين بتطلع.
+  </div>
+</div>
+
+<div class="overlay" id="ov"></div>
+<aside class="drawer" id="dr" aria-hidden="true">
+  <div class="dhead">
+    <div id="dtitle"></div>
+    <button class="btn" id="dclose">✕ إغلاق</button>
+  </div>
+  <div class="dbody" id="dbody"></div>
+</aside>
+
+<script>
+const DATA = /*__DATA__*/null;
+const LIVE = /*__LIVE__*/false;
+const STATUS = {ready:"✅ مطابق", near:"🟡 قريب", radar:"👀 رادار", no:"غير مطابق"};
+const MSTATUS = {ready:"🚀 زخم قوي", near:"🟡 زخم محتمل", no:"لا يوجد زخم"};
+let tab = "irtikaz", filt = null, tagF = null;
+
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+document.getElementById("theme").onclick = () => {
+  const cur = document.documentElement.dataset.theme ||
+    (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark";
+  document.documentElement.dataset.theme = nx;
+  try{ localStorage.setItem("fr-theme", nx) }catch(e){}
+  if (openSym) openDetail(openSym);
+};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const fpct = (p, s=true) => p == null ? "-" : (s && p > 0 ? "+" : "") + (+p).toFixed(1) + "%";
+const fM = n => n == null ? "-" : n >= 1e9 ? (n/1e9).toFixed(2)+"B" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n >= 1e3 ? (n/1e3).toFixed(0)+"K" : String(n);
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const scoreColor = s => s >= 75 ? "var(--good)" : s >= 55 ? "var(--warn)" : s >= 35 ? "var(--info)" : "var(--muted)";
+
+const stocks = (DATA && DATA.stocks) || [];
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · تم فحص <span class="num">${DATA.scanned}</span> سهم · اجتاز الفلتر <span class="num">${DATA.passed_filter}</span> · ${esc(DATA.source)}` : "لا توجد بيانات";
+if (DATA && DATA.demo) $("#demo").style.display = "block";
+
+// ------- tiles
+function tiles(){
+  const c = k => stocks.filter(s => s.irtikaz.status === k).length;
+  const m = stocks.filter(s => s.momentum.status !== "no").length;
+  const T = [["ready","مطابق للشروط",c("ready")],["near","قريب (باقي شرط أو شرطين)",c("near")],
+             ["radar","تحت الرادار",c("radar")],["mom","زخم اليوم",m]];
+  $("#tiles").innerHTML = T.map(([k,l,n]) =>
+    `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n}</b><span>${l}</span></div>`).join("");
+  document.querySelectorAll(".tile").forEach(el => el.onclick = () => {
+    const k = el.dataset.k;
+    if (k === "mom"){ setTab("momentum"); filt = null; }
+    else { if (tab !== "irtikaz") setTab("irtikaz"); filt = filt === k ? null : k; }
+    render();
+  });
+}
+
+// ------- chips
+function chips(){
+  const all = {};
+  stocks.forEach(s => s.tags.forEach(t => all[t] = (all[t]||0)+1));
+  $("#chips").innerHTML = Object.entries(all).sort((a,b)=>b[1]-a[1]).map(([t,n]) =>
+    `<span class="chip ${tagF===t?"on":""}" data-t="${esc(t)}">${esc(t)} <span class="num">${n}</span></span>`).join("");
+  document.querySelectorAll(".chip").forEach(el => el.onclick = () => { tagF = tagF === el.dataset.t ? null : el.dataset.t; render(); });
+}
+
+function tagClass(t){
+  if (/⚠|امتثال|كسر/.test(t)) return "b";
+  if (/ارتكاز|سحب|Former/.test(t)) return "g";
+  if (/زخم|تقسيم/.test(t)) return "w";
+  return "i";
+}
+
+function setTab(t){
+  tab = t;
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+}
+document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { setTab(b.dataset.t); filt = null; render(); });
+$("#q").oninput = render; $("#sort").onchange = render;
+
+function remainingList(s){
+  const ch = tab === "irtikaz" ? s.irtikaz.checks : s.momentum.checks;
+  return ch.filter(c => !c.ok && c.remaining).sort((a,b)=>b.weight-a.weight).map(c => c.remaining);
+}
+
+function render(){
+  tiles(); chips();
+  const q = $("#q").value.trim().toUpperCase();
+  let L = stocks.filter(s => !q || s.symbol.includes(q) || (s.name||"").toUpperCase().includes(q));
+  if (tab === "momentum") L = L.filter(s => s.momentum.status !== "no" || q);
+  if (filt) L = L.filter(s => s.irtikaz.status === filt);
+  if (tagF) L = L.filter(s => s.tags.includes(tagF));
+  const key = $("#sort").value;
+  const sc = s => tab === "irtikaz" ? s.irtikaz.score : s.momentum.score;
+  const S = {
+    score: (a,b) => sc(b) - sc(a),
+    support: (a,b) => (a.plan.dist_support_pct ?? 1e9) - (b.plan.dist_support_pct ?? 1e9),
+    rsi: (a,b) => (a.rsi ?? 1e9) - (b.rsi ?? 1e9),
+    rvol: (a,b) => (b.rel_volume ?? 0) - (a.rel_volume ?? 0),
+    float: (a,b) => (a.float ?? 1e12) - (b.float ?? 1e12),
+    upside: (a,b) => (b.plan.upside_pct ?? -1e9) - (a.plan.upside_pct ?? -1e9),
+  };
+  L.sort(S[key]);
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">لا توجد أسهم بهذا الفلتر حالياً. ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
+  $("#list").innerHTML = L.map(s => {
+    const isI = tab === "irtikaz";
+    const score = isI ? s.irtikaz.score : s.momentum.score;
+    const st = isI ? s.irtikaz.status : s.momentum.status;
+    const rem = remainingList(s).slice(0,2);
+    const chg = s.change_pct;
+    const facts = isI ? [
+        ["RSI", s.rsi], ["عن الدعم", fpct(s.plan.dist_support_pct)], ["الدعم", fp(s.plan.support)],
+        ["فلووت", fM(s.float)], ["أول هدف", s.plan.t1 ? fp(s.plan.t1)+" ("+fpct(s.plan.upside_pct)+")" : "-"]
+      ] : [
+        ["RVOL", s.rel_volume ? s.rel_volume.toFixed(1)+"x" : "-"], ["فوليوم", fM(s.volume)],
+        ["Gap", fpct(s.gap_pct)], ["فلووت", fM(s.float)], ["RSI", s.rsi]
+      ];
+    const warn = !isI && s.momentum.warnings.length ? `<div class="left"><span class="k">⚠</span> ${esc(s.momentum.warnings[0])}</div>` : "";
+    return `<div class="row" data-s="${esc(s.symbol)}">
+      <div>
+        <div class="sym ltr">${esc(s.symbol)}</div>
+        <div class="name" title="${esc(s.name)}">${esc(s.name)}</div>
+        <div class="px"><span class="num">$${fp(s.price)}</span> <span class="num ${chg>=0?"up":"down"}">${fpct(chg)}</span></div>
+      </div>
+      <div>
+        <div class="facts">${facts.map(([k,v]) => `<span>${k}: <b class="num">${esc(v ?? "-")}</b></span>`).join("")}</div>
+        ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
+          (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
+        ${warn}
+        <div class="tags">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
+      </div>
+      <div class="score">
+        <div class="top"><span class="badge ${st}">${isI ? STATUS[st] : MSTATUS[st]}</span><span class="pct num" style="color:${scoreColor(score)}">${Math.round(score)}%</span></div>
+        <div class="bar"><i style="width:${score}%;background:${scoreColor(score)}"></i></div>
+        <div class="note">${isI ? "جاهزية سهم الارتكاز" : "قوة الزخم"}</div>
+      </div>
+    </div>`;
+  }).join("");
+  document.querySelectorAll(".row").forEach(el => el.onclick = () => openDetail(el.dataset.s));
+}
+
+// ------- chart (SVG candlesticks + levels)
+function chartSVG(s){
+  const c = s.chart, n = c.c.length, W = 800, H = 330, VH = 50, pad = {l:8, r:58, t:10, b:22};
+  const p = s.plan;
+  const levels = [];
+  if (p.entry_zone[0]) levels.push(p.entry_zone[0], p.entry_zone[1]);
+  if (p.stop) levels.push(p.stop);
+  (p.four_targets||[]).forEach(x => levels.push(x));
+  let lo = Math.min(...c.l.filter(x=>x!=null)), hi = Math.max(...c.h.filter(x=>x!=null));
+  const vis = levels.filter(x => x != null && x < hi * 1.6 && x > lo * 0.6);
+  lo = Math.min(lo, ...vis) * 0.97; hi = Math.max(hi, ...vis) * 1.03;
+  const ph = H - VH - pad.t - pad.b;
+  const y = v => pad.t + (hi - v) / (hi - lo) * ph;
+  const cw = (W - pad.l - pad.r) / n;
+  const x = i => pad.l + i * cw + cw / 2;
+  const up = cssv("--up"), dn = cssv("--down"), line = cssv("--line"), muted = cssv("--muted");
+  let g = "";
+  // grid
+  for (let k = 0; k <= 4; k++){ const v = lo + (hi-lo)*k/4; g += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${line}" stroke-width="1"/><text x="${W-pad.r+4}" y="${y(v)+4}" fill="${muted}" font-size="11">${fp(v)}</text>`; }
+  // entry zone
+  if (p.entry_zone[0]) g += `<rect x="${pad.l}" width="${W-pad.l-pad.r}" y="${y(p.entry_zone[1])}" height="${Math.max(1,y(p.entry_zone[0])-y(p.entry_zone[1]))}" fill="${cssv("--zone")}"/>`;
+  const hl = (v, col, label, dash) => v == null || v > hi || v < lo ? "" :
+    `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="5 4"':""}/><text x="${pad.l+4}" y="${y(v)-4}" fill="${col}" font-size="11" font-weight="600">${label} ${fp(v)}</text>`;
+  g += hl(p.support, cssv("--good"), "الدعم", false);
+  g += hl(p.stop, cssv("--bad"), "الوقف", true);
+  (p.four_targets||[]).forEach((t,i) => g += hl(t, cssv("--accent"), "هدف "+(i+1), true));
+  // MAs
+  const path = arr => { let d = "", on = false; arr.forEach((v,i) => { if (v == null || v > hi || v < lo){ on = false; return; } d += (on ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); on = true; }); return d; };
+  g += `<path d="${path(c.ma20)}" fill="none" stroke="${cssv("--ma20")}" stroke-width="1.4"/>`;
+  g += `<path d="${path(c.ma50)}" fill="none" stroke="${cssv("--ma50")}" stroke-width="1.4"/>`;
+  // candles
+  const vmax = Math.max(...c.v);
+  for (let i = 0; i < n; i++){
+    const o = c.o[i], h = c.h[i], l = c.l[i], cl = c.c[i]; if (cl == null) continue;
+    const col = cl >= o ? up : dn, bw = Math.max(1, cw * 0.62);
+    g += `<line x1="${x(i)}" x2="${x(i)}" y1="${y(h)}" y2="${y(l)}" stroke="${col}" stroke-width="1"/>`;
+    g += `<rect x="${x(i)-bw/2}" width="${bw}" y="${y(Math.max(o,cl))}" height="${Math.max(1, Math.abs(y(o)-y(cl)))}" fill="${col}"/>`;
+    const vh = c.v[i] / vmax * (VH - 6);
+    g += `<rect x="${x(i)-bw/2}" width="${bw}" y="${H - pad.b - vh}" height="${vh}" fill="${col}" opacity=".45"/>`;
+  }
+  // dates
+  [[0,"start"], [Math.floor(n/2),"middle"], [n-1,"end"]].forEach(([i,a]) => g += `<text x="${x(i)}" y="${H-6}" fill="${muted}" font-size="11" text-anchor="${a}">${c.d[i]}</text>`);
+  return `<svg style="direction:ltr" viewBox="0 0 ${W} ${H}" role="img" aria-label="شارت ${esc(s.symbol)}">${g}</svg>`;
+}
+
+function checksHTML(list){
+  return list.map(c => {
+    const pc = Math.round((c.progress ?? (c.ok?1:0)) * 100);
+    const col = c.ok ? "var(--good)" : pc >= 50 ? "var(--warn)" : "var(--bad)";
+    return `<div class="check">
+      <div class="ic">${c.ok ? "✅" : pc >= 50 ? "🟡" : "❌"}</div>
+      <div><div class="t">${esc(c.title)}</div><div class="d">${esc(c.detail)}</div>${c.remaining ? `<div class="r">⏳ ${esc(c.remaining)}</div>` : ""}
+        <div class="mini"><i style="width:${pc}%;background:${col}"></i></div></div>
+      <div class="p num">${(+c.got).toFixed(0)}/${c.weight}</div></div>`;
+  }).join("");
+}
+
+let openSym = null;
+function openDetail(sym){
+  const s = stocks.find(x => x.symbol === sym); if (!s) return;
+  openSym = sym;
+  const p = s.plan, I = s.irtikaz, M = s.momentum;
+  $("#dtitle").innerHTML = `<span class="sym ltr">${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · ${esc(s.country||"")} · بيانات ${esc(s.date)}</div>`;
+  const rs = s.reverse_splits.length ? s.reverse_splits.map(r => `${r.ratio} (${r.date}، قبل ${r.days_ago} يوم)`).join("<br>") : "لا يوجد خلال سنتين";
+  const h4 = s.h4 ? `RSI 4س: <b class="num">${s.h4.rsi}</b> · ${s.h4.new_low_recent ? "<span style='color:var(--bad)'>كسر قاع 5 جلسات</span>" : "ما كسر قاع 5 جلسات ✓"} · شموع 20%+: <span class="num">${s.h4.big_candles}</span>` : "يظهر للمرشحين فقط";
+  const news = (s.news||[]).length ? `<ul class="clean news">${s.news.map(n => `<li>${n.url ? `<a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>` : esc(n.title)} <span class="note">— ${esc(n.source||"")} ${esc((n.time||"").slice(0,16).replace("T"," "))}</span></li>`).join("")}</ul>` : `<div class="note">لا توجد أخبار محملة</div>`;
+  $("#dbody").innerHTML = `
+    <div class="card">
+      <div class="grid2" style="align-items:center">
+        <div><div class="note">جاهزية سهم الارتكاز</div><div class="pct num" style="font-size:30px;color:${scoreColor(I.score)}">${Math.round(I.score)}%</div><span class="badge ${I.status}">${STATUS[I.status]}</span></div>
+        <div><div class="note">قوة الزخم اليوم</div><div class="pct num" style="font-size:30px;color:${scoreColor(M.score)}">${Math.round(M.score)}%</div><span class="badge ${M.status==="ready"?"ready":M.status==="near"?"near":"no"}">${MSTATUS[M.status]}</span></div>
+      </div>
+      <div style="margin-top:10px"><b>متى يكون جاهز؟</b><ul class="clean">${I.readiness.map(r => `<li>${esc(r)}</li>`).join("")}</ul></div>
+      <div class="tags" style="margin-top:8px">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
+    </div>
+
+    <div class="card chart"><h3>الشارت اليومي (آخر 100 جلسة)</h3>${chartSVG(s)}
+      <div class="legend"><span><i style="background:var(--ma20)"></i>MA20</span><span><i style="background:var(--ma50)"></i>MA50</span><span><i style="background:var(--good)"></i>الدعم</span><span><i style="background:var(--zone);height:9px"></i>منطقة الطلب</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--accent)"></i>الأهداف الأربعة</span></div>
+    </div>
+
+    <div class="card"><h3>📋 خطة فيصل المقترحة (Limit داخل منطقة الطلب — لا تشتري من العرض)</h3>
+      <div class="plan">
+        <div class="pbox"><span>الدعم الحقيقي</span><b class="num">${fp(p.support)}</b><span>${esc(p.support_kind)} · لمسات ${p.support_touches}</span></div>
+        <div class="pbox"><span>منطقة الطلب</span><b class="num">${fp(p.entry_zone[0])} – ${fp(p.entry_zone[1])}</b><span>السعر عنها ${fpct(p.dist_support_pct)}</span></div>
+        <div class="pbox"><span>وقف الخسارة (تحت القاع)</span><b class="num" style="color:var(--bad)">${fp(p.stop)}</b><span>كسره = خروج بدون عاطفة</span></div>
+        <div class="pbox"><span>الطلبات المقسمة</span><b class="num">${p.orders.map(fp).join(" / ")}</b><span>طلب 1 · 2 · 3</span></div>
+        <div class="pbox"><span>الهدف الأول (أول مقاومة)</span><b class="num" style="color:var(--good)">${fp(p.t1)}</b><span>${fpct(p.upside_pct)} · R:R ${p.rr ?? "-"}</span></div>
+        <div class="pbox"><span>الأهداف الأربعة (كل هدف 25%)</span><b class="num">${(p.four_targets||[]).map(fp).join(" / ") || "-"}</b><span>الهدف الرئيسي ${fp(p.main_target)}</span></div>
+      </div>
+      <div class="note" style="margin-top:8px">المقاومات فوق: <span class="num">${p.resistances.map(fp).join(" · ") || "-"}</span><br>
+      الشموع الساقطة (لم يرجع لها): <span class="num">${p.falling_candles.map(f => fp(f.top)+" ("+f.date+")").join(" · ") || "-"}</span><br>
+      فجوات غير مغطاة: <span class="num">${p.gaps.map(g => fp(g.from)+"→"+fp(g.to)).join(" · ") || "-"}</span></div>
+    </div>
+
+    <div class="card"><h3>✔ شروط سهم الارتكاز (${Math.round(I.base)} من 100 قبل تعديلات السلوك)</h3>${checksHTML(I.checks)}
+      ${I.adjustments.length ? `<div style="margin-top:10px"><b>تعديلات السلوك:</b><ul class="clean">${I.adjustments.map(a => `<li><b class="num" style="color:${a.pts>0?"var(--good)":"var(--bad)"}">${a.pts>0?"+":""}${a.pts}</b> ${esc(a.name)} — <span class="note">${esc(a.detail)}</span></li>`).join("")}</ul></div>` : ""}
+    </div>
+
+    <div class="card"><h3>⚡ شروط الزخم</h3>${checksHTML(M.checks)}
+      ${M.warnings.length ? `<div class="r" style="color:var(--warn);margin-top:8px">${M.warnings.map(esc).join("<br>")}</div>` : ""}
+      ${s.vwap ? `<div class="note" style="margin-top:6px">VWAP: <span class="num">${fp(s.vwap.vwap)}</span> · قمة أول 5 دقائق: <span class="num">${fp(s.vwap.first5_high)}</span></div>` : ""}
+    </div>
+
+    <div class="grid2">
+      <div class="card"><h3>📊 بيانات السهم</h3><dl class="kv">
+        <dt>القيمة السوقية</dt><dd class="num">${fM(s.market_cap)}</dd>
+        <dt>الفلووت</dt><dd class="num">${fM(s.float)}</dd>
+        <dt>عدد الأسهم</dt><dd class="num">${fM(s.shares_out)}</dd>
+        <dt>الشورت</dt><dd class="num">${fM(s.short_shares)} ${s.short_pct_float!=null?"("+s.short_pct_float+"% من الفلووت)":""}</dd>
+        <dt>قيمة الشورت / القيمة السوقية</dt><dd class="num">${s.short_to_mcap!=null?s.short_to_mcap+"%":"-"}</dd>
+        <dt>فوليوم اليوم / المتوسط</dt><dd class="num">${fM(s.volume)} / ${fM(s.avg_volume)} (${s.rel_volume ?? "-"}x)</dd>
+        <dt>RSI يومي</dt><dd class="num">${s.rsi} (أدنى 10 أيام ${s.rsi_min10})</dd>
+        <dt>MA20 / 30 / 50 / 200</dt><dd class="num">${fp(s.ma[20])} / ${fp(s.ma[30])} / ${fp(s.ma[50])} / ${fp(s.ma[200])}</dd>
+        <dt>قمة/قاع 52 أسبوع</dt><dd class="num">${fp(s.hi52)} / ${fp(s.lo52)} (${fpct(s.drawdown_pct)})</dd>
+      </dl></div>
+      <div class="card"><h3>🧠 السلوك</h3><dl class="kv">
+        <dt>Former Runner</dt><dd>${s.former_runner.max_pct >= 100 ? "✅ " : ""}<span class="num">+${s.former_runner.max_pct}%</span> <span class="note">${esc(s.former_runner.date||"")}</span></dd>
+        <dt>التقسيم العكسي</dt><dd class="num">${rs}</dd>
+        <dt>تحت 1$ (امتثال ناسداك)</dt><dd>${s.below_1_streak >= 30 ? `<span style="color:var(--bad)">${s.below_1_streak} جلسة متتالية — احتمال تقسيم عكسي (مهلة 180 يوم)</span>` : s.below_1_streak ? s.below_1_streak+" جلسة" : "لا"}</dd>
+        <dt>شموع قروبات</dt><dd>${s.pump_candles >= 2 ? `<span style="color:var(--bad)">⚠ ${s.pump_candles} آخر 30 يوم</span>` : s.pump_candles}</dd>
+        <dt>التذبذب اليومي</dt><dd class="num">${s.median_range_pct}% ${s.quiet ? "(هادئ ≤10% — خالٍ من القروبات)" : ""}</dd>
+        <dt>نموذج W</dt><dd>${s.w ? `قاعين ${fp(s.w.low1)}/${fp(s.w.low2)} · خط العنق ${fp(s.w.neck)} · ${s.w.broken ? "مكسور ✓ (يحتاج ثبات)" : "باقي "+fpct(s.w.to_neck_pct)}` : "-"}</dd>
+        <dt>سحب سيولة</dt><dd>${s.sweep ? `إلى ${fp(s.sweep.sweep_low)} (${s.sweep.date}) ثم استرداد ✓` : "-"}</dd>
+        <dt>صعد من قاع 20 يوم</dt><dd class="num">${fpct(s.up_from_low20_pct)}</dd>
+        <dt>فريم 4 ساعات</dt><dd>${h4}</dd>
+      </dl></div>
+    </div>
+
+    <div class="card"><h3>📰 الأخبار</h3>${news}<div class="note">الخبر محفز، وليس سبب دخول إذا الشارت غير جاهز.</div></div>
+
+    <div class="card"><h3>✋ قائمة فحص قبل الدخول (يدوي)</h3><ul class="clean">
+      <li>ما نوع السهم: زخم أم ارتكاز؟</li><li>أين الدعم الحقيقي؟ وأين وقف الخسارة؟</li>
+      <li>هل الفوليوم يؤكد؟ وهل السعر فوق الفواب (في الزخم)؟</li><li>هل دخلت متأخر؟ (صعد 20-50% = مطاردة)</li>
+      <li>شوف شمعة المضارب مقابل شمعة القروب على ويبل: شمعة المضارب سيولتها عالية وتتعدى 50% بلحظة، القروب حدها ~50 ألف$ ثم يهبط</li>
+      <li>الشورت المتاح الحقيقي (iBorrowDesk / المنصة) — الرقم هنا هو Short Interest الرسمي</li>
+      <li>في الزخم الخطأ لا يتجاوز 1-2%</li></ul>
+      <div class="links" style="margin-top:8px">
+        <a href="https://finviz.com/quote.ashx?t=${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">Finviz</a>
+        <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">TradingView</a>
+        <a href="https://finance.yahoo.com/quote/${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">Yahoo</a>
+        <a href="https://iborrowdesk.com/report/${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">الشورت المتاح</a>
+        <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(s.symbol)}&type=&dateb=&owner=include&count=40" target="_blank" rel="noopener">ملفات SEC (طرح/تقسيم)</a>
+      </div>
+    </div>`;
+  $("#ov").classList.add("on"); $("#dr").classList.add("on"); $("#dr").setAttribute("aria-hidden","false");
+  $("#dr").scrollTop = 0;
+}
+function closeDetail(){ openSym = null; $("#ov").classList.remove("on"); $("#dr").classList.remove("on"); $("#dr").setAttribute("aria-hidden","true"); }
+$("#dclose").onclick = closeDetail; $("#ov").onclick = closeDetail;
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+
+// ------- live mode (python scanner.py --serve)
+if (DATA && DATA.actions_url){
+  const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = "";
+  a.title = "يفتح GitHub: اضغط Run workflow، وبعد ~10 دقائق حدّث هذي الصفحة";
+}
+if (LIVE){
+  const b = $("#rescan"); b.style.display = "";
+  let last = DATA && DATA.generated_at;
+  b.onclick = async () => { b.disabled = true; b.textContent = "⏳ جاري المسح..."; await fetch("/api/rescan"); };
+  setInterval(async () => {
+    try{
+      const st = await (await fetch("/api/status")).json();
+      if (st.running){ b.disabled = true; b.textContent = "⏳ جاري المسح..."; }
+      else { b.disabled = false; b.textContent = "🔄 تحديث المسح"; if (st.generated_at && st.generated_at !== last) location.reload(); }
+    }catch(e){}
+  }, 4000);
+}
+render();
+</script>
+</body>
+</html>
