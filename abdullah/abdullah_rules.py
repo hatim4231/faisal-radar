@@ -111,8 +111,10 @@ def find_wave(df: pd.DataFrame, A: dict) -> dict | None:
             jump = max(cl[i] / cl[i - 1] for i in split_inside if i > 0)
             if peak / jump / low < A["min_wave_mult"]:
                 continue
-        # لازم السعر صحح بعد القمة (القمة ما تكون اليوم)
+        # لازم السعر صحح بعد القمة (القمة ما تكون اليوم)، والقمة ما انكسرت بعدها
         if p >= n - 2:
+            continue
+        if float(hi[p + 1:].max()) > peak * 1.02 or float(cl[-1]) >= peak * 0.95:
             continue
         cand = {"low_i": li, "peak_i": p, "low": low, "peak": peak, "mult": mult,
                 "low_date": _d(df, li), "peak_date": _d(df, p), "split_inside": bool(split_inside)}
