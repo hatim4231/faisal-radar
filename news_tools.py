@@ -27,6 +27,10 @@ POSITIVE = [
     (r"\bFDA (approv|clear)|\bapproval\b|\bapproved\b|\bclearance\b", 3, "موافقة"),
     (r"\b(contract|agreement|order|purchase order)s? (award|win|won|signed|secur)|\bawarded\b|\bwins?\b .*contract|\bsecures?\b", 3, "عقد/طلبية"),
     (r"\bpartnership\b|\bcollaborat|\bstrategic alliance\b|\bjoint venture\b|\bteams? up\b", 2, "شراكة"),
+    (r"\b(distribution|supply|licens\w*|exclusive) (agreement|deal)\b|\bdeal with\b|\bsigns?\b .*(agreement|deal|MOU)", 3, "اتفاقية/صفقة"),
+    (r"\b(surpass|top)s? .*estimates|\bbeat(s)? .*estimates|\btops? (Q\d|earnings|revenue)", 3, "فاق التوقعات"),
+    (r"\bshares? (double|triple|soar|surge|jump|rall)|\bstock (double|triple|soar|surge|jump|rall)|\b(soars?|surges?|jumps?|skyrockets?)\b", 2, "صعود قوي للسهم"),
+    (r"\bup \d+%|\bnarrow(s|ed|ing)? (net )?loss", 1, "تحسن"),
     (r"\brecord (revenue|sales|quarter)|\brevenue (grew|growth|increase|up)|\bbeats?\b|\bexceed(s|ed)? (expectations|estimates)|\bprofit(able|ability)\b", 3, "نتائج قوية"),
     (r"\bpositive (results|data|topline)|\bmet (its )?primary endpoint|\bstatistically significant\b|\bsuccessful(ly)?\b", 3, "نتائج إيجابية"),
     (r"\bpatent (grant|issued|allow)|\breceives? .*patent\b", 2, "براءة اختراع"),
@@ -46,7 +50,8 @@ NEGATIVE = [
     (r"\bdelist|\bdeficiency (notice|letter)\b|\bnon-?compliance\b|\bminimum bid price\b", 3, "خطر الشطب/عدم الامتثال"),
     (r"\bgoing concern\b|\bbankrupt|\bchapter 11\b|\binsolven|\bdefault(s|ed)? on\b", 4, "خطر الإفلاس"),
     (r"\blawsuit\b|\bclass action\b|\bsued\b|\binvestigation\b|\bsubpoena\b|\bSEC charges\b|\bfraud\b", 3, "قضايا/تحقيق"),
-    (r"\bmiss(es|ed)? (estimates|expectations)|\bnet loss widen|\brevenue (declin|decreas|fell|drop)|\bloss (widen|increase)", 2, "نتائج ضعيفة"),
+    (r"\b(falls?|plunges?|tumbles?|sinks?|slumps?|drops?|crash(es)?)\b \d|\bshares? (fall|plunge|tumble|sink|drop)|\bstock (falls|plunges|tumbles|sinks|drops)", 2, "هبوط قوي للسهم"),
+    (r"\bmiss(es|ed)? (estimates|expectations)|\bsales decline|\bnet loss widen|\brevenue (declin|decreas|fell|drop)|\bloss (widen|increase)", 2, "نتائج ضعيفة"),
     (r"\bcomplete response letter\b|\bCRL\b|\bFDA (reject|declin)|\bfailed to meet\b|\bdid not meet\b|\bclinical hold\b|\bdiscontinu", 4, "فشل/رفض"),
     (r"\bresign(s|ed|ation)\b|\bdeparture of\b|\bterminat(es|ed|ion)\b|\bsuspend(s|ed)?\b|\bhalt(s|ed)?\b", 2, "استقالة/إنهاء/إيقاف"),
     (r"\bdowngrade[sd]?\b|\bcuts? (guidance|outlook)|\blowers? (guidance|outlook)|\bprice target (cut|lower)", 2, "خفض تقييم/توقعات"),
@@ -55,27 +60,48 @@ NEGATIVE = [
 ]
 
 
+def _score(blob: str):
+    pos, neg, wp, wn = 0, 0, [], []
+    for pat, w, why in POSITIVE:
+        if re.search(pat, blob, re.I):
+            pos += w
+            wp.append(why)
+    for pat, w, why in NEGATIVE:
+        if re.search(pat, blob, re.I):
+            neg += w
+            wn.append(why)
+    return pos, neg, wp, wn
+
+
 def sentiment(title: str, text: str) -> dict:
-    """تقدير آلي بالكلمات المفتاحية. العنوان وزنه مضاعف."""
-    pos, neg, why_p, why_n = 0, 0, [], []
-    for blob, mult in ((title or "", 2), (text or "", 1)):
-        for pat, w, why in POSITIVE:
-            if re.search(pat, blob, re.I):
-                pos += w * mult
-                if why not in why_p:
-                    why_p.append(why)
-        for pat, w, why in NEGATIVE:
-            if re.search(pat, blob, re.I):
-                neg += w * mult
-                if why not in why_n:
-                    why_n.append(why)
-    if neg >= pos + 2:
-        label = "negative"
-    elif pos >= neg + 2:
-        label = "positive"
+    """
+    تقدير آلي بالكلمات المفتاحية.
+    العنوان يحكم أولاً؛ النص يُستخدم فقط إذا العنوان ما فيه إشارة واضحة (وبشرط أقوى)،
+    لأن بيانات الشركات الصغيرة مليانة كلمات ترويجية.
+    """
+    tp, tn, twp, twn = _score(title or "")
+    bp, bn, bwp, bwn = _score(text or "")
+    if tp or tn:
+        if tn > tp:
+            label = "negative"
+        elif tp > tn:
+            label = "positive"
+        else:
+            label = "neutral"
+        why_p, why_n = twp, twn
+        # خبر تخفيف/طرح في النص يقلب الخبر لسلبي حتى لو العنوان إيجابي
+        if label == "positive" and any(w in bwn for w in ("طرح أسهم (تخفيف)", "خطر الإفلاس")):
+            label, why_n = "negative", twn + [w for w in bwn if w in ("طرح أسهم (تخفيف)", "خطر الإفلاس")]
     else:
-        label = "neutral"
-    return {"label": label, "pos": pos, "neg": neg, "why_pos": why_p[:3], "why_neg": why_n[:3]}
+        if bn >= 4 and bn >= bp + 3:
+            label = "negative"
+        elif bp >= 7 and bp >= bn + 3:
+            label = "positive"
+        else:
+            label = "neutral"
+        why_p, why_n = bwp, bwn
+    return {"label": label, "pos": tp * 2 + bp, "neg": tn * 2 + bn,
+            "why_pos": list(dict.fromkeys(why_p))[:3], "why_neg": list(dict.fromkeys(why_n))[:3]}
 
 
 # ----------------------------------------------------------------------------
@@ -167,6 +193,8 @@ def enrich(items: list[dict], translate, full_text_count: int = 3) -> list[dict]
             hit = _load().get(key)
         if hit:
             x.update(hit)
+            s = sentiment(x["title"], hit.get("text", ""))  # التقييم ينحسب من جديد دائماً
+            x.update({"sentiment": s["label"], "why_pos": s["why_pos"], "why_neg": s["why_neg"]})
             continue
         text = fetch_article(x.get("url")) if i < full_text_count else ""
         if not text:
