@@ -46,7 +46,7 @@
     "batch_size": 80,
     "info_workers": 8,
     "deep_scan_min_score": 45,
-    "deep_scan_max": 60,
+    "deep_scan_max": 100,
     "report_min_score": 40
   }
 }

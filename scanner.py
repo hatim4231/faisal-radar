@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import re
 import os
 import sys
 import threading
@@ -217,8 +218,46 @@ def parse_news(items) -> list[dict]:
         ts = c.get("pubDate") or c.get("providerPublishTime")
         if isinstance(ts, (int, float)):
             ts = datetime.fromtimestamp(ts, tz=timezone.utc).isoformat()
-        out.append({"title": title, "url": url, "source": prov, "time": ts})
-    return out[:6]
+        summary = c.get("summary") or c.get("description") or ""
+        summary = re.sub(r"<[^>]+>", " ", summary)
+        summary = re.sub(r"\s+", " ", summary).strip()[:600]
+        out.append({"title": title, "summary": summary, "url": url, "source": prov, "time": ts})
+    return out[:5]
+
+
+def translate_ar(texts: list[str]) -> list[str]:
+    """ترجمة للعربي (خدمة قوقل المجانية). إذا فشلت يرجع النص الأصلي."""
+    import requests
+    out = []
+    for t in texts:
+        if not t:
+            out.append(t)
+            continue
+        try:
+            r = requests.get("https://translate.googleapis.com/translate_a/single",
+                             params={"client": "gtx", "sl": "auto", "tl": "ar", "dt": "t", "q": t},
+                             timeout=15)
+            out.append("".join(seg[0] for seg in r.json()[0] if seg and seg[0]) or t)
+        except Exception:
+            out.append(t)
+    return out
+
+
+def short_available(t: str) -> dict | None:
+    """الشورت المتاح للاقتراض (اللي يقصده فيصل بـ "شورت 10 آلاف") من iBorrowDesk."""
+    import requests
+    try:
+        r = requests.get(f"https://iborrowdesk.com/api/ticker/{t}", timeout=15,
+                         headers={"User-Agent": "Mozilla/5.0"})
+        js = r.json()
+        rows = js.get("daily") or js.get("real_time") or []
+        if not rows:
+            return None
+        last = rows[-1]
+        return {"available": last.get("available"), "fee": last.get("fee"),
+                "date": str(last.get("date") or last.get("time") or "")[:16]}
+    except Exception:
+        return None
 
 
 def deep_scan(results: dict, cfg):
@@ -236,9 +275,12 @@ def deep_scan(results: dict, cfg):
     # الأخبار
     def news(t):
         try:
-            return t, parse_news(yf.Ticker(t).news)
+            n = parse_news(yf.Ticker(t).news)
         except Exception:
-            return t, []
+            n = []
+        for x in n:
+            x["title_ar"], x["summary_ar"] = translate_ar([x["title"], x["summary"]])
+        return t, n
 
     with ThreadPoolExecutor(6) as ex:
         for t, n in ex.map(news, syms):
@@ -260,6 +302,17 @@ def deep_scan(results: dict, cfg):
                     c["progress"] = 1 if fresh else 0
                     c["detail"] = "يوجد خبر خلال آخر 36 ساعة" if fresh else ("آخر خبر قديم" if n else "لا توجد أخبار")
             m["score"] = round(min(100, m["score"] + (10 if fresh else 0)), 1)
+
+    # الشورت المتاح للاقتراض
+    with ThreadPoolExecutor(6) as ex:
+        for t, sa in zip(syms, ex.map(short_available, syms)):
+            if sa:
+                results[t]["short_available"] = sa
+
+    n_news = sum(len(results[t].get("news", [])) for t in syms)
+    n_tr = sum(1 for t in syms for x in results[t].get("news", []) if x.get("title_ar") and x["title_ar"] != x["title"])
+    n_sa = sum(1 for t in syms if results[t].get("short_available"))
+    log(f"  أخبار: {n_news} (مترجم {n_tr}) · شورت متاح: {n_sa}/{len(syms)} سهم")
 
     # فريم 4 ساعات (يشمل البري والأفتر)
     try:

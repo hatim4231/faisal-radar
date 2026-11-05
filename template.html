@@ -110,6 +110,8 @@ input[type=search]{flex:1;min-width:140px}
 .chart svg{width:100%;height:auto;display:block}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
 .legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.newsitem{padding:9px 0;border-bottom:1px solid var(--line)} .newsitem:last-of-type{border-bottom:0}
+.newsitem .nt{font-weight:600;font-size:14px} .newsitem .ns{font-size:13.5px;margin:3px 0;line-height:1.7}
 .news a{color:var(--accent);text-decoration:none}
 .news li{margin-bottom:6px;font-size:13.5px}
 .links a{color:var(--accent);margin-left:14px;font-size:13.5px;text-decoration:none}
@@ -244,6 +246,13 @@ function setTab(t){
 document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { setTab(b.dataset.t); filt = null; render(); });
 $("#q").oninput = render; $("#sort").onchange = render;
 
+function shortTxt(s){
+  const parts = [];
+  if (s.short_shares != null) parts.push("\u2066" + fM(s.short_shares) + (s.short_pct_float != null ? " (" + s.short_pct_float + "%)" : "") + "\u2069");
+  if (s.short_available && s.short_available.available != null) parts.push("متاح \u2066" + fM(s.short_available.available) + "\u2069");
+  return parts.join(" · ") || "-";
+}
+function dateTxt(t){ return (t||"").slice(0,16).replace("T"," "); }
 function remainingList(s){
   const ch = tab === "irtikaz" ? s.irtikaz.checks : s.momentum.checks;
   return ch.filter(c => !c.ok && c.remaining).sort((a,b)=>b.weight-a.weight).map(c => c.remaining);
@@ -276,10 +285,10 @@ function render(){
     const chg = s.change_pct;
     const facts = isI ? [
         ["RSI", s.rsi], ["عن الدعم", fpct(s.plan.dist_support_pct)], ["الدعم", fp(s.plan.support)],
-        ["فلووت", fM(s.float)], ["أول هدف", s.plan.t1 ? fp(s.plan.t1)+" ("+fpct(s.plan.upside_pct)+")" : "-"]
+        ["فلووت", fM(s.float)], ["الشورت", shortTxt(s)], ["أول هدف", s.plan.t1 ? fp(s.plan.t1)+" ("+fpct(s.plan.upside_pct)+")" : "-"]
       ] : [
         ["RVOL", s.rel_volume ? s.rel_volume.toFixed(1)+"x" : "-"], ["فوليوم", fM(s.volume)],
-        ["Gap", fpct(s.gap_pct)], ["فلووت", fM(s.float)], ["RSI", s.rsi]
+        ["Gap", fpct(s.gap_pct)], ["فلووت", fM(s.float)], ["الشورت", shortTxt(s)], ["RSI", s.rsi]
       ];
     const warn = !isI && s.momentum.warnings.length ? `<div class="left"><span class="k">⚠</span> ${esc(s.momentum.warnings[0])}</div>` : "";
     return `<div class="row" data-s="${esc(s.symbol)}">
@@ -289,10 +298,11 @@ function render(){
         <div class="px"><span class="num">$${fp(s.price)}</span> <span class="num ${chg>=0?"up":"down"}">${fpct(chg)}</span></div>
       </div>
       <div>
-        <div class="facts">${facts.map(([k,v]) => `<span>${k}: <b class="num">${esc(v ?? "-")}</b></span>`).join("")}</div>
+        <div class="facts">${facts.map(([k,v]) => `<span>${k}: <b class="${/[\u0600-\u06FF]/.test(String(v)) ? "" : "num"}">${esc(v ?? "-")}</b></span>`).join("")}</div>
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
+        ${(s.news||[]).length ? `<div class="left">📰 <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}
         <div class="tags">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
       </div>
       <div class="score">
@@ -370,7 +380,7 @@ function openDetail(sym){
   $("#dtitle").innerHTML = `<span class="sym ltr">${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · ${esc(s.country||"")} · بيانات ${esc(s.date)}</div>`;
   const rs = s.reverse_splits.length ? s.reverse_splits.map(r => `${r.ratio} (${r.date}، قبل ${r.days_ago} يوم)`).join("<br>") : "لا يوجد خلال سنتين";
   const h4 = s.h4 ? `RSI 4س: <b class="num">${s.h4.rsi}</b> · ${s.h4.new_low_recent ? "<span style='color:var(--bad)'>كسر قاع 5 جلسات</span>" : "ما كسر قاع 5 جلسات ✓"} · شموع 20%+: <span class="num">${s.h4.big_candles}</span>` : "يظهر للمرشحين فقط";
-  const news = (s.news||[]).length ? `<ul class="clean news">${s.news.map(n => `<li>${n.url ? `<a href="${esc(n.url)}" target="_blank" rel="noopener">${esc(n.title)}</a>` : esc(n.title)} <span class="note">— ${esc(n.source||"")} ${esc((n.time||"").slice(0,16).replace("T"," "))}</span></li>`).join("")}</ul>` : `<div class="note">لا توجد أخبار محملة</div>`;
+  const news = (s.news||[]).length ? s.news.map(n => `<div class="newsitem"><div class="nt">${esc(n.title_ar || n.title)}</div>${(n.summary_ar || n.summary) ? `<div class="ns">${esc(n.summary_ar || n.summary)}</div>` : ""}<div class="note">${esc(n.source||"")} · <span class="num">${esc(dateTxt(n.time))}</span>${n.title_ar && n.title_ar !== n.title ? ` · <span class="ltr">${esc(n.title)}</span>` : ""}</div></div>`).join("") : `<div class="note">لا توجد أخبار حديثة لهذا السهم</div>`;
   $("#dbody").innerHTML = `
     <div class="card">
       <div class="grid2" style="align-items:center">
@@ -413,7 +423,8 @@ function openDetail(sym){
         <dt>القيمة السوقية</dt><dd class="num">${fM(s.market_cap)}</dd>
         <dt>الفلووت</dt><dd class="num">${fM(s.float)}</dd>
         <dt>عدد الأسهم</dt><dd class="num">${fM(s.shares_out)}</dd>
-        <dt>الشورت</dt><dd class="num">${fM(s.short_shares)} ${s.short_pct_float!=null?"("+s.short_pct_float+"% من الفلووت)":""}</dd>
+        <dt>عدد أسهم الشورت (Short Interest)</dt><dd>${s.short_shares!=null ? `<span class="num">${(+s.short_shares).toLocaleString("en-US")}</span> سهم` : "-"} ${s.short_pct_float!=null?`(<span class="num">${s.short_pct_float}%</span> من الفلووت)`:""}</dd>
+        <dt>الشورت المتاح للاقتراض</dt><dd>${s.short_available && s.short_available.available!=null ? `<span class="num">${(+s.short_available.available).toLocaleString("en-US")}</span> سهم${s.short_available.fee!=null?` · رسوم <span class="num">${s.short_available.fee}%</span>`:""} <span class="note num">${esc(s.short_available.date)}</span>` : "-"}</dd>
         <dt>قيمة الشورت / القيمة السوقية</dt><dd class="num">${s.short_to_mcap!=null?s.short_to_mcap+"%":"-"}</dd>
         <dt>فوليوم اليوم / المتوسط</dt><dd class="num">${fM(s.volume)} / ${fM(s.avg_volume)} (${s.rel_volume ?? "-"}x)</dd>
         <dt>RSI يومي</dt><dd class="num">${s.rsi} (أدنى 10 أيام ${s.rsi_min10})</dd>
@@ -439,7 +450,7 @@ function openDetail(sym){
       <li>ما نوع السهم: زخم أم ارتكاز؟</li><li>أين الدعم الحقيقي؟ وأين وقف الخسارة؟</li>
       <li>هل الفوليوم يؤكد؟ وهل السعر فوق الفواب (في الزخم)؟</li><li>هل دخلت متأخر؟ (صعد 20-50% = مطاردة)</li>
       <li>شوف شمعة المضارب مقابل شمعة القروب على ويبل: شمعة المضارب سيولتها عالية وتتعدى 50% بلحظة، القروب حدها ~50 ألف$ ثم يهبط</li>
-      <li>الشورت المتاح الحقيقي (iBorrowDesk / المنصة) — الرقم هنا هو Short Interest الرسمي</li>
+      <li>الشورت المتاح يتغير خلال اليوم — تأكد منه في منصتك قبل الدخول</li>
       <li>في الزخم الخطأ لا يتجاوز 1-2%</li></ul>
       <div class="links" style="margin-top:8px">
         <a href="https://finviz.com/quote.ashx?t=${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">Finviz</a>

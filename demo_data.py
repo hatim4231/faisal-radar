@@ -84,8 +84,10 @@ def build(cfg) -> dict:
     for sym, name, d, info in scenarios():
         a = fr.analyze(d, info, cfg)
         a.update({"symbol": sym, "name": name + " (تجريبي)", "sector": "Demo", "country": "-"})
-        a["news"] = [{"title": "خبر تجريبي — هذا تقرير ببيانات وهمية", "url": None,
-                      "source": "Demo", "time": "2026-11-04T13:00:00Z"}]
+        a["news"] = [{"title": "Demo Corp announces new contract", "title_ar": "خبر تجريبي: الشركة تعلن عن عقد جديد",
+                      "summary": "", "summary_ar": "هذا ملخص تجريبي للخبر يظهر في الصفحة مباشرة بدون روابط.",
+                      "url": None, "source": "Demo", "time": "2026-11-04T13:00:00Z"}]
+        a["short_available"] = {"available": 10000, "fee": 12.5, "date": "2026-11-04"}
         rows.append(a)
     rows.sort(key=lambda r: -r["irtikaz"]["score"])
     return {"generated_at": "تجريبي — بيانات وهمية", "source": "بيانات وهمية للتجربة فقط",
