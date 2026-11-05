@@ -14,64 +14,14 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
-  scan:
+  diag:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
-    env:
-      RADAR_PASSWORD: ${{ secrets.RADAR_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
-
       - run: pip install -r requirements.txt
-
-      - name: كاش بيانات الشركات (يسرّع المسح)
-        uses: actions/cache@v4
-        with:
-          path: cache
-          key: info-${{ github.run_id }}
-          restore-keys: info-
-
-      - name: المسح
-        run: python scanner.py --no-open --out site/index.html
-
-      - name: نسخ ملف Excel (فقط إذا الموقع بدون كلمة سر)
-        if: env.RADAR_PASSWORD == ''
-        run: cp output/latest.csv site/latest.csv
-
-      - name: رادار عبدالله
-        run: python abdullah/abdullah_scanner.py --no-open --out site/abdullah/index.html
-
-      - name: قفل الموقع بكلمة سر (إذا موجودة في Secrets باسم RADAR_PASSWORD)
-        if: env.RADAR_PASSWORD != ''
-        run: |
-          SALT=$(printf '%s' "$RADAR_PASSWORD" | sha256sum | cut -c1-32)
-          OPTS=(-p "$RADAR_PASSWORD" --short -s "$SALT" --remember 60 --config false
-                --template-placeholder "كلمة السر" --template-remember "تذكرني على هذا الجهاز"
-                --template-button "دخول" --template-error "كلمة السر غلط"
-                --template-color-primary "#2f6fde" --template-color-secondary "#0e1013")
-          npx --yes staticrypt@3.5.4 site/index.html "${OPTS[@]}" --template-title "📡 رادار فيصل" -d site
-          npx --yes staticrypt@3.5.4 site/abdullah/index.html "${OPTS[@]}" --template-title "🌊 رادار عبدالله" -d site/abdullah
-
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-  deploy:
-    needs: scan
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+      - run: python diag/flye.py FLYE
