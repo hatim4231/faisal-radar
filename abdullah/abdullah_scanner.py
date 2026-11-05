@@ -133,13 +133,12 @@ def run(cfg, tickers=None, deep=True) -> dict:
             a["flags"].append("عدد الأسهم أكبر بكثير من الفلووت — انتبه لأسهم مقيدة قد تنفك")
         results[t] = a
 
-        # حفظ مستوى الإبطال أول مرة نشوف هالموجة (ما يتغير بعدين)
+        # حفظ الدعم والإبطال أول مرة يصير السهم متماسك/قريب (ما يتغير بعدين لنفس الموجة)
         st = state.get(t)
-        if a["zone"] and a["invalidation"] and (not st or st.get("peak_date") != a["wave"]["peak_date"]):
+        if a["status"] in ("ready", "near") and (not st or st.get("peak_date") != a["wave"]["peak_date"]):
             state[t] = {"peak_date": a["wave"]["peak_date"], "invalidation": a["invalidation"],
-                        "zone_low": a["zone"]["low"], "zone_high": a["zone"]["high"],
-                        "zone_kind": a["zone"]["kind"], "since": a["date"], "broken": False}
-        elif st and a["invalidated"]:
+                        "support": a["support"], "since": a["date"], "broken": False}
+        elif st and st.get("peak_date") == a["wave"]["peak_date"] and a["invalidated"]:
             st["broken"] = True
     STATE.write_text(json.dumps(state), encoding="utf-8")
     log(f"[عبدالله] أسهم فيها موجة تدبيل: {len(results)}")
@@ -147,13 +146,17 @@ def run(cfg, tickers=None, deep=True) -> dict:
     if deep and results:
         deep_scan(results, cfg)
 
-    rows = [r for r in results.values() if explicit or r["score"] >= cfg["scan"]["report_min_score"]
-            or r["status"] in ("ready", "near")]
-    order = {"ready": 0, "near": 1, "radar": 2, "invalid": 3}
+    # المطلوب أسهم ما طلعت: نشيل اللي طلعت أو كسرت الدعم
+    from collections import Counter
+    counts = Counter(r["status"] for r in results.values())
+    rows = [r for r in results.values() if explicit or
+            (r["status"] in ("ready", "near", "radar") and r["score"] >= cfg["scan"]["report_min_score"])]
+    order = {"ready": 0, "near": 1, "radar": 2, "moved": 3, "invalid": 4}
     rows.sort(key=lambda r: (order[r["status"]], -r["score"]))
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "Yahoo Finance + Interactive Brokers (الشورت المتاح)",
-               "scanned": len(daily), "with_wave": len(results), "seconds": round(time.time() - t0),
+               "scanned": len(daily), "with_wave": len(results),
+               "moved": counts.get("moved", 0), "invalid": counts.get("invalid", 0), "seconds": round(time.time() - t0),
                "config": cfg, "stocks": rows}
     if os.environ.get("GITHUB_REPOSITORY"):
         payload["actions_url"] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/scan.yml"
@@ -164,8 +167,8 @@ def run(cfg, tickers=None, deep=True) -> dict:
 
 def deep_scan(results: dict, cfg):
     import yfinance as yf
-    cands = sorted(results.values(), key=lambda r: ({"ready": 0, "near": 1, "radar": 2, "invalid": 3}[r["status"]], -r["score"]))
-    syms = [r["symbol"] for r in cands if r["status"] != "invalid"][:cfg["scan"]["deep_scan_max"]]
+    cands = sorted(results.values(), key=lambda r: ({"ready": 0, "near": 1, "radar": 2, "moved": 3, "invalid": 4}[r["status"]], -r["score"]))
+    syms = [r["symbol"] for r in cands if r["status"] in ("ready", "near", "radar")][:cfg["scan"]["deep_scan_max"]]
     if not syms:
         return
     log(f"[عبدالله] أخبار + 4 ساعات + ساعة لـ {len(syms)} سهم")
@@ -196,7 +199,7 @@ def deep_scan(results: dict, cfg):
                 d = d.dropna(subset=["Close"])
                 d.index = pd.to_datetime(d.index)
                 r = results[t]
-                r["intraday"] = ar.intraday_check(d, r["zone"], r["resistance"])
+                r["intraday"] = ar.intraday_check(d, r["support"], r["consolidation"]["top"])
             except Exception:
                 pass
     except Exception as e:
@@ -206,13 +209,13 @@ def deep_scan(results: dict, cfg):
 def summary(rows):
     from collections import Counter
     c = Counter(r["status"] for r in rows)
-    lines = [f"## رادار عبدالله: موجة ثانية {c['ready']} · عند الدعم {c['near']} · يصحح {c['radar']} · ملغي {c['invalid']}", "",
-             "| السهم | السعر | الحالة | النقاط | الموجة | التصحيح | المنطقة | الإبطال | الشورت |", "|---|---|---|---|---|---|---|---|---|"]
-    for r in rows[:20]:
-        w, z = r["wave"], r["zone"]
-        lines.append(f"| {r['symbol']} | {r['price']} | {r['status']} | {r['score']:.0f} | {w['low']}→{w['peak']} x{w['mult']} | "
-                     f"{w['retrace_pct']}% | {(str(z['low']) + '-' + str(z['high'])) if z else '-'} | {r['invalidation']} | "
-                     f"{r['short_used']['value']} |")
+    lines = [f"## رادار عبدالله: متماسك {c['ready']} · يتماسك {c['near']} · يصحح {c['radar']}", "",
+             "| السهم | السعر | الحالة | النقاط | الموجة | التصحيح | الدعم | اختبارات | جلسات تماسك | الإبطال | الشورت |",
+             "|---|---|---|---|---|---|---|---|---|---|---|"]
+    for r in rows[:25]:
+        w, k = r["wave"], r["consolidation"]
+        lines.append(f"| {r['symbol']} | {r['price']} | {r['status']} | {r['score']:.0f} | {w['low']}→{w['peak']} x{w['mult']} ({w['len']}ج) | "
+                     f"{w['retrace_pct']}% | {r['support']} | {k['touches']} | {k['len']} | {r['invalidation']} | {r['short_used']['value']} |")
     txt = "\n".join(lines)
     print(txt, flush=True)
     sp = os.environ.get("GITHUB_STEP_SUMMARY")

@@ -141,8 +141,8 @@ ul.clean{margin:0;padding-right:18px}
     </div>
   </header>
   <div class="card" style="margin-bottom:12px">
-    <b>الفكرة:</b> موجة تدبيل فعلية ← تصحيح إلى دعم ← ثبات ← عودة طلب لموجة ثانية.
-    <span class="note">فرضية تداول نعمل عليها، وليست نظرية مثبتة النجاح. التقسيم العكسي ليس شرطاً، وقفزته الحسابية لا تُحسب تدبيل.</span>
+    <b>الفكرة:</b> سهم دبّل خلال شهر-شهرين ← صحح ← ثبت على دعم واختبره مرات عديدة وتماسك ← <b>قبل ما يطلع</b>.
+    <span class="note">الأسهم اللي طلعت أو كسرت الدعم تنشال من القائمة. فرضية تداول نعمل عليها، وليست نظرية مثبتة النجاح. التقسيم العكسي ليس شرطاً، وقفزته الحسابية لا تُحسب تدبيل.</span>
   </div>
   <div class="tiles" id="tiles"></div>
   <div class="toolbar">
@@ -150,14 +150,16 @@ ul.clean{margin:0;padding-right:18px}
     <select id="sort">
       <option value="status">حسب الحالة</option>
       <option value="score">الأعلى نقاط</option>
-      <option value="zone">الأقرب للمنطقة</option>
+      <option value="zone">الأقرب للدعم</option>
+      <option value="touches">الأكثر اختباراً للدعم</option>
+      <option value="consol">الأطول تماسكاً</option>
       <option value="mult">الأقوى تدبيل</option>
       <option value="recent">الأحدث موجة</option>
     </select>
   </div>
   <div class="list" id="list"></div>
   <div class="disc">
-    رادار عبدالله يطبق الشروط الخمسة آلياً: تدبيل سابق قريب، تصحيح إلى منطقة مهمة، ثبات، ظهور طلب جديد، وإبطال واضح محدد مسبقاً.
+    رادار عبدالله يطبق الشروط آلياً: تدبيل خلال شهر-شهرين، تصحيح، تماسك على دعم، اختبار الدعم مرات عديدة، وإبطال واضح محدد مسبقاً — ويستبعد الأسهم اللي طلعت.
     قبل إدراج أي سهم: راجع الأخبار، والتمويل والتخفيف المحتمل، والسيولة، والشورت المتاح لعدة أيام.
     ليس توصية شراء أو بيع، والبيانات المجانية فيها تأخير وأحياناً أخطاء. الأرقام للدراسة فقط.
   </div>
@@ -169,8 +171,8 @@ ul.clean{margin:0;padding-right:18px}
 </aside>
 <script>
 const DATA = /*__DATA__*/null;
-const ST = {ready:"🌊 موجة ثانية محتملة", near:"🟡 عند الدعم — ينتظر الطلب", radar:"👀 يصحح", invalid:"⛔ ملغي"};
-const STC = {ready:"ready", near:"near", radar:"radar", invalid:"no"};
+const ST = {ready:"🎯 متماسك على الدعم", near:"🟡 بدأ يتماسك", radar:"👀 يصحح", moved:"طلع", invalid:"⛔ كسر الدعم"};
+const STC = {ready:"ready", near:"near", radar:"radar", moved:"no", invalid:"no"};
 let filt = null, openSym = null;
 try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
 const $ = s => document.querySelector(s);
@@ -188,10 +190,10 @@ $("#theme").onclick = () => {
   try{ localStorage.setItem("fr-theme", nx) }catch(e){}
   if (openSym) openDetail(openSym);
 };
-$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · تم فحص <span class="num">${DATA.scanned}</span> سهم · فيها موجة تدبيل <span class="num">${DATA.with_wave}</span> · ${esc(DATA.source)}` : "لا توجد بيانات";
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · تم فحص <span class="num">${DATA.scanned}</span> سهم · فيها موجة تدبيل <span class="num">${DATA.with_wave}</span> · مستبعد (طلع <span class="num">${DATA.moved ?? 0}</span> · كسر الدعم <span class="num">${DATA.invalid ?? 0}</span>) · ${esc(DATA.source)}` : "لا توجد بيانات";
 if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
 
-function zoneDist(s){ return s.zone ? (s.price - s.zone.high) / s.zone.high * 100 : 1e9; }
+function zoneDist(s){ return s.dist_support_pct ?? 1e9; }
 function shortTxt(s){
   const u = s.short_used || {};
   if (u.value == null) return "غير معروف";
@@ -199,7 +201,7 @@ function shortTxt(s){
 }
 function tiles(){
   const c = k => stocks.filter(s => s.status === k).length;
-  const T = [["ready","موجة ثانية محتملة"],["near","عند الدعم — ينتظر الطلب"],["radar","يصحح نحو الدعم"],["invalid","ملغي (كسر الإبطال)"]];
+  const T = [["ready","متماسك على الدعم (اختبره 3+ مرات)"],["near","بدأ يتماسك"],["radar","يصحح بعد التدبيل"]];
   $("#tiles").innerHTML = T.map(([k,l]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${c(k)}</b><span>${l}</span></div>`).join("");
   document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = filt === el.dataset.k ? null : el.dataset.k; render(); });
 }
@@ -208,15 +210,17 @@ function render(){
   tiles();
   const q = $("#q").value.trim().toUpperCase();
   let L = stocks.filter(s => (!q || s.symbol.includes(q)) && (!filt || s.status === filt));
-  const o = {ready:0, near:1, radar:2, invalid:3};
+  const o = {ready:0, near:1, radar:2, moved:3, invalid:4};
   const S = {status:(a,b)=>o[a.status]-o[b.status]||b.score-a.score, score:(a,b)=>b.score-a.score,
-    zone:(a,b)=>zoneDist(a)-zoneDist(b), mult:(a,b)=>b.wave.mult-a.wave.mult, recent:(a,b)=>a.wave.sessions_since_peak-b.wave.sessions_since_peak};
+    zone:(a,b)=>zoneDist(a)-zoneDist(b), mult:(a,b)=>b.wave.mult-a.wave.mult, touches:(a,b)=>b.consolidation.touches-a.consolidation.touches, consol:(a,b)=>b.consolidation.len-a.consolidation.len, recent:(a,b)=>a.wave.sessions_since_peak-b.wave.sessions_since_peak};
   L.sort(S[$("#sort").value]);
   if (!L.length){ $("#list").innerHTML = `<div class="empty">لا توجد أسهم بهذا الفلتر حالياً.</div>`; return; }
   $("#list").innerHTML = L.map(s => {
     const w = s.wave, rem = s.checks.filter(c => !c.ok && c.remaining).map(c => c.remaining).slice(0,2);
+    const k = s.consolidation;
     const facts = [["الموجة", `${fp(w.low)}→${fp(w.peak)} x${w.mult}`], ["التصحيح", w.retrace_pct!=null ? w.retrace_pct+"%" : "-"],
-      ["المنطقة", s.zone ? fp(s.zone.low)+"–"+fp(s.zone.high) : "-"], ["الإبطال", fp(s.invalidation)], ["الشورت", shortTxt(s)]];
+      ["الدعم", fp(s.support)], ["اختبر الدعم", k.touches + " مرات"], ["تماسك", k.len + " جلسة"],
+      ["عن الدعم", fpct(s.dist_support_pct)], ["الإبطال", fp(s.invalidation)], ["الشورت", shortTxt(s)]];
     const n0 = (s.news||[])[0];
     return `<div class="row" data-s="${esc(s.symbol)}">
       <div><div class="sym ltr">${esc(s.symbol)}</div><div class="name" title="${esc(s.name)}">${esc(s.name)}</div>
@@ -228,7 +232,7 @@ function render(){
         ${n0 ? `<div class="left">📰 <span class="note">${esc((n0.time||"").slice(0,10))}</span> ${esc(n0.title_ar || n0.title)}</div>` : ""}
       </div>
       <div class="score"><div class="top"><span class="badge ${STC[s.status]}">${ST[s.status]}</span><span class="pct num" style="color:${scol(s.status)}">${Math.round(s.score)}</span></div>
-        <div class="bar"><i style="width:${s.score}%;background:${scol(s.status)}"></i></div><div class="note">نقاط الشروط الخمسة من 100</div></div>
+        <div class="bar"><i style="width:${s.score}%;background:${scol(s.status)}"></i></div><div class="note">نقاط الشروط من 100</div></div>
     </div>`;
   }).join("");
   document.querySelectorAll(".row").forEach(el => el.onclick = () => openDetail(el.dataset.s));
@@ -236,18 +240,19 @@ function render(){
 function chartSVG(s){
   const c = s.chart, n = c.c.length, W = 800, H = 330, VH = 50, pad = {l:8, r:58, t:10, b:22};
   let lo = Math.min(...c.l), hi = Math.max(...c.h);
-  [s.invalidation, s.resistance, s.zone && s.zone.low].forEach(v => { if (v) lo = Math.min(lo, v); });
+  if (s.invalidation) lo = Math.min(lo, s.invalidation);
   lo *= 0.97; hi *= 1.03;
   const ph = H - VH - pad.t - pad.b, y = v => pad.t + (hi - v) / (hi - lo) * ph;
   const cw = (W - pad.l - pad.r) / n, x = i => pad.l + i * cw + cw / 2;
   const up = cssv("--up"), dn = cssv("--down"), line = cssv("--line"), muted = cssv("--muted");
   let g = "";
   for (let k = 0; k <= 4; k++){ const v = lo + (hi-lo)*k/4; g += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${line}"/><text x="${W-pad.r+4}" y="${y(v)+4}" fill="${muted}" font-size="11">${fp(v)}</text>`; }
-  if (s.zone) g += `<rect x="${pad.l}" width="${W-pad.l-pad.r}" y="${y(s.zone.high)}" height="${Math.max(2,y(s.zone.low)-y(s.zone.high))}" fill="${cssv("--zone")}"/>`;
+  const k = s.consolidation;
+  if (c.cons_start_i != null && k.top){ const x0 = pad.l + Math.max(0,c.cons_start_i) * cw; g += `<rect x="${x0}" width="${W-pad.r-x0}" y="${y(k.top)}" height="${Math.max(2,y(s.support)-y(k.top))}" fill="${cssv("--zone")}" stroke="${cssv("--good")}" stroke-dasharray="3 3"/>`; }
   const hl = (v, col, label, dash) => v == null || v > hi || v < lo ? "" : `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="5 4"':""}/><text x="${pad.l+4}" y="${y(v)-4}" fill="${col}" font-size="11" font-weight="600">${label} ${fp(v)}</text>`;
+  g += hl(s.support, cssv("--good"), "الدعم", false);
   g += hl(s.invalidation, cssv("--bad"), "الإبطال", true);
-  g += hl(s.resistance, cssv("--warn"), "مقاومة التماسك", true);
-  (s.targets||[]).forEach((t,i) => g += hl(t, cssv("--accent"), i === (s.targets.length-1) ? "قمة الموجة" : "هدف", true));
+  (s.targets||[]).forEach((t,i) => g += hl(t, cssv("--accent"), i === s.targets.length-1 ? "قمة الموجة" : "هدف "+(i+1), true));
   const vmax = Math.max(...c.v);
   for (let i = 0; i < n; i++){
     const o = c.o[i], h = c.h[i], l = c.l[i], cl = c.c[i]; if (cl == null) continue;
@@ -257,6 +262,7 @@ function chartSVG(s){
   }
   const mark = (i, v, t, above) => i < 0 || i >= n ? "" : `<circle cx="${x(i)}" cy="${y(v)}" r="5" fill="none" stroke="${cssv("--accent")}" stroke-width="2"/><text x="${x(i)}" y="${above ? y(v)-9 : y(v)+17}" fill="${cssv("--accent")}" font-size="11" font-weight="700" text-anchor="middle">${t}</text>`;
   g += mark(c.wave_low_i, s.wave.low, "قاع الموجة", false) + mark(c.wave_peak_i, s.wave.peak, "القمة", true);
+  (k.touch_dates||[]).forEach(d => { const i = c.d.indexOf(d); if (i >= 0) g += `<path d="M${x(i)} ${y(c.l[i])+6} l-5 9 h10 z" fill="${cssv("--good")}"/>`; });
   [[0,"start"],[Math.floor(n/2),"middle"],[n-1,"end"]].forEach(([i,a]) => g += `<text x="${x(i)}" y="${H-6}" fill="${muted}" font-size="11" text-anchor="${a}">${c.d[i]}</text>`);
   return `<svg style="direction:ltr" viewBox="0 0 ${W} ${H}">${g}</svg>`;
 }
@@ -277,23 +283,25 @@ function openDetail(sym){
       <span class="badge ${STC[s.status]}" style="font-size:14px">${ST[s.status]}</span><span class="pct num" style="font-size:28px;color:${scol(s.status)}">${Math.round(s.score)}/100</span></div>
       ${s.flags.length ? `<ul class="clean" style="color:var(--bad);margin-top:8px">${s.flags.map(f => `<li>${esc(f)}</li>`).join("")}</ul>` : ""}</div>
     <div class="card chart"><h3>الشارت اليومي</h3>${chartSVG(s)}
-      <div class="legend"><span><i style="background:var(--zone);height:9px"></i>منطقة الدعم</span><span><i style="background:var(--bad)"></i>الإبطال</span><span><i style="background:var(--warn)"></i>مقاومة التماسك</span><span><i style="background:var(--accent)"></i>الموجة والأهداف</span></div></div>
+      <div class="legend"><span><i style="background:var(--zone);height:9px"></i>منطقة التماسك</span><span><i style="background:var(--good)"></i>الدعم (▲ = اختبار)</span><span><i style="background:var(--bad)"></i>الإبطال</span><span><i style="background:var(--accent)"></i>الموجة والأهداف</span></div></div>
     <div class="card"><h3>📋 النموذج</h3><div class="plan">
       <div class="pbox"><span>قاع الموجة</span><b class="num">${fp(w.low)}</b><span class="num">${esc(w.low_date)}</span></div>
       <div class="pbox"><span>قمة الموجة</span><b class="num">${fp(w.peak)}</b><span class="num">${esc(w.peak_date)}</span></div>
-      <div class="pbox"><span>التدبيل</span><b class="num">x${w.mult}</b><span>قبل ${w.sessions_since_peak} جلسة${w.split_inside?" · فيها تقسيم (مستبعد)":""}</span></div>
-      <div class="pbox"><span>منطقة الدعم</span><b class="num">${s.zone ? fp(s.zone.low)+" – "+fp(s.zone.high) : "-"}</b><span>${esc(s.zone ? s.zone.kind : "")}</span></div>
+      <div class="pbox"><span>التدبيل</span><b class="num">x${w.mult}</b><span>خلال ${w.len} جلسة · القمة قبل ${w.sessions_since_peak} جلسة</span></div>
+      <div class="pbox"><span>الدعم</span><b class="num" style="color:var(--good)">${fp(s.support)}</b><span>${esc(s.support_zone || "قاع التماسك")}</span></div>
+      <div class="pbox"><span>اختبارات الدعم</span><b>${s.consolidation.touches} مرات</b><span class="num">${(s.consolidation.touch_dates||[]).slice(-4).join(" · ") || "-"}</span></div>
+      <div class="pbox"><span>التماسك</span><b>${s.consolidation.len} جلسة</b><span>بين \u2066${fp(s.support)}\u2069 و \u2066${fp(s.consolidation.top)}\u2069 · مدى \u2066${s.consolidation.range_pct}%\u2069</span></div>
+      <div class="pbox"><span>منطقة الدخول قرب الدعم</span><b class="num">${fp(s.entry[0])} – ${fp(s.entry[1])}</b><span>السعر عن الدعم ${fpct(s.dist_support_pct)}</span></div>
       <div class="pbox"><span>مستوى الإبطال</span><b class="num" style="color:var(--bad)">${fp(s.invalidation)}</b><span>${s.fixed_from_state ? "محدد مسبقاً ولا يتغير" : "حُدد في هذا المسح"}</span></div>
-      <div class="pbox"><span>مقاومة التماسك (الطلب الجديد)</span><b class="num">${fp(s.resistance)}</b><span>الأهداف: <span class="num">${(s.targets||[]).map(fp).join(" / ")}</span></span></div>
-    </div><div class="note" style="margin-top:8px">التصحيح: <span class="num">${w.retrace_pct}%</span> من الموجة · فوليوم التصحيح <span class="num">${s.corr_vol_ratio!=null?Math.round(s.corr_vol_ratio*100)+"%":"-"}</span> من فوليوم الموجة
+    </div><div class="note" style="margin-top:8px">الأهداف: <span class="num">${(s.targets||[]).map(fp).join(" / ") || "-"}</span> (سقف التماسك ← منتصف الطريق ← قمة الموجة) · التصحيح <span class="num">${w.retrace_pct}%</span> · فوليوم التماسك <span class="num">${s.vol_ratio!=null?Math.round(s.vol_ratio*100)+"%":"-"}</span> من فوليوم الموجة
       <br>كل مناطق الدعم: ${s.zones.map(z => `<span class="num">${fp(z.low)}–${fp(z.high)}</span> (${esc(z.kind)})`).join(" · ")}</div></div>
-    <div class="card"><h3>✔ الشروط الخمسة</h3>${checksHTML(s.checks)}</div>
+    <div class="card"><h3>✔ الشروط</h3>${checksHTML(s.checks)}</div>
     <div class="grid2">
       <div class="card"><h3>⏱ الفريمات الصغيرة</h3><dl class="kv">
         <dt>4 ساعات: بدون قاع أدنى</dt><dd>${yes(it.h4_no_lower_low)}</dd>
-        <dt>4 ساعات: إغلاقات داخل المنطقة</dt><dd class="num">${it.h4_closes_in_zone ?? "-"}</dd>
-        <dt>4 ساعات: استرداد المقاومة</dt><dd>${yes(it.h4_reclaim)}</dd>
-        <dt>ساعة: فوق مقاومة التماسك</dt><dd>${yes(it.h1_above_res)}</dd>
+        <dt>4 ساعات: لمسات الدعم</dt><dd class="num">${it.h4_touches ?? "-"}</dd>
+        <dt>4 ساعات: الإغلاق فوق الدعم</dt><dd>${yes(it.h4_close_above_support)}</dd>
+        <dt>ساعة: المسافة لسقف التماسك</dt><dd class="num">${it.h1_dist_top_pct != null ? it.h1_dist_top_pct+"%" : "-"}</dd>
         <dt>ساعة: الحجم / المتوسط</dt><dd class="num">${it.h1_vol_ratio != null ? it.h1_vol_ratio+"x" : "-"}</dd></dl>
         <div class="note">يظهر للمرشحين فقط</div></div>
       <div class="card"><h3>🩳 الشورت المتاح (عدة قراءات)</h3>${shortTable}

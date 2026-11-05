@@ -114,7 +114,7 @@ def find_wave(df: pd.DataFrame, A: dict) -> dict | None:
         # لازم السعر صحح بعد القمة (القمة ما تكون اليوم)، والقمة ما انكسرت بعدها
         if p >= n - 2:
             continue
-        if float(hi[p + 1:].max()) > peak * 1.02 or float(cl[-1]) >= peak * 0.95:
+        if float(hi[p + 1:].max()) > peak * 1.02 or float(cl[-1]) >= peak * 0.85:
             continue
         cand = {"low_i": li, "peak_i": p, "low": low, "peak": peak, "mult": mult,
                 "low_date": _d(df, li), "peak_date": _d(df, p), "split_inside": bool(split_inside)}
@@ -189,8 +189,44 @@ class C:
                 "progress": round(self.progress, 2)}
 
 
+def consolidation(df: pd.DataFrame, start: int, max_range_pct: float) -> dict | None:
+    """
+    أطول نافذة أخيرة (بعد القمة) السعر فيها متماسك: أعلى سعر ÷ أدنى سعر <= 1 + max_range.
+    ترجع: طولها، الدعم (أدنى سعر)، السقف، وعدد مرات اختبار الدعم.
+    """
+    n = len(df)
+    hi, lo = df["High"].values, df["Low"].values
+    best = None
+    for k in range(3, n - start):
+        a = n - k
+        h, l = float(hi[a:].max()), float(lo[a:].min())
+        if l <= 0 or h / l > 1 + max_range_pct / 100:
+            break
+        best = (k, l, h)
+    if not best:
+        return None
+    k, sup, top = best
+    a = n - k
+    # اختبارات الدعم: كل نزول للدعم (ضمن 4%) بعد ارتداد واضح عنه (القمة تبعد عن الدعم)
+    band = sup * 1.04
+    bounce = sup * (1 + max(0.04, min(0.08, (top / sup - 1) / 2)))
+    touches, dates, armed = 0, [], True
+    for i in range(a, n):
+        if armed and lo[i] <= band:
+            touches += 1
+            dates.append(str(df.index[i])[:10])
+            armed = False
+        if not armed and hi[i] >= bounce and lo[i] > band:
+            armed = True
+    return {"len": k, "support": sup, "top": top, "range_pct": (top / sup - 1) * 100,
+            "touches": touches, "touch_dates": dates, "start_i": a}
+
+
 def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None = None) -> dict | None:
-    """state = مستوى الإبطال المحفوظ من مسح سابق (عشان ما يتغير الدعم كلما هبط السهم)."""
+    """
+    state = الدعم ومستوى الإبطال المحفوظ من أول مرة ظهر فيها السهم (ما يتغير كلما هبط).
+    يرجع None إذا ما فيه موجة تدبيل. الحالة "moved" = طلع/بدأ يطلع، "invalid" = كسر الدعم.
+    """
     info = info or {}
     A = cfg["abdullah"]
     df = df.dropna(subset=["Open", "High", "Low", "Close"]).copy()
@@ -207,165 +243,158 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
         return None
     li, p = w["low_i"], w["peak_i"]
     after = df.iloc[p + 1:]
-    post_low = float(after["Low"].min()) if len(after) else price
-    retrace = (w["peak"] - price) / (w["peak"] - w["low"]) * 100 if w["peak"] > w["low"] else None
     sessions_since_peak = n - 1 - p
+    wave_len = p - li
 
+    cons = consolidation(df, p + 1, A["consolidation_max_range_pct"])
     zones = support_zones(df, w)
-    zone = pick_zone(zones, price, post_low)
+    sup = cons["support"] if cons else float(after["Low"].min())
+    retrace = (w["peak"] - sup) / (w["peak"] - w["low"]) * 100 if w["peak"] > w["low"] else 0
+    zone_match = next((z for z in zones if z["low"] * 0.94 <= sup <= z["high"] * 1.06), None)
 
-    # --- الإبطال: يُحدد مرة وحدة ويبقى ثابت لنفس الموجة
+    # الإبطال: يتحدد أول مرة ويبقى ثابت لنفس الموجة
     fixed = state if (state and state.get("peak_date") == w["peak_date"]) else None
     if fixed:
         inval = fixed["invalidation"]
-        zone_fixed = {"kind": fixed.get("zone_kind", ""), "low": fixed["zone_low"], "high": fixed["zone_high"]}
-        zone = zone_fixed
     else:
-        inval = zone["low"] * (1 - A["invalidation_below_zone_pct"] / 100) if zone else None
-    # ملغي إذا أغلق تحت الإبطال الحين، أو انكسر في مسح سابق لنفس الموجة
-    invalidated = bool(inval and (price < inval or (fixed and fixed.get("broken"))))
+        inval = sup * (1 - A["invalidation_below_support_pct"] / 100)
+    # كسر الدعم: السعر نزل تحت قاع التماسك السابق (قبل آخر 5 جلسات) بوضوح
+    prior = after.iloc[:-5] if len(after) > 10 else None
+    prior_sup = float(prior["Low"].tail(20).min()) if prior is not None and len(prior) else None
+    broke_prior = bool(prior_sup and price < prior_sup * (1 - A["invalidation_below_support_pct"] / 100))
+    broken = price < inval or broke_prior or bool(fixed and fixed.get("broken"))
+
+    # طلع؟ (اخترق سقف التماسك أو ارتد بقوة من الدعم)
+    prior_top = float(df["High"].iloc[-(cons["len"]):-2].max()) if cons and cons["len"] > 4 else None
+    moved = price > sup * (1 + A["max_bounce_pct"] / 100) or \
+        bool(prior_top and price > prior_top * (1 + A["breakout_pct"] / 100))
 
     checks: list[C] = []
 
-    # 1) التدبيل
-    c = C("wave", "تدبيل سابق قريب ومثبت", 25)
-    c.ok, c.progress = True, 1
-    rec = sessions_since_peak <= A["recent_sessions"]
-    c.got = 25 if rec else 18
-    c.detail = (f"من {fp(w['low'])} ({w['low_date']}) إلى {fp(w['peak'])} ({w['peak_date']}) = x{w['mult']:.2f} "
-                f"(+{(w['mult'] - 1) * 100:.0f}%) · قبل {sessions_since_peak} جلسة")
-    if not rec:
-        c.remaining = "الموجة صارت قديمة نسبياً"
+    # 1) التدبيل خلال شهر-شهرين
+    c = C("wave", "تدبيل سابق خلال شهر إلى شهرين", 20)
+    c.ok, c.progress, c.got = True, 1, 20
+    c.detail = (f"من {fp(w['low'])} ({w['low_date']}) إلى {fp(w['peak'])} ({w['peak_date']}) "
+                f"= x{w['mult']:.2f} خلال {wave_len} جلسة · القمة قبل {sessions_since_peak} جلسة")
     checks.append(c)
 
-    # 2) التصحيح إلى منطقة مهمة
-    c = C("zone", "تصحيح إلى منطقة دعم مهمة", 20)
-    dist = pct(price, zone["high"]) if zone else None
-    low10 = float(df["Low"].tail(10).min())
-    touched = bool(zone and low10 <= zone["high"] * (1 + A["zone_near_pct"] / 100) and low10 >= zone["low"] * 0.93)
-    if zone and price <= zone["high"] * (1 + A["zone_near_pct"] / 100):
-        c.ok, c.got, c.progress = True, 20, 1
-        c.detail = f"عند {zone['kind']} {fp(zone['low'])} – {fp(zone['high'])} · التصحيح {retrace:.0f}% من الموجة"
-    elif touched and price > zone["high"] * (1 + A["max_bounce_pct"] / 100):
-        c.got, c.progress = 8, 0.4
-        c.detail = (f"لمس {zone['kind']} {fp(zone['low'])} – {fp(zone['high'])} وارتد بقوة "
-                    f"(+{pct(price, low10):.0f}% من {fp(low10)}) — الحركة بدأت")
-        c.remaining = "لا تطارد — انتظر إعادة اختبار المنطقة أو تماسك جديد"
-    elif touched:
-        c.ok, c.got, c.progress = True, 20, 1
-        c.detail = (f"صحح إلى {zone['kind']} {fp(zone['low'])} – {fp(zone['high'])} (أدنى سعر {fp(low10)}) "
-                    f"وارتد منها · التصحيح {retrace:.0f}%")
-    elif zone:
-        c.progress = max(0, 1 - (dist - A["zone_near_pct"]) / 40)
-        c.got = 20 * c.progress * 0.5
-        c.detail = f"السعر فوق {zone['kind']} ({fp(zone['low'])} – {fp(zone['high'])}) · التصحيح {retrace:.0f}%"
-        c.remaining = f"يحتاج ينزل {abs(pct(zone['high'], price)):.1f}% ليوصل المنطقة {fp(zone['low'])} – {fp(zone['high'])}"
-    else:
-        c.detail = "كسر كل مناطق الدعم المحددة"
-        c.remaining = "ما فيه منطقة دعم صالحة تحت السعر"
-    checks.append(c)
-
-    # 3) الثبات عند المنطقة
-    c = C("hold", "ثبات عند المنطقة (توقف القيعان الأدنى)", 20)
-    k = A["hold_sessions"]
-    last = df.tail(k)
-    prevk = df.iloc[-(2 * k):-k]
-    no_lower = float(last["Low"].min()) >= float(prevk["Low"].min()) * 0.99 if len(prevk) else False
-    in_zone_days = int(((df["Low"].tail(15) <= (zone["high"] * 1.03 if zone else 0)) &
-                        (df["Close"].tail(15) >= (zone["low"] * 0.98 if zone else 1e9))).sum()) if zone else 0
-    wave_vol = float(df["Volume"].iloc[li:p + 1].mean())
-    corr_vol = float(after["Volume"].mean()) if len(after) else wave_vol
-    vol_dry = corr_vol < wave_vol * A["vol_dry_ratio"]
-    if no_lower and in_zone_days >= 3:
-        c.ok, c.got, c.progress = True, 15 + (5 if vol_dry else 0), 1
-        c.detail = f"ما سجل قاع أدنى آخر {k} جلسات · {in_zone_days} جلسات عند المنطقة"
-    else:
-        c.progress = 0.5 if no_lower else (0.3 if in_zone_days else 0)
-        c.got = 8 if no_lower else (4 if in_zone_days else 0)
-        c.detail = "لا يزال يسجل قيعان أدنى" if not no_lower else f"ثابت لكن {in_zone_days} جلسة فقط عند المنطقة"
-        c.remaining = f"يحتاج يثبت {k} جلسات عند المنطقة بدون قيعان أدنى"
-    c.detail += f" · فوليوم التصحيح {corr_vol / wave_vol * 100:.0f}% من فوليوم الموجة" + (" (جف ✓ قرينة مساعدة)" if vol_dry else "")
-    checks.append(c)
-
-    # 4) طلب جديد: استرداد مقاومة التماسك + حجم + احتفاظ
-    c = C("demand", "ظهور طلب جديد (استرداد مقاومة + حجم + احتفاظ)", 25)
-    cons = df.tail(A["consolidation_sessions"] + 3).iloc[:-3] if n > 20 else df.tail(10)
-    res = float(cons["High"].max())
-    avg_vol = float(df["Volume"].iloc[-31:-1].mean())
-    closes = df["Close"].tail(3).values
-    vols = df["Volume"].tail(3).values
-    broke_i = next((i for i in range(3) if closes[i] > res), None)
-    if broke_i is not None:
-        held = all(x > res for x in closes[broke_i:])
-        vol_ok = vols[broke_i] >= avg_vol * A["demand_vol_mult"]
-        held_n = 3 - broke_i
-        if held and vol_ok and held_n >= 2:
-            c.ok, c.got, c.progress = True, 25, 1
-            c.detail = f"استرد {fp(res)} بحجم {vols[broke_i] / avg_vol:.1f}x وثبت {held_n} جلسات فوقه"
-        elif held:
-            c.got, c.progress = 15, 0.6
-            c.detail = f"استرد {fp(res)}" + (f" بحجم {vols[broke_i] / avg_vol:.1f}x" if vol_ok else " لكن الحجم ضعيف")
-            c.remaining = "يحتاج احتفاظ جلستين فوق المستوى" + ("" if vol_ok else " مع تحسن الحجم")
-        else:
-            c.got, c.progress = 5, 0.2
-            c.detail = f"لامس/تجاوز {fp(res)} ثم رجع تحته — الملامسة لا تكفي"
-            c.remaining = f"يحتاج إغلاق واحتفاظ فوق {fp(res)}"
-    else:
-        c.progress = max(0, 1 - pct(res, price) / 25) * 0.4
-        c.got = 0
-        c.detail = f"مقاومة التماسك {fp(res)}"
-        c.remaining = f"باقي {pct(res, price):.1f}% لاسترداد {fp(res)} مع حجم أعلى من المتوسط"
-    checks.append(c)
-
-    # 5) الإبطال
-    c = C("inval", "مستوى إبطال واضح ومحترم", 10)
-    if inval and not invalidated:
+    # 2) تصحيح فعلي
+    c = C("correction", "تصحيح بعد الموجة", 10)
+    if retrace >= A["min_retrace_pct"]:
         c.ok, c.got, c.progress = True, 10, 1
-        c.detail = f"الإبطال عند {fp(inval)} (السعر فوقه بـ {pct(price, inval):.1f}%)" + (" · محدد من مسح سابق" if fixed else "")
-    elif inval:
-        c.detail = f"أغلق تحت مستوى الإبطال {fp(inval)} — النموذج ضعيف/ملغي"
-        c.remaining = "ينتظر موجة جديدة"
+        c.detail = f"صحح {retrace:.0f}% من الموجة (من {fp(w['peak'])} إلى {fp(sup)})"
     else:
-        c.detail = "ما أمكن تحديد مستوى إبطال"
+        c.progress = retrace / A["min_retrace_pct"]
+        c.got = 10 * c.progress
+        c.detail = f"صحح {retrace:.0f}% فقط"
+        c.remaining = f"التصحيح خفيف — غالباً يحتاج نزول لمنطقة أقوى"
+    checks.append(c)
+
+    # 3) التماسك (عدد الجلسات)
+    c = C("consol", "تماسك على الدعم (عدة جلسات)", 20)
+    L = cons["len"] if cons else 0
+    need = A["consolidation_min_sessions"]
+    if L >= need:
+        c.ok, c.got, c.progress = True, 20, 1
+        c.detail = f"متماسك {L} جلسة بين {fp(sup)} و {fp(cons['top'])} (مدى {cons['range_pct']:.0f}%)"
+    else:
+        c.progress = L / need
+        c.got = 20 * c.progress
+        c.detail = f"متماسك {L} جلسة فقط" if L else "لا يزال ينزل — ما بدأ تماسك"
+        c.remaining = f"باقي {need - L} جلسات تماسك تقريباً"
+    checks.append(c)
+
+    # 4) اختبار الدعم مرات عديدة
+    c = C("touches", "اختبر الدعم مرات عديدة وصمد", 25)
+    t = cons["touches"] if cons else 0
+    need_t = A["min_touches"]
+    if t >= need_t:
+        c.ok, c.got, c.progress = True, 25, 1
+        c.detail = f"اختبر الدعم {fp(sup)} {t} مرات ({'، '.join(cons['touch_dates'][-5:])})"
+    else:
+        c.progress = t / need_t
+        c.got = 25 * c.progress * 0.8
+        c.detail = f"اختبر الدعم {t} مرة" if t else "ما اختبر الدعم بعد"
+        c.remaining = f"يحتاج اختبار الدعم {need_t - t} مرة إضافية ويصمد"
+    checks.append(c)
+
+    # 5) تماسك ضيق
+    c = C("tight", "مدى التماسك ضيق", 10)
+    rp = cons["range_pct"] if cons else None
+    if rp is not None and rp <= A["tight_range_pct"]:
+        c.ok, c.got, c.progress = True, 10, 1
+        c.detail = f"المدى {rp:.0f}% — تماسك ضيق"
+    elif rp is not None:
+        c.progress = 0.5
+        c.got = 5
+        c.detail = f"المدى {rp:.0f}% — تماسك واسع نوعاً ما"
+    else:
+        c.detail = "-"
+    checks.append(c)
+
+    # 6) الدعم منطقة مهمة من الشارت
+    c = C("zone", "الدعم عند منطقة مهمة (قاعدة / مقاومة سابقة / رف)", 10)
+    if zone_match:
+        c.ok, c.got, c.progress = True, 10, 1
+        c.detail = f"يتوافق مع {zone_match['kind']} {fp(zone_match['low'])} – {fp(zone_match['high'])}"
+    else:
+        c.detail = "الدعم ما يطابق قاعدة أو مقاومة سابقة واضحة"
+    checks.append(c)
+
+    # 7) جفاف الفوليوم (قرينة مساعدة)
+    c = C("vol", "الفوليوم جف أثناء التصحيح (قرينة مساعدة)", 5)
+    wave_vol = float(df["Volume"].iloc[li:p + 1].mean()) or 1
+    cons_vol = float(df["Volume"].tail(max(L, 5)).mean())
+    vr = cons_vol / wave_vol
+    if vr < A["vol_dry_ratio"]:
+        c.ok, c.got, c.progress = True, 5, 1
+    c.detail = f"فوليوم التماسك {vr * 100:.0f}% من فوليوم الموجة"
     checks.append(c)
 
     score = sum(x.got for x in checks)
     ok = {x.key: x.ok for x in checks}
-    if invalidated or not zone:
+    if broken:
         status = "invalid"
-    elif ok["zone"] and ok["hold"] and ok["demand"] and ok["inval"]:
+    elif moved:
+        status = "moved"
+    elif ok["consol"] and ok["touches"] and ok["correction"]:
         status = "ready"
-    elif ok["zone"] and ok["inval"] and (ok["hold"] or checks[3].got >= 15):
+    elif L >= 4 and t >= 2:
         status = "near"
     else:
         status = "radar"
 
-    # الأهداف: قمة الموجة، ونصف الطريق
-    t_mid = (res + w["peak"]) / 2 if res < w["peak"] else None
+    remaining_total = [x.remaining for x in checks if x.remaining]
+    entry = [sup, sup * (1 + A["entry_above_support_pct"] / 100)]
+    targets = [x for x in ((cons["top"] if cons else None), (sup + w["peak"]) / 2, w["peak"]) if x and x > price]
 
-    # السيولة
-    dollar_vol = avg_vol * price
-
+    avg_vol = float(df["Volume"].iloc[-31:-1].mean())
     tail = df.tail(120)
+    off = n - len(tail)
     chart = {"d": [str(i)[:10] for i in tail.index],
              "o": [_r(x) for x in tail["Open"]], "h": [_r(x) for x in tail["High"]],
              "l": [_r(x) for x in tail["Low"]], "c": [_r(x) for x in tail["Close"]],
              "v": [int(x) for x in tail["Volume"]],
-             "wave_low_i": li - (n - len(tail)), "wave_peak_i": p - (n - len(tail))}
+             "wave_low_i": li - off, "wave_peak_i": p - off,
+             "cons_start_i": (cons["start_i"] - off) if cons else None}
 
-    r14 = rsi(df["Close"]).iloc[-1]
     return {
         "price": _r(price), "change_pct": _r(pct(price, prev), 2), "date": str(df.index[-1])[:10],
-        "volume": int(df["Volume"].iloc[-1]), "avg_volume": int(avg_vol), "dollar_volume": int(dollar_vol),
-        "rsi": _r(r14, 1),
+        "volume": int(df["Volume"].iloc[-1]), "avg_volume": int(avg_vol), "dollar_volume": int(avg_vol * price),
+        "rsi": _r(rsi(df["Close"]).iloc[-1], 1),
         "wave": {"low": _r(w["low"]), "low_date": w["low_date"], "peak": _r(w["peak"]),
-                 "peak_date": w["peak_date"], "mult": _r(w["mult"], 2), "sessions_since_peak": sessions_since_peak,
-                 "retrace_pct": _r(retrace, 1), "split_inside": w["split_inside"]},
-        "zone": {"kind": zone["kind"], "low": _r(zone["low"]), "high": _r(zone["high"])} if zone else None,
+                 "peak_date": w["peak_date"], "mult": _r(w["mult"], 2), "len": wave_len,
+                 "sessions_since_peak": sessions_since_peak, "retrace_pct": _r(retrace, 1),
+                 "split_inside": w["split_inside"]},
+        "support": _r(sup), "support_zone": zone_match["kind"] if zone_match else None,
+        "consolidation": {"len": L, "top": _r(cons["top"]) if cons else None,
+                          "range_pct": _r(rp, 1), "touches": t,
+                          "touch_dates": cons["touch_dates"] if cons else []},
+        "dist_support_pct": _r(pct(price, sup), 1),
+        "entry": [_r(x) for x in entry], "invalidation": _r(inval), "invalidated": broken,
+        "fixed_from_state": bool(fixed), "targets": [_r(x) for x in targets],
         "zones": [{"kind": z["kind"], "low": _r(z["low"]), "high": _r(z["high"])} for z in zones],
-        "invalidation": _r(inval), "invalidated": invalidated, "fixed_from_state": bool(fixed),
-        "resistance": _r(res), "targets": [_r(x) for x in (t_mid, w["peak"]) if x],
-        "vol_dry": vol_dry, "corr_vol_ratio": _r(corr_vol / wave_vol if wave_vol else None, 2),
+        "vol_ratio": _r(vr, 2), "remaining": remaining_total,
         "score": round(score, 1), "status": status, "checks": [x.d() for x in checks],
         "chart": chart,
     }
@@ -375,7 +404,7 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
 # فحص 4 ساعات و ساعة (للمرشحين)
 # ----------------------------------------------------------------------------
 
-def intraday_check(h1: pd.DataFrame, zone: dict | None, res: float | None) -> dict:
+def intraday_check(h1: pd.DataFrame, support: float | None, top: float | None) -> dict:
     out = {}
     if h1 is None or h1.empty:
         return out
@@ -385,14 +414,23 @@ def intraday_check(h1: pd.DataFrame, zone: dict | None, res: float | None) -> di
         lows = h4["Low"].tail(12).values
         # بنية الدعم: هل آخر 6 شموع 4س بدون قاع أدنى من الـ 6 اللي قبلها؟
         out["h4_no_lower_low"] = bool(lows[-6:].min() >= lows[:6].min() * 0.99)
-        if zone:
-            out["h4_closes_in_zone"] = int(((h4["Close"].tail(12) >= zone["low"]) &
-                                            (h4["Close"].tail(12) <= zone["high"] * 1.05)).sum())
-        if res:
-            out["h4_reclaim"] = bool(h4["Close"].iloc[-1] > res)
-    if len(h1) >= 20 and res:
+        if support:
+            # كم مرة لمست شموع 4 ساعات الدعم (ضمن 4%) آخر 60 شمعة
+            lo = h4["Low"].tail(60).values
+            tc, inside = 0, False
+            for v in lo:
+                if v <= support * 1.04:
+                    if not inside:
+                        tc += 1
+                    inside = True
+                elif v > support * 1.06:
+                    inside = False
+            out["h4_touches"] = tc
+            out["h4_close_above_support"] = bool(h4["Close"].iloc[-1] >= support)
+    if len(h1) >= 20:
         last = h1.tail(7)  # تقريباً جلسة
         avgv = float(h1["Volume"].tail(70).mean())
-        out["h1_above_res"] = bool(last["Close"].iloc[-1] > res)
         out["h1_vol_ratio"] = round(float(last["Volume"].mean()) / avgv, 2) if avgv else None
+        if top:
+            out["h1_dist_top_pct"] = round((top / float(last["Close"].iloc[-1]) - 1) * 100, 1)
     return out
