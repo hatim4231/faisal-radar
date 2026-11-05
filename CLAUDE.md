@@ -25,7 +25,7 @@ GitHub Pages: https://hatim4231.github.io/faisal-radar
 - `abdullah/abdullah_rules.py` الشروط الخمسة · `abdullah/abdullah_scanner.py` التشغيل (يستخدم أدوات جلب البيانات من `scanner.py`)
 - `abdullah/template.html` الصفحة · `abdullah/config.json` الأرقام
 - التقسيم العكسي ليس شرطاً، وقفزته الحسابية ما تُحسب تدبيل.
-- مستوى الإبطال يُحفظ أول مرة في `cache/abdullah_state.json` ولا يتغير لنفس الموجة. قراءات الشورت المتاح بتواريخها في `cache/short_history.json` (بدون تكلفة الاقتراض).
+- مستوى الإبطال يُحفظ أول مرة في `cache/abdullah_state_v2.json` ولا يتغير لنفس الموجة. قراءات الشورت المتاح بتواريخها في `cache/short_history.json` (بدون تكلفة الاقتراض).
 - الرابط: https://hatim4231.github.io/faisal-radar/abdullah/
 
 ## التجربة

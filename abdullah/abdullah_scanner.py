@@ -37,7 +37,7 @@ log = data.log
 CACHE = data.CACHE
 OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
-STATE = CACHE / "abdullah_state.json"
+STATE = CACHE / "abdullah_state_v2.json"
 SHORT_HIST = CACHE / "short_history.json"
 
 DILUTION = re.compile(r"offering|private placement|registered direct|at-the-market|\bATM\b|warrant|"

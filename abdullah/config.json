@@ -17,6 +17,8 @@
     "_wave_len_help": "الموجة تكون خلال 42 جلسة كحد أقصى (تقريباً شهرين)",
     "peak_within_sessions": 120,
     "min_retrace_pct": 35,
+    "max_retrace_pct": 110,
+    "_retrace_help": "التصحيح بين 35% و110% من الموجة. أكثر من 110% = نزل تحت قاع الانطلاقة وفقد الموجة",
     "consolidation_max_range_pct": 25,
     "consolidation_min_sessions": 8,
     "min_touches": 3,

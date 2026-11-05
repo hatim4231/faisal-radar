@@ -264,6 +264,10 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
     broke_prior = bool(prior_sup and price < prior_sup * (1 - A["invalidation_below_support_pct"] / 100))
     broken = price < inval or broke_prior or bool(fixed and fixed.get("broken"))
 
+    # فقد الموجة كاملة (نزل تحت قاع الانطلاقة بوضوح) = مو تصحيح، النموذج ملغي
+    if retrace > A["max_retrace_pct"]:
+        broken = True
+
     # طلع؟ (اخترق سقف التماسك أو ارتد بقوة من الدعم)
     prior_top = float(df["High"].iloc[-(cons["len"]):-2].max()) if cons and cons["len"] > 4 else None
     moved = price > sup * (1 + A["max_bounce_pct"] / 100) or \
