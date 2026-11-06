@@ -15,4 +15,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python diag/sec_check.py ELPW,VRAX,NCT
+      - run: python diag/full_case.py SVRE

@@ -110,6 +110,9 @@ FTS_QUERY = ('"registered direct" OR "private placement" OR "securities purchase
              'OR "placement agent" OR "underwriting agreement"')
 
 
+FTS_STATS = {"ok": 0, "err": 0, "hits": 0, "last_err": ""}
+
+
 def fts_hits(cik: int) -> list[dict]:
     """بحث في نص ملفات 6-K و 8-K (الشركات الأجنبية تعلن الطرح والتمويل في 6-K)."""
     from urllib.parse import quote
@@ -118,8 +121,12 @@ def fts_hits(cik: int) -> list[dict]:
            f"&forms=6-K,8-K,6-K/A,8-K/A&dateRange=custom&startdt={start}&enddt={date.today().isoformat()}")
     try:
         js = _get(url)
-    except Exception:
+        FTS_STATS["ok"] += 1
+    except Exception as e:
+        FTS_STATS["err"] += 1
+        FTS_STATS["last_err"] = repr(e)[:160]
         return []
+    FTS_STATS["hits"] += len(js.get("hits", {}).get("hits", []))
     out, seen = [], set()
     for h in js.get("hits", {}).get("hits", []):
         src = h.get("_source", {})
@@ -189,4 +196,54 @@ def annotate(rows: list[dict], log=print) -> None:
         if dl and dl["level"] != "none":
             log(f"    SEC {r['symbol']}: {dl['level']} · " + " | ".join(f"{h['date']} {h['form']}" for h in dl["hits"][:4]))
     lv = [r.get("dilution", {}).get("level") for r in rows]
+    log(f"  SEC بحث 6-K/8-K: نجح {FTS_STATS['ok']} فشل {FTS_STATS['err']} نتائج {FTS_STATS['hits']} {FTS_STATS['last_err']}")
     log(f"  SEC: فُحص {ok} (فشل {fail}) · عالي {lv.count('high')} · متوسط {lv.count('medium')} · منخفض {lv.count('low')}")
+
+
+# ----------------------------------------------------------------------------
+# قرار المستخدم: الشركة اللي عندها طرح/تخفيف متكرر خلال شهور قليلة ما تترشح أبداً (كل الرادارات)
+# ----------------------------------------------------------------------------
+REPEAT_MIN_EVENTS = 2     # حدثين تخفيف منفصلين أو أكثر خلال 90 يوم = متكرر
+MERGE_DAYS = 3            # ملفات بنفس الأيام (مثلاً EFFECT ثم 424B بعد يوم) = حدث واحد
+NEWS_DILUTION = ("طرح أسهم (تخفيف)", "Warrants (تخفيف)", "تخفيف", "تمويل بتخفيف محتمل")
+
+
+def dilution_events(r: dict) -> list[dict]:
+    """أحداث التخفيف المنفصلة: من ملفات SEC (بدون S-8) + الأخبار السلبية عن طرح/Warrants."""
+    pts = []
+    for h in (r.get("dilution") or {}).get("hits", []):
+        if h["sev"] >= 2 and not h["form"].upper().startswith("S-8"):
+            pts.append((h["date"], f"SEC {h['form']}"))
+    for n in r.get("news") or []:
+        if n.get("sentiment") == "negative" and any(w in NEWS_DILUTION for w in n.get("why_neg") or []):
+            d = (n.get("time") or "")[:10]
+            try:
+                if d and (date.today() - datetime.strptime(d, "%Y-%m-%d").date()).days <= LOOKBACK_DAYS:
+                    pts.append((d, "خبر: " + (n.get("title_ar") or n.get("title") or "")[:60]))
+            except ValueError:
+                pass
+    pts.sort()
+    events = []
+    for d, what in pts:
+        dt = datetime.strptime(d, "%Y-%m-%d").date()
+        if events and (dt - events[-1]["_d"]).days <= MERGE_DAYS:
+            events[-1]["what"].append(what)
+            continue
+        events.append({"_d": dt, "date": d, "what": [what]})
+    for e in events:
+        e.pop("_d")
+    return events
+
+
+def exclude_repeat_diluters(rows: list[dict], log=print) -> tuple[list[dict], list[dict]]:
+    keep, out = [], []
+    for r in rows:
+        ev = dilution_events(r)
+        if len(ev) >= REPEAT_MIN_EVENTS:
+            out.append({"symbol": r["symbol"], "name": r.get("name"), "price": r.get("price"),
+                        "events": [{"date": e["date"], "what": " + ".join(e["what"][:3])} for e in ev]})
+        else:
+            keep.append(r)
+    if out:
+        log(f"  مستبعد لتخفيف متكرر ({len(out)}): " + ", ".join(f"{x['symbol']}({len(x['events'])})" for x in out))
+    return keep, out

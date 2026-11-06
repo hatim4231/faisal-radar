@@ -171,11 +171,12 @@ def run(cfg, tickers=None, deep=True) -> dict:
             if dl.get("level") in ("high", "medium"):
                 h = dl["hits"][0]
                 r["flags"].insert(0, f"{'⛔' if dl['level'] == 'high' else '⚠'} SEC: {h['label']} ({h['form']} · {h['date']})")
+    rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "Yahoo Finance + Interactive Brokers (الشورت المتاح)",
                "scanned": len(daily), "with_wave": len(results),
                "moved": counts.get("moved", 0), "invalid": counts.get("invalid", 0), "seconds": round(time.time() - t0),
-               "config": cfg, "stocks": rows}
+               "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil}
     if os.environ.get("GITHUB_REPOSITORY"):
         payload["actions_url"] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/scan.yml"
     summary(rows)
@@ -265,6 +266,7 @@ def main():
     payload = run(cfg, a.tickers.split(",") if a.tickers else None, deep=not a.no_deep)
     out = Path(a.out) if a.out else OUT / "abdullah_report.html"
     write_html(payload, out)
+    (OUT / "sig_abdullah.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
     log(f"[عبدالله] التقرير: {out}")
     if not a.no_open:
         webbrowser.open(out.resolve().as_uri())

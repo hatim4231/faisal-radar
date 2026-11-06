@@ -141,6 +141,8 @@ ul.clean{margin:0;padding-right:18px}
     <div style="display:flex;gap:8px;align-items:center">
       <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
       <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" href="../insiders/" style="text-decoration:none">🟢 المطّلعين</a>
+      <a class="btn" href="../track/" style="text-decoration:none">📈 السجل</a>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
       <button class="btn" id="theme" title="الوضع الليلي">🌓</button>
     </div>
@@ -149,6 +151,7 @@ ul.clean{margin:0;padding-right:18px}
     <b>الفكرة:</b> سهم دبّل خلال شهر-شهرين ← صحح ← ثبت على دعم واختبره مرات عديدة وتماسك ← <b>قبل ما يطلع</b>.
     <span class="note">الأسهم اللي طلعت أو كسرت الدعم تنشال من القائمة. فرضية تداول نعمل عليها، وليست نظرية مثبتة النجاح. التقسيم العكسي ليس شرطاً، وقفزته الحسابية لا تُحسب تدبيل.</span>
   </div>
+  <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles"></div>
   <div class="toolbar">
     <input type="search" id="q" placeholder="ابحث برمز السهم...">
@@ -338,9 +341,9 @@ function openDetail(sym){
       <dt>عدد الأسهم</dt><dd class="num">${fM(s.shares_out)}</dd><dt>متوسط الفوليوم</dt><dd class="num">${fM(s.avg_volume)}</dd>
       <dt>السيولة اليومية</dt><dd class="num">$${fM(s.dollar_volume)}</dd><dt>RSI يومي</dt><dd class="num">${s.rsi}</dd></dl></div>
     ${s.dilution ? `<div class="card"><h3>🏛 خطر التخفيف من ملفات SEC (آخر 90 يوم)</h3>
-      <div style="font-weight:700;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--good)"}">${{high:"⛔ خطر عالي — طرح/تسجيل حديث (آخر 30 يوم)",medium:"⚠ خطر محتمل — عنده تسجيل أو رف طرح",low:"خطر خفيف",none:"✓ ما فيه ملفات طرح خلال 90 يوم"}[s.dilution.level]}</div>
+      <div style="font-weight:700;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--good)"}">${{high:"⛔ خطر عالي — طرح/تسجيل حديث (آخر 30 يوم)",medium:"⚠ خطر محتمل — عنده تسجيل أو رف طرح",low:"خطر خفيف",none:"ما لقى الفحص الآلي ملفات طرح خلال 90 يوم — تأكد بنفسك قبل الدخول"}[s.dilution.level]}</div>
       ${(s.dilution.hits||[]).length ? `<ul class="clean" style="margin-top:6px">${s.dilution.hits.map(h => `<li><b class="num">${esc(h.form)}</b> · <span class="num">${esc(h.date)}</span> (قبل ${h.days_ago} يوم) — ${esc(h.label)}</li>`).join("")}</ul>` : ""}
-      <div class="note" style="margin-top:6px">424B = طرح تسعّر · S-3/F-3 = رف طرح (ممكن ATM يبيع أثناء الجلسة) · S-1/F-1 = طرح أو إعادة بيع · EFFECT = التسجيل صار فعّال</div></div>` : ""}
+      <div class="note" style="margin-top:6px">424B = طرح تسعّر · 424B3 = إعادة بيع · 6-K/8-K + EX-1/EX-4/EX-10 = اتفاقية طرح أو Warrants أو تمويل · S-3/F-3 = رف طرح (ممكن ATM يبيع أثناء الجلسة) · S-1/F-1 = طرح أو إعادة بيع · EFFECT = التسجيل صار فعّال</div></div>` : ""}
     <div class="card"><h3>📰 الأخبار</h3>${news}
       ${s.dilution_news ? `<div style="margin-top:8px;color:var(--bad)"><b>أخبار تمويل/تخفيف:</b><ul class="clean">${s.dilution_news.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}</div>`;
   $("#ov").classList.add("on"); $("#dr").classList.add("on"); $("#dr").scrollTop = 0;
@@ -348,6 +351,17 @@ function openDetail(sym){
 function closeDetail(){ openSym = null; $("#ov").classList.remove("on"); $("#dr").classList.remove("on"); }
 $("#dclose").onclick = closeDetail; $("#ov").onclick = closeDetail;
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+
+(function(){
+  const ex = (DATA && DATA.excluded_dilution) || [];
+  if (!ex.length) return;
+  const box = document.getElementById("excl"); box.style.display = "";
+  box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم (اضغط للتفاصيل)";
+  document.getElementById("excl-body").innerHTML = ex.map(function(x){
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">' + esc(x.name||"") + '</span><ul class="clean note">' +
+      x.events.map(function(e){ return '<li><span class="num">' + esc(e.date) + '</span> — ' + esc(e.what) + '</li>'; }).join("") + '</ul></div>';
+  }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
+})();
 render();
 </script>
 </body>

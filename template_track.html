@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>سجل التوصيات</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --info:#5b5bd6; --info-bg:#ececfd;
+  --up:#16a36a; --down:#e04848; --ma20:#e39a1c; --ma50:#7c5cd6; --zone:rgba(19,149,92,.13);
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+    --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+  --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.demo{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{outline:2px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;background:var(--panel2);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:inherit;padding:6px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
+input[type=search]{flex:1;min-width:140px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;display:grid;grid-template-columns:150px 1fr 210px;gap:14px;align-items:center}
+.row:hover{border-color:var(--accent)}
+.sym{font-weight:700;font-size:17px}
+.name{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.px{font-size:14px}
+.up{color:var(--up)} .down{color:var(--down)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:600}
+.left{font-size:13px;margin-top:5px}
+.left .k{color:var(--warn);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.tag.g{background:var(--good-bg);color:var(--good);border-color:transparent}
+.tag.w{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.tag.b{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag.i{background:var(--info-bg);color:var(--info);border-color:transparent}
+.score{display:flex;flex-direction:column;gap:5px}
+.score .top{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.badge.ready{background:var(--good-bg);color:var(--good)}
+.badge.near{background:var(--warn-bg);color:var(--warn)}
+.badge.radar{background:var(--info-bg);color:var(--info)}
+.badge.no{background:var(--panel2);color:var(--muted)}
+.pct{font-size:20px;font-weight:700}
+.bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+/* detail */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20}
+.overlay.on{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(860px,100%);background:var(--bg);z-index:21;overflow-y:auto;transform:translateX(-102%);transition:transform .2s ease;border-right:1px solid var(--line)}
+.drawer.on{transform:none}
+.dhead{position:sticky;top:0;background:var(--bg);padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:2}
+#dtitle{min-width:0;flex:1} #dtitle .name{white-space:normal} #dclose{flex-shrink:0}
+.dbody{padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.check{display:grid;grid-template-columns:22px 1fr 60px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);align-items:start}
+.check:last-child{border-bottom:0}
+.check .ic{font-size:15px;line-height:1.4}
+.check .t{font-weight:600;font-size:14px}
+.check .d{color:var(--muted);font-size:13px}
+.check .r{color:var(--warn);font-size:13px;font-weight:500}
+.check .p{font-size:12px;color:var(--muted);text-align:left}
+.mini{height:5px;background:var(--panel2);border-radius:99px;margin-top:4px;overflow:hidden}
+.mini i{display:block;height:100%}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pbox{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.pbox span{display:block;color:var(--muted);font-size:12px}
+.pbox b{font-size:16px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.newsitem{padding:9px 0;border-bottom:1px solid var(--line)} .newsitem:last-of-type{border-bottom:0}
+.newsitem .nt{font-weight:600;font-size:14px} .newsitem .ns{font-size:13.5px;margin:3px 0;line-height:1.7}
+.news a{color:var(--accent);text-decoration:none}
+.news li{margin-bottom:6px;font-size:13.5px}
+.links a{color:var(--accent);margin-left:14px;font-size:13.5px;text-decoration:none}
+.note{font-size:12.5px;color:var(--muted)}
+.disc{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+ul.clean{margin:0;padding-right:18px}
+@media (max-width:820px){
+  .row{grid-template-columns:1fr;gap:8px}
+  .name{max-width:none}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .plan{grid-template-columns:repeat(2,1fr)}
+}
+.sent{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.sent.positive{background:var(--good-bg);color:var(--good)} .sent.negative{background:var(--bad-bg);color:var(--bad)} .sent.neutral{background:var(--panel2);color:var(--muted)}
+.newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:420px;overflow-y:auto;padding-left:6px}
+.newsitem .why{font-size:12px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>📈 سجل التوصيات</h1><div class="sub" id="meta"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
+      <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" href="../abdullah/" style="text-decoration:none">🌊 عبدالله</a>
+      <a class="btn" href="../insiders/" style="text-decoration:none">🟢 المطّلعين</a>
+    </div>
+  </header>
+  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة.
+    <span class="note">«نجح» = وصل الهدف الأول قبل الوقف. نفس اليوم فيه الوقف والهدف = نحسبه وقف (الأحوط). هذا سجل لقياس الرادار — مو توصية شراء.</span></div>
+  <div id="stats" class="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
+  <div class="toolbar">
+    <div class="tabs" id="tabs"></div>
+    <select id="fres"><option value="">كل النتائج</option><option value="open">⏳ مفتوحة</option><option value="win">✅ نجحت</option><option value="stop">❌ وقف</option><option value="expired">⌛ انتهت</option></select>
+  </div>
+  <div class="card" style="overflow-x:auto;padding:0"><table id="tbl" style="width:100%;border-collapse:collapse;font-size:13.5px"></table></div>
+  <div class="disc">السجل يبدأ من يوم تشغيله، ومع الوقت يصير الحكم أدق. ليس توصية شراء أو بيع.</div>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const pc = p => p == null ? "-" : (p > 0 ? "+" : "") + p + "%";
+const RES = {open:["⏳ مفتوحة","var(--muted)"], t1:["✅ وصل الهدف 1 (مفتوحة)","var(--good)"], t2:["🏆 الهدف 2","var(--good)"],
+  t1_then_stop:["✅ الهدف 1 ثم وقف","var(--good)"], t1_expired:["✅ الهدف 1 (انتهت)","var(--good)"], stop:["❌ وقف","var(--bad)"], expired:["⌛ انتهت بدون هدف","var(--warn)"]};
+let tab = "all";
+$("#meta").textContent = DATA ? "آخر تحديث: " + DATA.generated_at + " · عدد التوصيات: " + DATA.trades.length : "";
+function statsHTML(){
+  $("#stats").innerHTML = Object.entries(DATA.radars).map(([k,name]) => {
+    const s = DATA.stats[k], r = DATA.stats_status[k+":ready"], n = DATA.stats_status[k+":near"];
+    return `<div class="tile" style="cursor:default"><span style="font-weight:700;color:var(--text)">${esc(name)}</span>
+      <b class="num" style="color:var(--good)">${s.hit_pct ?? "-"}%</b><span>نجحت (وصلت الهدف 1) من ${s.n} توصية انحسمت</span>
+      <div class="note" style="margin-top:6px">❌ وقف ${s.stop_pct ?? "-"}% · ⏳ مفتوحة ${s.open} · متوسط أقصى ربح ${pc(s.avg_max_gain)}<br>
+      المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}</div></div>`;
+  }).join("");
+}
+function tabsHTML(){
+  const T = [["all","الكل"], ...Object.entries(DATA.radars)];
+  $("#tabs").innerHTML = T.map(([k,n]) => `<button data-t="${k}" class="${tab===k?"on":""}">${esc(n)}</button>`).join("");
+  document.querySelectorAll("#tabs button").forEach(b => b.onclick = () => { tab = b.dataset.t; render(); });
+}
+function render(){
+  tabsHTML();
+  const f = $("#fres").value;
+  const L = DATA.trades.filter(t => (tab === "all" || t.radar === tab) && (!f ||
+    (f === "open" && (t.result === "open" || t.result === "t1")) || (f === "win" && t.result.startsWith("t")) ||
+    (f === "stop" && t.result === "stop") || (f === "expired" && t.result === "expired")));
+  const th = s => `<th style="text-align:right;padding:8px;border-bottom:1px solid var(--line);color:var(--muted);font-weight:600;white-space:nowrap">${s}</th>`;
+  const td = (s, st="") => `<td style="padding:8px;border-bottom:1px solid var(--line);white-space:nowrap;${st}">${s}</td>`;
+  $("#tbl").innerHTML = `<tr>${["التاريخ","الرادار","السهم","الحالة","الدخول","الوقف","الهدف 1","النتيجة","أقصى ربح","أقصى نزول","الآن","جلسات"].map(th).join("")}</tr>` +
+    (L.length ? L.map(t => { const r = RES[t.result] || [t.result,""];
+      return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name))}${td(`<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label))}
+        ${td(`<span class="num">${fp(t.entry)}</span>`)}${td(`<span class="num" style="color:var(--bad)">${fp(t.stop)}</span>`)}${td(`<span class="num" style="color:var(--good)">${fp(t.t1)}</span>`)}
+        ${td(r[0], "color:"+r[1]+";font-weight:600")}${td(`<span class="num ${(t.max_gain_pct||0)>0?"up":""}">${pc(t.max_gain_pct)}</span>`)}${td(`<span class="num ${(t.max_dd_pct||0)<0?"down":""}">${pc(t.max_dd_pct)}</span>`)}
+        ${td(`<span class="num">${fp(t.last)} (${pc(t.ret_pct)})</span>`)}${td(`<span class="num">${t.sessions ?? 0}</span>`)}</tr>`; }).join("")
+    : `<tr><td colspan="12" style="padding:30px;text-align:center;color:var(--muted)">ما فيه توصيات بهذا الفلتر بعد</td></tr>`);
+}
+$("#fres").onchange = render;
+if (DATA){ statsHTML(); render(); }
+</script>
+</body>
+</html>
