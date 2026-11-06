@@ -10,7 +10,7 @@ on:
   workflow_dispatch:          # زر Run workflow للتحديث اليدوي (حتى من الجوال)
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -24,6 +24,8 @@ jobs:
     timeout-minutes: 45
     env:
       RADAR_PASSWORD: ${{ secrets.RADAR_PASSWORD }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
     steps:
       - uses: actions/checkout@v4
 
@@ -41,8 +43,15 @@ jobs:
           key: info-${{ github.run_id }}
           restore-keys: info-
 
+      - name: سجل التوصيات (فرع track-data)
+        run: |
+          git fetch origin track-data:track-data 2>/dev/null && git worktree add trackdata track-data \
+            || { git worktree add --orphan -b track-data trackdata && echo '{"trades": []}' > trackdata/track.json; }
+
       - name: المسح
-        run: python scanner.py --no-open --out site/index.html
+        run: |
+          python scanner.py --no-open --out site/index.html
+          cp output/latest.json output/sig_faisal_dev.json
 
       - name: نسخ ملف Excel (فقط إذا الموقع بدون كلمة سر)
         if: env.RADAR_PASSWORD == ''
@@ -52,7 +61,21 @@ jobs:
         run: python abdullah/abdullah_scanner.py --no-open --out site/abdullah/index.html
 
       - name: رادار فيصل — النسخة الأصلية
-        run: python faisal_original/run_original.py --out site/original/index.html
+        run: |
+          python faisal_original/run_original.py --out site/original/index.html
+          cp output/latest.json output/sig_faisal_orig.json
+
+      - name: متابعة التوصيات + تيليجرام
+        run: python tracker.py
+
+      - name: حفظ السجل
+        run: |
+          cd trackdata
+          git config user.name "Faisal Radar"
+          git config user.email "hatim423@hotmail.com"
+          git add -A
+          git commit -q -m "تحديث سجل التوصيات $(date -u +%F_%H%M)" || echo "لا تغيير"
+          git push -q origin track-data
 
       - name: قفل الموقع بكلمة سر (إذا موجودة في Secrets باسم RADAR_PASSWORD)
         if: env.RADAR_PASSWORD != ''
@@ -65,6 +88,7 @@ jobs:
           npx --yes staticrypt@3.5.4 site/index.html "${OPTS[@]}" --template-title "📡 رادار فيصل" -d site
           npx --yes staticrypt@3.5.4 site/abdullah/index.html "${OPTS[@]}" --template-title "🌊 رادار عبدالله" -d site/abdullah
           npx --yes staticrypt@3.5.4 site/original/index.html "${OPTS[@]}" --template-title "📜 فيصل الأصلي" -d site/original
+          npx --yes staticrypt@3.5.4 site/track/index.html "${OPTS[@]}" --template-title "📈 سجل التوصيات" -d site/track
 
       - uses: actions/upload-pages-artifact@v3
         with:

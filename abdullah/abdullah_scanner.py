@@ -266,6 +266,7 @@ def main():
     payload = run(cfg, a.tickers.split(",") if a.tickers else None, deep=not a.no_deep)
     out = Path(a.out) if a.out else OUT / "abdullah_report.html"
     write_html(payload, out)
+    (OUT / "sig_abdullah.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
     log(f"[عبدالله] التقرير: {out}")
     if not a.no_open:
         webbrowser.open(out.resolve().as_uri())

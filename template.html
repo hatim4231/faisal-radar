@@ -141,6 +141,7 @@ ul.clean{margin:0;padding-right:18px}
     <div style="display:flex;gap:8px;align-items:center">
       <a class="btn" id="lnk-other" href="original/" style="text-decoration:none">📜 فيصل الأصلي</a>
       <a class="btn" id="lnk-abd" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
+      <a class="btn" id="lnk-track" href="track/" style="text-decoration:none">📈 السجل</a>
       <button class="btn primary" id="rescan" style="display:none">🔄 تحديث المسح</button>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
       <button class="btn" id="theme" title="الوضع الليلي">🌓</button>
@@ -208,6 +209,7 @@ if (DATA && DATA.variant === "original"){
   document.title = "فيصل الأصلي";
   const o = document.getElementById("lnk-other"); o.href = "../"; o.textContent = "📡 فيصل المطوّر";
   document.getElementById("lnk-abd").href = "../abdullah/";
+  document.getElementById("lnk-track").href = "../track/";
 } else if (DATA) {
   document.getElementById("h1").textContent = "📡 رادار فيصل — المطوّر";
 }
