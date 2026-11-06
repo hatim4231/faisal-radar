@@ -4,7 +4,7 @@
   "universe": {
     "exchanges": ["NASDAQ"],
     "_exchanges_help": "أضف \"NYSE_AMERICAN\" أو \"NYSE\" لو تبي توسع البحث",
-    "min_price": 1.0,
+    "min_price": 0.5,
     "max_price": 5.0,
     "max_market_cap": 300000000,
     "max_float": 50000000,

@@ -164,7 +164,7 @@ def run():
         for s in signals(key, payload):
             if (key, s["symbol"]) in open_keys or not s.get("entry"):
                 continue
-            t = {"id": f"{key}:{s['symbol']}:{s['date']}", "radar": key, "radar_name": name,
+            t = {"id": f"{key}:{s['symbol']}:{s['date']}", "radar": key, "radar_name": name, "sub1": s["entry"] < 1,
                  "opened_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "result": "open", **s}
             if any(x["id"] == t["id"] for x in trades):
                 continue
@@ -266,6 +266,9 @@ def build_page(track):
     by = {k: stats([t for t in trades if t["radar"] == k]) for k in RADARS}
     by_status = {f"{k}:{s}": stats([t for t in trades if t["radar"] == k and t["status"] == s])
                  for k in RADARS for s in ("ready", "near")}
+    for k in RADARS:  # الأسهم تحت 1$ مقابل فوقه
+        by_status[f"{k}:sub1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 9) < 1])
+        by_status[f"{k}:over1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 0) >= 1])
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "radars": {k: v[0] for k, v in RADARS.items()}, "stats": by, "stats_status": by_status,
                "trades": sorted(trades, key=lambda t: t["opened_at"], reverse=True)}

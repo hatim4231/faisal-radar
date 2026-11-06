@@ -338,6 +338,7 @@ function render(){
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
         ${s.dilution && s.dilution.level!=="none" && s.dilution.level!=="low" ? `<div class="left" style="color:${s.dilution.level==="high"?"var(--bad)":"var(--warn)"}">🏛 SEC: ${esc(s.dilution.hits[0].label)} (<span class="num">${esc(s.dilution.hits[0].form)} · ${esc(s.dilution.hits[0].date)}</span>)</div>` : ""}
+        ${s.compliance ? `<div class="left" style="color:${s.compliance.level==="block"?"var(--bad)":s.compliance.level==="info"?"var(--muted)":"var(--warn)"}">🏛 ${esc(s.compliance.why)}</div>` : ""}
         ${s.new_low ? `<div class="left" style="color:${s.new_low.pending?"var(--bad)":"var(--good)"}">${s.new_low.pending?"⚠":"✓"} ${esc(s.new_low.why)}</div>` : ""}
         ${s.split_zone ? `<div class="left" style="color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--muted)"}">✂️ منطقة التقسيم <span class="num">${fp(s.split_zone.sweep)} – ${fp(s.split_zone.half)}</span> · ${esc(s.split_zone.label)}${(s.split_zone.status==="above" || s.split_zone.status==="na") ? " · " + esc(s.split_zone.note) : ""}</div>` : ""}
         ${(s.news||[]).length ? `<div class="left">${sentBadge(s.news[0])} <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}

@@ -34,6 +34,7 @@ import scanner as data  # noqa: E402  (أدوات جلب البيانات فقط
 import abdullah_rules as ar  # noqa: E402
 import news_tools  # noqa: E402
 import sec_tools  # noqa: E402
+import compliance_rule  # noqa: E402
 
 log = data.log
 CACHE = data.CACHE
@@ -131,6 +132,7 @@ def run(cfg, tickers=None, deep=True) -> dict:
             a["flags"].append("الشورت غير معروف — ما يترشح لين يتأكد")
             if a["status"] in ("ready", "near"):
                 a["status"] = "radar"
+        compliance_rule.apply_abdullah(a, d)  # امتثال ناسداك للأسهم تحت 1$
         if a["dollar_volume"] < A["min_dollar_volume"]:
             a["flags"].append(f"سيولة ضعيفة: متوسط التداول ${a['dollar_volume'] / 1e3:,.0f}K يومياً")
         if flt and a.get("shares_out") and a["shares_out"] > flt * 3:

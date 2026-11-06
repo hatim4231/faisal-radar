@@ -197,7 +197,8 @@ def run(cfg, tickers=None) -> dict:
     if not explicit:
         tickers = [t for t in tickers if not (len(t) == 5 and t[-1] in "WRU") and "-" not in t]
     daily = data.download_daily(tickers, cfg)
-    U = cfg["universe"]
+    U = dict(cfg["universe"])
+    U["min_price"] = max(U["min_price"], 1.0)  # قرار المستخدم: المطّلعين يبقى من 1$ (التوسيع لـ 0.50$ لفيصل وعبدالله فقط)
     pre = {t: d for t, d in daily.items()
            if explicit or (U["min_price"] <= float(d["Close"].iloc[-1]) <= U["max_price"]
                            and float(d["Volume"].tail(30).mean()) >= U["min_avg_volume"] * 0.7)}
