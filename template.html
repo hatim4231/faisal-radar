@@ -490,9 +490,9 @@ function openDetail(sym){
     </div>
 
     ${s.dilution ? `<div class="card"><h3>🏛 خطر التخفيف من ملفات SEC (آخر 90 يوم)</h3>
-      <div style="font-weight:700;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--good)"}">${{high:"⛔ خطر عالي — طرح/تسجيل حديث (آخر 30 يوم)",medium:"⚠ خطر محتمل — عنده تسجيل أو رف طرح",low:"خطر خفيف",none:"✓ ما فيه ملفات طرح خلال 90 يوم"}[s.dilution.level]}</div>
+      <div style="font-weight:700;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--good)"}">${{high:"⛔ خطر عالي — طرح/تسجيل حديث (آخر 30 يوم)",medium:"⚠ خطر محتمل — عنده تسجيل أو رف طرح",low:"خطر خفيف",none:"ما لقى الفحص الآلي ملفات طرح خلال 90 يوم — تأكد بنفسك قبل الدخول"}[s.dilution.level]}</div>
       ${(s.dilution.hits||[]).length ? `<ul class="clean" style="margin-top:6px">${s.dilution.hits.map(h => `<li><b class="num">${esc(h.form)}</b> · <span class="num">${esc(h.date)}</span> (قبل ${h.days_ago} يوم) — ${esc(h.label)}</li>`).join("")}</ul>` : ""}
-      <div class="note" style="margin-top:6px">424B = طرح تسعّر · S-3/F-3 = رف طرح (ممكن ATM يبيع أثناء الجلسة) · S-1/F-1 = طرح أو إعادة بيع · EFFECT = التسجيل صار فعّال</div></div>` : ""}
+      <div class="note" style="margin-top:6px">424B = طرح تسعّر · 424B3 = إعادة بيع · 6-K/8-K + EX-1/EX-4/EX-10 = اتفاقية طرح أو Warrants أو تمويل · S-3/F-3 = رف طرح (ممكن ATM يبيع أثناء الجلسة) · S-1/F-1 = طرح أو إعادة بيع · EFFECT = التسجيل صار فعّال</div></div>` : ""}
     <div class="card"><h3>📰 الأخبار</h3>${news}<div class="note">الخبر محفز، وليس سبب دخول إذا الشارت غير جاهز.</div></div>
 
     <div class="card"><h3>✋ قائمة فحص قبل الدخول (يدوي)</h3><ul class="clean">

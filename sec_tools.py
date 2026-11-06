@@ -19,11 +19,12 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 
 USER_AGENT = "FaisalRadar hatim423@hotmail.com"
-CACHE_FILE = Path(__file__).resolve().parent / "cache" / "sec_cache.json"
+CACHE_FILE = Path(__file__).resolve().parent / "cache" / "sec_cache_v2.json"
 LOOKBACK_DAYS = 90
 HIGH_DAYS = 30
 
 FORMS = {
+    "424B3": ("نشرة إعادة بيع — مساهمين يقدرون يبيعون أسهمهم", 2),
     "424B": ("نشرة طرح تسعّرت", 3),
     "S-1": ("تسجيل طرح / إعادة بيع (S-1)", 2),
     "F-1": ("تسجيل طرح / إعادة بيع (F-1)", 2),
@@ -89,11 +90,61 @@ def check(ticker: str) -> dict | None:
         url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{acc.replace('-', '')}/{doc}"
         hits.append({"form": form, "date": fdate, "label": label, "sev": sev, "url": url,
                      "days_ago": (date.today() - d).days})
+    hits += fts_hits(cik)
+    hits.sort(key=lambda h: h["date"], reverse=True)
     if not hits:
         return {"level": "none", "hits": [], "cik": cik}
     recent_high = any(h["sev"] >= 3 and h["days_ago"] <= HIGH_DAYS for h in hits)
     level = "high" if recent_high else ("medium" if any(h["sev"] >= 2 for h in hits) else "low")
     return {"level": level, "hits": hits[:8], "cik": cik}
+
+
+EXHIBITS = {
+    "EX-1": "اتفاقية اكتتاب / وكيل طرح (Underwriting / Placement)",
+    "EX-4": "Warrants أو سندات قابلة للتحويل",
+    "EX-10": "اتفاقية شراء أسهم / تمويل (Securities Purchase)",
+    "EX-99": "بيان صحفي عن تمويل",
+}
+FTS_QUERY = ('"registered direct" OR "private placement" OR "securities purchase agreement" OR "public offering" '
+             'OR "pre-funded" OR "warrant inducement" OR "convertible note" OR "equity line" OR "at-the-market" '
+             'OR "placement agent" OR "underwriting agreement"')
+
+
+def fts_hits(cik: int) -> list[dict]:
+    """بحث في نص ملفات 6-K و 8-K (الشركات الأجنبية تعلن الطرح والتمويل في 6-K)."""
+    from urllib.parse import quote
+    start = (date.today() - timedelta(days=LOOKBACK_DAYS)).isoformat()
+    url = (f"https://efts.sec.gov/LATEST/search-index?q={quote(FTS_QUERY)}&ciks={cik:010d}"
+           f"&forms=6-K,8-K,6-K/A,8-K/A&dateRange=custom&startdt={start}&enddt={date.today().isoformat()}")
+    try:
+        js = _get(url)
+    except Exception:
+        return []
+    out, seen = [], set()
+    for h in js.get("hits", {}).get("hits", []):
+        src = h.get("_source", {})
+        fdate = src.get("file_date") or ""
+        acc, _, fname = (h.get("_id") or "").partition(":")
+        desc = (src.get("file_description") or src.get("file_type") or "").upper()
+        if (acc, desc) in seen or not fdate:
+            continue
+        seen.add((acc, desc))
+        ex = desc.split(".")[0]  # "EX-10.1" -> "EX-10"
+        label = EXHIBITS.get(ex, "إعلان فيه طرح أو تمويل")
+        try:
+            days = (date.today() - datetime.strptime(fdate, "%Y-%m-%d").date()).days
+        except ValueError:
+            continue
+        form = (src.get("form") or (src.get("root_forms") or ["6-K"])[0])
+        out.append({"form": f"{form} {desc}".strip(), "date": fdate, "label": label, "sev": 3 if ex in ("EX-1", "EX-4", "EX-10") else 2,
+                    "days_ago": days, "url": f"https://www.sec.gov/Archives/edgar/data/{cik}/{acc.replace('-', '')}/{fname}"})
+    # ملف واحد فيه عدة مرفقات: نخلي أهم مرفق لكل ملف
+    best = {}
+    for h in out:
+        k = h["date"] + h["form"].split()[0]
+        if k not in best or h["sev"] > best[k]["sev"]:
+            best[k] = h
+    return list(best.values())
 
 
 def _load():
@@ -133,5 +184,9 @@ def annotate(rows: list[dict], log=print) -> None:
         CACHE_FILE.write_text(json.dumps(cache), encoding="utf-8")
     except Exception:
         pass
+    for r in rows:
+        dl = r.get("dilution")
+        if dl and dl["level"] != "none":
+            log(f"    SEC {r['symbol']}: {dl['level']} · " + " | ".join(f"{h['date']} {h['form']}" for h in dl["hits"][:4]))
     lv = [r.get("dilution", {}).get("level") for r in rows]
     log(f"  SEC: فُحص {ok} (فشل {fail}) · عالي {lv.count('high')} · متوسط {lv.count('medium')} · منخفض {lv.count('low')}")
