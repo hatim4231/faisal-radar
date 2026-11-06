@@ -37,7 +37,10 @@ GitHub Pages: https://hatim4231.github.io/faisal-radar
 - `abdullah/abdullah_rules.py` الشروط الخمسة · `abdullah/abdullah_scanner.py` التشغيل (يستخدم أدوات جلب البيانات من `scanner.py`)
 - `abdullah/template.html` الصفحة · `abdullah/config.json` الأرقام
 - التقسيم العكسي ليس شرطاً، وقفزته الحسابية ما تُحسب تدبيل.
-- مستوى الإبطال يُحفظ أول مرة في `cache/abdullah_state_v2.json` ولا يتغير لنفس الموجة. قراءات الشورت المتاح بتواريخها في `cache/short_history.json` (بدون تكلفة الاقتراض).
+- مستوى الإبطال يُحفظ أول مرة في `cache/abdullah_state_v3.json` ولا يتغير لنفس الموجة. قراءات الشورت المتاح بتواريخها في `cache/short_history.json` (بدون تكلفة الاقتراض).
+- تطوير من صور عبدالإله (SSM، CRE، YMAT، STAK): الدعم الأقوى = **بداية الانطلاقة** (15 نقطة)، **الوقف = أدنى سعر** في التماسك −1%،
+  **نافذة التوقيت** 12-35 جلسة بعد القمة (SSM دبّل بعد ~20 يوم)، **4H Sweep** (شمعة 4 ساعات تنزل تحت قاع سابق وتغلق فوقه) = +5 للمرشحين،
+  هدف **قمة 4 ساعات**، و**عمر السهم في القائمة** (`cache/abdullah_seen.json`). اختبار الدعم = نزول ضمن 3% ويُحسب اختبار جديد بعد إغلاق 2.5%+ فوق الدعم.
 - الرابط: https://hatim4231.github.io/faisal-radar/abdullah/
 
 ## التجربة

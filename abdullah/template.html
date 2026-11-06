@@ -248,7 +248,9 @@ function render(){
       <div>
         <div class="facts">${facts.map(([k,v]) => `<span>${k}: <b class="${/[؀-ۿ]/.test(v)?"":"num"}">${esc(v)}</b></span>`).join("")}</div>
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` : ""}
+        ${(s.flags_pos||[]).length ? `<div class="left" style="color:var(--good)">✅ ${esc(s.flags_pos[0])}</div>` : ""}
         ${s.flags.length ? `<div class="left" style="color:var(--bad)">⚠ ${esc(s.flags[0])}</div>` : ""}
+        ${s.list_days != null ? `<div class="left note">📋 في القائمة من <span class="num">${s.list_days}</span> يوم (${esc(s.list_since)})</div>` : ""}
         ${n0 ? `<div class="left">${sentBadge(n0)} <span class="note">${esc((n0.time||"").slice(0,10))}</span> ${esc(n0.title_ar || n0.title)}</div>` : ""}
       </div>
       <div class="score"><div class="top"><span class="badge ${STC[s.status]}">${ST[s.status]}</span><span class="pct num" style="color:${scol(s.status)}">${Math.round(s.score)}</span></div>
@@ -301,6 +303,8 @@ function openDetail(sym){
   $("#dbody").innerHTML = `
     <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
       <span class="badge ${STC[s.status]}" style="font-size:14px">${ST[s.status]}</span><span class="pct num" style="font-size:28px;color:${scol(s.status)}">${Math.round(s.score)}/100</span></div>
+      ${(s.flags_pos||[]).length ? `<ul class="clean" style="color:var(--good);margin-top:8px">${s.flags_pos.map(f => `<li>${esc(f)}</li>`).join("")}</ul>` : ""}
+      ${s.list_days != null ? `<div class="note" style="margin-top:6px">📋 في قائمة الرادار من ${s.list_days} يوم (أول ظهور ${esc(s.list_since)}) — SSM دبّل بعد حوالي 20 يوم من دخوله القوائم</div>` : ""}
       ${s.flags.length ? `<ul class="clean" style="color:var(--bad);margin-top:8px">${s.flags.map(f => `<li>${esc(f)}</li>`).join("")}</ul>` : ""}</div>
     <div class="card chart"><h3>الشارت اليومي</h3>${chartSVG(s)}
       <div class="legend"><span><i style="background:var(--zone);height:9px"></i>منطقة التماسك</span><span><i style="background:var(--good)"></i>الدعم (▲ = اختبار)</span><span><i style="background:var(--bad)"></i>الإبطال</span><span><i style="background:var(--accent)"></i>الموجة والأهداف</span></div></div>
@@ -312,7 +316,7 @@ function openDetail(sym){
       <div class="pbox"><span>اختبارات الدعم</span><b>${s.consolidation.touches} مرات</b><span class="num">${(s.consolidation.touch_dates||[]).slice(-4).join(" · ") || "-"}</span></div>
       <div class="pbox"><span>التماسك</span><b>${s.consolidation.len} جلسة</b><span>بين \u2066${fp(s.support)}\u2069 و \u2066${fp(s.consolidation.top)}\u2069 · مدى \u2066${s.consolidation.range_pct}%\u2069</span></div>
       <div class="pbox"><span>منطقة الدخول قرب الدعم</span><b class="num">${fp(s.entry[0])} – ${fp(s.entry[1])}</b><span>السعر عن الدعم ${fpct(s.dist_support_pct)}</span></div>
-      <div class="pbox"><span>مستوى الإبطال</span><b class="num" style="color:var(--bad)">${fp(s.invalidation)}</b><span>${s.fixed_from_state ? "محدد مسبقاً ولا يتغير" : "حُدد في هذا المسح"}</span></div>
+      <div class="pbox"><span>مستوى الإبطال</span><b class="num" style="color:var(--bad)">${fp(s.invalidation)}</b><span>تحت أدنى سعر · ${s.fixed_from_state ? "محدد مسبقاً ولا يتغير" : "حُدد في هذا المسح"}</span></div>
     </div><div class="note" style="margin-top:8px">الأهداف: <span class="num">${(s.targets||[]).map(fp).join(" / ") || "-"}</span> (سقف التماسك ← منتصف الطريق ← قمة الموجة) · التصحيح <span class="num">${w.retrace_pct}%</span> · فوليوم التماسك <span class="num">${s.vol_ratio!=null?Math.round(s.vol_ratio*100)+"%":"-"}</span> من فوليوم الموجة
       <br>كل مناطق الدعم: ${s.zones.map(z => `<span class="num">${fp(z.low)}–${fp(z.high)}</span> (${esc(z.kind)})`).join(" · ")}</div></div>
     <div class="card"><h3>✔ الشروط</h3>${checksHTML(s.checks)}</div>
@@ -321,6 +325,8 @@ function openDetail(sym){
         <dt>4 ساعات: بدون قاع أدنى</dt><dd>${yes(it.h4_no_lower_low)}</dd>
         <dt>4 ساعات: لمسات الدعم</dt><dd class="num">${it.h4_touches ?? "-"}</dd>
         <dt>4 ساعات: الإغلاق فوق الدعم</dt><dd>${yes(it.h4_close_above_support)}</dd>
+        <dt>4 ساعات: سحب سيولة (Sweep)</dt><dd>${it.h4_sweep ? `✅ إلى <span class="num">${fp(it.h4_sweep_low)}</span> <span class="note">${esc(it.h4_sweep_time||"")}</span>` : yes(it.h4_sweep)}</dd>
+        <dt>الهدف: قمة 4 ساعات</dt><dd class="num">${fp(it.h4_high)}</dd>
         <dt>ساعة: المسافة لسقف التماسك</dt><dd class="num">${it.h1_dist_top_pct != null ? it.h1_dist_top_pct+"%" : "-"}</dd>
         <dt>ساعة: الحجم / المتوسط</dt><dd class="num">${it.h1_vol_ratio != null ? it.h1_vol_ratio+"x" : "-"}</dd></dl>
         <div class="note">يظهر للمرشحين فقط</div></div>
