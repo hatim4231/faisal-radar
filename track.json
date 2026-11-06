@@ -18,9 +18,12 @@
    "name": "FBS Global Limited",
    "why": "RSI 33.6 · دعم 2.04 (عنه 6.1%) · منطقة الطلب 2.04–2.24",
    "dilution": "none",
-   "sessions": 0,
-   "last": 2.165,
-   "last_date": "2026-11-05"
+   "sessions": 1,
+   "last": 2.1,
+   "last_date": "2026-11-06",
+   "max_gain_pct": -3.0,
+   "max_dd_pct": -3.0,
+   "ret_pct": -3.0
   },
   {
    "id": "faisal_dev:ALP:2026-11-05",
@@ -41,11 +44,11 @@
    "why": "RSI 30.9 · دعم 2.78 (عنه 6.1%) · منطقة الطلب 2.78–3.06",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.975,
+   "last": 3.105,
    "last_date": "2026-11-06",
-   "max_gain_pct": 0.8,
+   "max_gain_pct": 6.3,
    "max_dd_pct": -1.0,
-   "ret_pct": 0.8
+   "ret_pct": 5.3
   },
   {
    "id": "faisal_dev:INHD:2026-11-05",
@@ -66,11 +69,11 @@
    "why": "RSI 32.7 · دعم 2.88 (عنه 4.5%) · منطقة الطلب 2.88–3.17",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.965,
+   "last": 2.98,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.2,
-   "max_dd_pct": -3.3,
-   "ret_pct": -1.5
+   "max_dd_pct": -3.6,
+   "ret_pct": -1.0
   },
   {
    "id": "faisal_orig:FBGL:2026-11-05",
@@ -90,9 +93,12 @@
    "name": "FBS Global Limited",
    "why": "RSI 33.6 · دعم 2.04 (عنه 6.1%) · منطقة الطلب 2.04–2.24",
    "dilution": "none",
-   "sessions": 0,
-   "last": 2.165,
-   "last_date": "2026-11-05"
+   "sessions": 1,
+   "last": 2.1,
+   "last_date": "2026-11-06",
+   "max_gain_pct": -3.0,
+   "max_dd_pct": -3.0,
+   "ret_pct": -3.0
   },
   {
    "id": "faisal_orig:BYAH:2026-11-05",
@@ -113,11 +119,11 @@
    "why": "RSI 43.0 · دعم 1.90 (عنه 10.0%) · منطقة الطلب 1.90–2.09",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.15,
+   "last": 2.16,
    "last_date": "2026-11-06",
    "max_gain_pct": 10.0,
    "max_dd_pct": 2.9,
-   "ret_pct": 2.9
+   "ret_pct": 3.3
   },
   {
    "id": "faisal_orig:ALP:2026-11-05",
@@ -138,11 +144,11 @@
    "why": "RSI 30.9 · دعم 2.78 (عنه 6.1%) · منطقة الطلب 2.78–3.06",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.975,
+   "last": 3.105,
    "last_date": "2026-11-06",
-   "max_gain_pct": 0.8,
+   "max_gain_pct": 6.3,
    "max_dd_pct": -1.0,
-   "ret_pct": 0.8
+   "ret_pct": 5.3
   },
   {
    "id": "faisal_orig:MWYN:2026-11-05",
@@ -189,11 +195,11 @@
    "why": "RSI 40.2 · دعم 2.10 (عنه 1.0%) · منطقة الطلب 2.10–2.31",
    "dilution": "medium",
    "sessions": 1,
-   "last": 2.235,
+   "last": 2.2001,
    "last_date": "2026-11-06",
    "max_gain_pct": 8.5,
    "max_dd_pct": -0.0,
-   "ret_pct": 5.4
+   "ret_pct": 3.8
   },
   {
    "id": "faisal_orig:INHD:2026-11-05",
@@ -214,11 +220,11 @@
    "why": "RSI 32.7 · دعم 2.88 (عنه 4.5%) · منطقة الطلب 2.88–3.17",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.965,
+   "last": 2.98,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.2,
-   "max_dd_pct": -3.3,
-   "ret_pct": -1.5
+   "max_dd_pct": -3.6,
+   "ret_pct": -1.0
   },
   {
    "id": "abdullah:PN:2026-11-05",
@@ -239,11 +245,11 @@
    "why": "موجة 2.71→15.40 · دعم 2.14 · اختبر 5 مرات · تماسك 23 جلسة",
    "dilution": "medium",
    "sessions": 1,
-   "last": 2.45,
+   "last": 2.37,
    "last_date": "2026-11-06",
    "max_gain_pct": 3.4,
    "max_dd_pct": -1.6,
-   "ret_pct": 2.9
+   "ret_pct": -0.4
   },
   {
    "id": "abdullah:SPHL:2026-11-05",
@@ -264,11 +270,11 @@
    "why": "موجة 2.02→5.94 · دعم 2.25 · اختبر 3 مرات · تماسك 6 جلسة",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.26,
+   "last": 2.3,
    "last_date": "2026-11-06",
    "max_gain_pct": 1.6,
    "max_dd_pct": -2.2,
-   "ret_pct": -2.2
+   "ret_pct": -0.4
   },
   {
    "id": "abdullah:CAMP:2026-11-05",
@@ -289,11 +295,11 @@
    "why": "موجة 2.90→6.00 · دعم 3.48 · اختبر 2 مرات · تماسك 7 جلسة",
    "dilution": "medium",
    "sessions": 1,
-   "last": 3.675,
+   "last": 3.855,
    "last_date": "2026-11-06",
-   "max_gain_pct": 2.4,
-   "max_dd_pct": -1.5,
-   "ret_pct": -1.2
+   "max_gain_pct": 3.8,
+   "max_dd_pct": -1.6,
+   "ret_pct": 3.6
   },
   {
    "id": "abdullah:RYOJ:2026-11-05",
@@ -313,9 +319,12 @@
    "name": "rYojbaba Co., Ltd.",
    "why": "موجة 2.55→6.18 · دعم 2.32 · اختبر 2 مرات · تماسك 7 جلسة",
    "dilution": "none",
-   "sessions": 0,
-   "last": 2.33,
-   "last_date": "2026-11-05"
+   "sessions": 1,
+   "last": 2.35,
+   "last_date": "2026-11-06",
+   "max_gain_pct": 1.7,
+   "max_dd_pct": 0.9,
+   "ret_pct": 0.9
   },
   {
    "id": "insiders:TDIC:2026-11-05",
@@ -336,11 +345,11 @@
    "why": "1 مطّلع اشترى بـ $600,000 (متوسط 2.00) · Seto Wai Yue — عضو مجلس إدارة، Chief Executive Officer، مالك 10%+ · آخر شراء 2026-10-09",
    "dilution": "none",
    "sessions": 1,
-   "last": 1.51,
+   "last": 1.53,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.0,
    "max_dd_pct": -0.0,
-   "ret_pct": 0.0
+   "ret_pct": 1.3
   },
   {
    "id": "insiders:LONA:2026-11-05",
@@ -361,11 +370,11 @@
    "why": "1 مطّلع اشترى بـ $9,919,161,281 (متوسط 3149.47) · Portman David J. — مالك 10%+ · آخر شراء 2026-10-26",
    "dilution": "none",
    "sessions": 1,
-   "last": 4.42,
+   "last": 4.34,
    "last_date": "2026-11-06",
-   "max_gain_pct": 2.5,
+   "max_gain_pct": 7.7,
    "max_dd_pct": -3.2,
-   "ret_pct": 1.8
+   "ret_pct": 0.0
   },
   {
    "id": "faisal_orig:INSG:2026-11-06",
@@ -408,7 +417,7 @@
    "why": "موجة 1.18→6.00 · دعم 1.10 · اختبر 3 مرات · تماسك 11 جلسة",
    "dilution": "none",
    "sessions": 0,
-   "last": 1.135,
+   "last": 1.12,
    "last_date": "2026-11-06"
   },
   {
@@ -430,7 +439,73 @@
    "why": "موجة 2.21→5.40 · دعم 4.20 · اختبر 2 مرات · تماسك 5 جلسة",
    "dilution": "none",
    "sessions": 0,
-   "last": 4.42,
+   "last": 4.34,
+   "last_date": "2026-11-06"
+  },
+  {
+   "id": "faisal_dev:SEGG:2026-11-06",
+   "radar": "faisal_dev",
+   "radar_name": "📡 فيصل المطوّر",
+   "opened_at": "2026-11-06 18:05",
+   "result": "open",
+   "symbol": "SEGG",
+   "status": "ready",
+   "label": "✅ مطابق",
+   "entry": 1.18,
+   "stop": 1.0864,
+   "t1": 1.52,
+   "t2": 2.09,
+   "score": 79.0,
+   "date": "2026-11-06",
+   "name": "Sports Entertainment Gaming Glo",
+   "why": "RSI 39.3 · دعم 1.12 (عنه 5.4%) · منطقة الطلب 1.12–1.23",
+   "dilution": "none",
+   "sessions": 0,
+   "last": 1.18,
+   "last_date": "2026-11-06"
+  },
+  {
+   "id": "faisal_orig:SEGG:2026-11-06",
+   "radar": "faisal_orig",
+   "radar_name": "📜 فيصل الأصلي",
+   "opened_at": "2026-11-06 18:05",
+   "result": "open",
+   "symbol": "SEGG",
+   "status": "ready",
+   "label": "✅ مطابق",
+   "entry": 1.18,
+   "stop": 1.0864,
+   "t1": 1.52,
+   "t2": 2.09,
+   "score": 79.0,
+   "date": "2026-11-06",
+   "name": "Sports Entertainment Gaming Glo",
+   "why": "RSI 39.3 · دعم 1.12 (عنه 5.4%) · منطقة الطلب 1.12–1.23",
+   "dilution": "none",
+   "sessions": 0,
+   "last": 1.18,
+   "last_date": "2026-11-06"
+  },
+  {
+   "id": "faisal_orig:MWYN:2026-11-06",
+   "radar": "faisal_orig",
+   "radar_name": "📜 فيصل الأصلي",
+   "opened_at": "2026-11-06 18:05",
+   "result": "open",
+   "symbol": "MWYN",
+   "status": "near",
+   "label": "🟡 قريب",
+   "entry": 1.37,
+   "stop": 1.3095,
+   "t1": 1.44,
+   "t2": 2.085,
+   "score": 59.5,
+   "date": "2026-11-06",
+   "name": "Marwynn Holdings, Inc.",
+   "why": "RSI 43.4 · دعم 1.35 (عنه 1.5%) · منطقة الطلب 1.35–1.49",
+   "dilution": "none",
+   "sessions": 0,
+   "last": 1.37,
    "last_date": "2026-11-06"
   }
  ]
