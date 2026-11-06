@@ -148,6 +148,9 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
 
 def run():
     track = load(TRACK, {"trades": []})
+    # توصيات انحفظت ببيانات غلط (تُحذف من السجل)
+    PURGE = {"insiders:LONA:2026-11-06"}
+    track["trades"] = [t for t in track["trades"] if t.get("id") not in PURGE]
     trades = track["trades"]
     new_events = []
 

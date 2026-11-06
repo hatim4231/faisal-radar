@@ -214,6 +214,13 @@ def run(cfg, tickers=None) -> dict:
         except Exception:
             errs += 1
             continue
+        if b:
+            px_now = float(pre[t]["Close"].iloc[-1])
+            mcap_guess = px_now * float(pre[t]["Volume"].tail(30).mean()) * 200
+            ok_b = [x for x in b if 0.25 * px_now <= x["price"] <= 4 * px_now and x["value"] <= max(5e6, mcap_guess)]
+            if len(ok_b) < len(b):
+                log(f"  {t}: تجاهلت {len(b) - len(ok_b)} عملية أرقامها غير منطقية (سعر/مبلغ)")
+            b = ok_b
         if b and sum(x["value"] for x in b) >= MIN_TOTAL:
             found[t] = b
         if i % 100 == 0:
@@ -239,6 +246,10 @@ def run(cfg, tickers=None) -> dict:
         sv, src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
         if sv is not None and sv > max_sh and not explicit:
             continue
+        if mcap:
+            buys = [x for x in buys if x["value"] <= mcap * 0.5]
+            if sum(x["value"] for x in buys) < MIN_TOTAL:
+                continue
         s = score(buys, price, d)
         prev = float(d["Close"].iloc[-2])
         tail = d.tail(90)
