@@ -32,6 +32,7 @@ import pandas as pd
 import faisal_rules as fr
 import news_tools
 import split_rule
+import new_low_rule
 import report
 
 ROOT = Path(__file__).resolve().parent
@@ -454,6 +455,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         if not a:
             continue
         split_rule.apply(a, d)  # منطقة التقسيم (عبدالإله): وسم ومعلومات فقط
+        new_low_rule.apply(a, d)  # قاع جديد: ما يترشح لين يتماسك عند الدعم الثاني ويختبره
         if a["gate_fail"] and not explicit:
             continue
         inf = infos.get(t) or {}

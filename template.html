@@ -332,6 +332,7 @@ function render(){
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
+        ${s.new_low ? `<div class="left" style="color:${s.new_low.pending?"var(--bad)":"var(--good)"}">${s.new_low.pending?"⚠":"✓"} ${esc(s.new_low.why)}</div>` : ""}
         ${s.split_zone ? `<div class="left" style="color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--muted)"}">✂️ منطقة التقسيم <span class="num">${fp(s.split_zone.sweep)} – ${fp(s.split_zone.half)}</span> · ${esc(s.split_zone.label)}${(s.split_zone.status==="above" || s.split_zone.status==="na") ? " · " + esc(s.split_zone.note) : ""}</div>` : ""}
         ${(s.news||[]).length ? `<div class="left">${sentBadge(s.news[0])} <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}
         <div class="tags">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
