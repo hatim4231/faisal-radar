@@ -35,9 +35,11 @@ RADARS = {
     "faisal_dev": ("📡 فيصل المطوّر", ROOT / "output" / "sig_faisal_dev.json"),
     "faisal_orig": ("📜 فيصل الأصلي", ROOT / "output" / "sig_faisal_orig.json"),
     "abdullah": ("🌊 عبدالله", ROOT / "output" / "sig_abdullah.json"),
+    "insiders": ("🟢 المطّلعين", ROOT / "output" / "sig_insiders.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
+STATUS_AR_INS = {"ready": "🟢 شراء داخلي قوي", "near": "🟡 شراء داخلي"}
 
 
 def log(*a):
@@ -62,6 +64,18 @@ def fp(x):
 def signals(key: str, payload: dict) -> list[dict]:
     out = []
     for s in payload.get("stocks", []):
+        if key == "insiders":
+            st = s.get("status")
+            if st not in ("ready", "near"):
+                continue
+            p0 = (s.get("people") or [{}])[0]
+            out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_INS[st],
+                        "entry": s["price"], "stop": s.get("stop"), "t1": s["targets"][0], "t2": s["targets"][1],
+                        "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
+                        "why": f"{s['insiders']} مطّلع اشترى بـ ${s['total']:,} (متوسط {fp(s.get('avg_price'))}) · "
+                               f"{p0.get('name', '')} — {'، '.join(p0.get('roles', []))} · آخر شراء {s.get('last_buy')}",
+                        "dilution": (s.get("dilution") or {}).get("level")})
+            continue
         if key == "abdullah":
             st = s.get("status")
             if st not in ("ready", "near"):
@@ -208,7 +222,7 @@ def telegram(events: list[str]):
             return
         st["chat_id"] = chat
         TG_STATE.write_text(json.dumps(st), encoding="utf-8")
-        events = ["✅ تم ربط رادار فيصل وعبدالله بتيليجرام. بتوصلك هنا التوصيات الجديدة والأهداف والوقف."] + events
+        events = ["✅ تم ربط رادارات فيصل وعبدالله والمطّلعين بتيليجرام. بتوصلك هنا التوصيات الجديدة والأهداف والوقف."] + events
     sent = 0
     for e in events[:25]:
         try:

@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار المطّلعين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --info:#5b5bd6; --info-bg:#ececfd;
+  --up:#16a36a; --down:#e04848; --ma20:#e39a1c; --ma50:#7c5cd6; --zone:rgba(19,149,92,.13);
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+    --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+  --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.demo{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{outline:2px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;background:var(--panel2);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:inherit;padding:6px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
+input[type=search]{flex:1;min-width:140px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;display:grid;grid-template-columns:150px 1fr 210px;gap:14px;align-items:center}
+.row:hover{border-color:var(--accent)}
+.sym{font-weight:700;font-size:17px}
+.name{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.px{font-size:14px}
+.up{color:var(--up)} .down{color:var(--down)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:600}
+.left{font-size:13px;margin-top:5px}
+.left .k{color:var(--warn);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.tag.g{background:var(--good-bg);color:var(--good);border-color:transparent}
+.tag.w{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.tag.b{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag.i{background:var(--info-bg);color:var(--info);border-color:transparent}
+.score{display:flex;flex-direction:column;gap:5px}
+.score .top{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.badge.ready{background:var(--good-bg);color:var(--good)}
+.badge.near{background:var(--warn-bg);color:var(--warn)}
+.badge.radar{background:var(--info-bg);color:var(--info)}
+.badge.no{background:var(--panel2);color:var(--muted)}
+.pct{font-size:20px;font-weight:700}
+.bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+/* detail */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20}
+.overlay.on{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(860px,100%);background:var(--bg);z-index:21;overflow-y:auto;transform:translateX(-102%);transition:transform .2s ease;border-right:1px solid var(--line)}
+.drawer.on{transform:none}
+.dhead{position:sticky;top:0;background:var(--bg);padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:2}
+#dtitle{min-width:0;flex:1} #dtitle .name{white-space:normal} #dclose{flex-shrink:0}
+.dbody{padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.check{display:grid;grid-template-columns:22px 1fr 60px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);align-items:start}
+.check:last-child{border-bottom:0}
+.check .ic{font-size:15px;line-height:1.4}
+.check .t{font-weight:600;font-size:14px}
+.check .d{color:var(--muted);font-size:13px}
+.check .r{color:var(--warn);font-size:13px;font-weight:500}
+.check .p{font-size:12px;color:var(--muted);text-align:left}
+.mini{height:5px;background:var(--panel2);border-radius:99px;margin-top:4px;overflow:hidden}
+.mini i{display:block;height:100%}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pbox{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.pbox span{display:block;color:var(--muted);font-size:12px}
+.pbox b{font-size:16px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.newsitem{padding:9px 0;border-bottom:1px solid var(--line)} .newsitem:last-of-type{border-bottom:0}
+.newsitem .nt{font-weight:600;font-size:14px} .newsitem .ns{font-size:13.5px;margin:3px 0;line-height:1.7}
+.news a{color:var(--accent);text-decoration:none}
+.news li{margin-bottom:6px;font-size:13.5px}
+.links a{color:var(--accent);margin-left:14px;font-size:13.5px;text-decoration:none}
+.note{font-size:12.5px;color:var(--muted)}
+.disc{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+ul.clean{margin:0;padding-right:18px}
+@media (max-width:820px){
+  .row{grid-template-columns:1fr;gap:8px}
+  .name{max-width:none}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .plan{grid-template-columns:repeat(2,1fr)}
+}
+.sent{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.sent.positive{background:var(--good-bg);color:var(--good)} .sent.negative{background:var(--bad-bg);color:var(--bad)} .sent.neutral{background:var(--panel2);color:var(--muted)}
+.newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:420px;overflow-y:auto;padding-left:6px}
+.newsitem .why{font-size:12px;color:var(--muted);margin-top:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>🟢 رادار المطّلعين</h1><div class="sub" id="meta"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
+      <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" href="../abdullah/" style="text-decoration:none">🌊 عبدالله</a>
+      <a class="btn" href="../track/" style="text-decoration:none">📈 السجل</a>
+      <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
+      <button class="btn" id="theme">🌓</button>
+    </div>
+  </header>
+  <div class="card" style="margin-bottom:12px"><b>الفكرة:</b> مدير الشركة أو عضو مجلس الإدارة أو مالك كبير اشترى أسهم الشركة <b>من السوق بفلوسه</b> (Form 4، عملية P). «المطّلع يبيع لأسباب كثيرة، بس يشتري لسبب واحد».
+    <span class="note">الحد الأدنى ٢٥ ألف دولار خلال ٣٠ يوم · الأثر غالباً على أسابيع لشهور، مو أيام · الشركات الأجنبية ما تقدم Form 4 فما تظهر هنا · ليس توصية شراء.</span></div>
+  <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
+  <div class="tiles" id="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
+  <div class="list" id="list"></div>
+  <div class="disc">النقاط: عدد المطّلعين (حتى 40) · منصبهم (حتى 20) · المبلغ (حتى 20) · حداثة الشراء (حتى 10) · قرب السعر من متوسط شرائهم (حتى 10).
+    الوقف المقترح: الأعلى بين −15% من السعر و 3% تحت قاع 20 يوم. ليس توصية شراء أو بيع.</div>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const fM = n => n == null ? "-" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n >= 1e3 ? (n/1e3).toFixed(0)+"K" : String(Math.round(n));
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const SENT = {positive:["✅","إيجابي"], negative:["❌","سلبي"], neutral:["➖","محايد"]};
+function sentBadge(n){ const s = SENT[n.sentiment] || SENT.neutral; return `<span class="sent ${n.sentiment||"neutral"}">${s[0]} ${s[1]}</span>`; }
+function newsHTML(list){
+  if (!(list||[]).length) return `<div class="note">لا توجد أخبار حديثة لهذا السهم</div>`;
+  return list.map(n => {
+    const why = [...(n.why_pos||[]).map(w => "✅ " + w), ...(n.why_neg||[]).map(w => "❌ " + w)];
+    const body = n.text_ar || n.summary_ar || n.summary || "";
+    return `<div class="newsitem">
+      <div class="nt">${sentBadge(n)} ${esc(n.title_ar || n.title)}</div>
+      ${why.length ? `<div class="why">السبب: ${why.map(esc).join(" · ")}</div>` : ""}
+      ${body ? `<div class="newsfull">${esc(body)}</div>` : ""}
+      <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span>${n.full ? "" : " · (النص الكامل غير متاح — هذا الملخص)"}</div>
+    </div>`;
+  }).join("") + `<div class="note" style="margin-top:6px">✅/❌ تقدير آلي من كلمات الخبر — اقرأ الخبر بنفسك قبل القرار.</div>`;
+}
+
+const ST = {ready:["🟢 شراء قوي","ready"], near:["🟡 شراء داخلي","near"], radar:["👀 مراقبة","radar"]};
+let filt = null;
+const stocks = (DATA && DATA.stocks) || [];
+$("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx) }catch(e){} };
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · فحص <span class="num">${DATA.scanned}</span> سهم · فيها شراء داخلي <span class="num">${DATA.found}</span> · ${esc(DATA.source)}` : "";
+if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
+function spark(c){ if (!c || c.c.length < 2) return ""; const W=140,H=36, lo=Math.min(...c.c), hi=Math.max(...c.c);
+  const pts = c.c.map((v,i)=>`${(i/(c.c.length-1)*W).toFixed(1)},${(H-(v-lo)/(hi-lo||1)*H).toFixed(1)}`).join(" ");
+  return `<svg style="direction:ltr" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><polyline points="${pts}" fill="none" stroke="${cssv("--accent")}" stroke-width="1.5"/></svg>`; }
+function tiles(){
+  const n = k => stocks.filter(s => s.status === k).length;
+  $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
+  document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = filt === el.dataset.k ? null : el.dataset.k; render(); });
+}
+function render(){
+  tiles();
+  const L = stocks.filter(s => !filt || s.status === filt);
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">ما فيه شراء داخلي بهذا الفلتر حالياً.</div>`; return; }
+  $("#list").innerHTML = L.map(s => { const [lab,cls] = ST[s.status]; const col = s.status==="ready"?"var(--good)":s.status==="near"?"var(--warn)":"var(--info)";
+    const p0 = s.people[0]; const n0 = (s.news||[])[0];
+    return `<div class="card" style="cursor:pointer" data-s="${esc(s.symbol)}">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+        <div><span class="sym ltr">${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct}%</span>
+          <div class="name" style="max-width:none">${esc(s.name)}</div></div>
+        <div>${spark(s.chart)}</div>
+        <div style="text-align:left"><span class="badge ${cls}">${lab}</span> <span class="pct num" style="color:${col}">${s.score}</span></div>
+      </div>
+      <div class="facts" style="margin-top:8px">
+        <span>المطّلعين: <b class="num">${s.insiders}</b></span><span>المجموع: <b class="num">$${fM(s.total)}</b></span>
+        <span>متوسط شرائهم: <b class="num">${fp(s.avg_price)}</b></span><span>السعر عنه: <b class="num">${s.above_avg_pct>0?"+":""}${s.above_avg_pct}%</b></span>
+        <span>آخر شراء: <b class="num">${esc(s.last_buy)}</b> (قبل ${s.days_ago} يوم)</span><span>الشورت: <b class="num">${s.short_used.value!=null?fM(s.short_used.value):"؟"}</b></span>
+      </div>
+      <div class="left">👤 ${esc(p0.name)} — ${esc(p0.roles.join("، "))} — <span class="num">$${fM(p0.value)}</span>${s.people.length>1?` <span class="note">+ ${s.people.length-1} آخرين</span>`:""}</div>
+      ${(s.tags||[]).length ? `<div class="tags">${s.tags.map(t => `<span class="tag ${/⛔/.test(t)?"b":"w"}">${esc(t)}</span>`).join("")}</div>` : ""}
+      ${n0 ? `<div class="left">${sentBadge(n0)} ${esc(n0.title_ar || n0.title)}</div>` : ""}
+      <div class="note" style="margin-top:4px">اضغط للتفاصيل ▾</div>
+    </div>`; }).join("");
+  document.querySelectorAll("#list .card").forEach(el => el.onclick = () => toggle(el));
+}
+function toggle(el){
+  const s = stocks.find(x => x.symbol === el.dataset.s); const ex = el.querySelector(".more");
+  if (ex){ ex.remove(); return; }
+  const d = document.createElement("div"); d.className = "more"; d.style.marginTop = "10px"; d.onclick = e => e.stopPropagation();
+  d.innerHTML = `<div class="plan">
+      <div class="pbox"><span>الدخول (السعر الحالي)</span><b class="num">${fp(s.price)}</b></div>
+      <div class="pbox"><span>الوقف المقترح</span><b class="num" style="color:var(--bad)">${fp(s.stop)}</b></div>
+      <div class="pbox"><span>الأهداف (+20% / +40%)</span><b class="num" style="color:var(--good)">${s.targets.map(fp).join(" / ")}</b></div></div>
+    <h3 style="margin:12px 0 6px;font-size:14px">👤 مين اشترى</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:13px">${s.people.map(p => `<tr style="border-bottom:1px solid var(--line)"><td style="padding:5px 0"><b>${esc(p.name)}</b><div class="note">${esc(p.roles.join("، "))}</div></td><td class="num">${fM(p.shares)} سهم</td><td class="num">$${fM(p.value)}</td><td class="num note">${esc(p.last)}</td></tr>`).join("")}</table>
+    <div class="note" style="margin-top:6px">${esc(s.why.join(" · "))}</div>
+    ${s.dilution ? `<div style="margin-top:8px;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: ${(s.dilution.hits||[]).slice(0,3).map(h => esc(h.form+" "+h.date+" — "+h.label)).join(" · ") || "ما لقى الفحص الآلي ملفات طرح — تأكد بنفسك"}</div>` : ""}
+    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}`;
+  el.appendChild(d);
+}
+(function(){ const ex = (DATA && DATA.excluded_dilution) || []; if (!ex.length) return;
+  const box = $("#excl"); box.style.display = ""; box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم";
+  $("#excl-body").innerHTML = ex.map(x => `<div class="note"><b class="ltr">${esc(x.symbol)}</b> — ${x.events.map(e => esc(e.date+" "+e.what)).join(" · ")}</div>`).join(""); })();
+render();
+</script>
+</body>
+</html>
