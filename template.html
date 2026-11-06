@@ -135,11 +135,12 @@ ul.clean{margin:0;padding-right:18px}
 <div class="wrap">
   <header>
     <div>
-      <h1>📡 رادار طريقة فيصل</h1>
+      <h1 id="h1">📡 رادار طريقة فيصل</h1>
       <div class="sub" id="meta"></div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <a class="btn" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
+      <a class="btn" id="lnk-other" href="original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" id="lnk-abd" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
       <button class="btn primary" id="rescan" style="display:none">🔄 تحديث المسح</button>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
       <button class="btn" id="theme" title="الوضع الليلي">🌓</button>
@@ -201,6 +202,14 @@ function newsHTML(list){
 }
 const DATA = /*__DATA__*/null;
 const LIVE = /*__LIVE__*/false;
+if (DATA && DATA.variant === "original"){
+  document.getElementById("h1").textContent = "📜 رادار فيصل — النسخة الأصلية";
+  document.title = "فيصل الأصلي";
+  const o = document.getElementById("lnk-other"); o.href = "../"; o.textContent = "📡 فيصل المطوّر";
+  document.getElementById("lnk-abd").href = "../abdullah/";
+} else if (DATA) {
+  document.getElementById("h1").textContent = "📡 رادار فيصل — المطوّر";
+}
 const STATUS = {ready:"✅ مطابق", near:"🟡 قريب", radar:"👀 رادار", no:"غير مطابق"};
 const MSTATUS = {ready:"🚀 زخم قوي", near:"🟡 زخم محتمل", no:"لا يوجد زخم"};
 let tab = "irtikaz", filt = null, tagF = null;
@@ -323,6 +332,9 @@ function render(){
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
+        ${s.dilution && s.dilution.level!=="none" && s.dilution.level!=="low" ? `<div class="left" style="color:${s.dilution.level==="high"?"var(--bad)":"var(--warn)"}">🏛 SEC: ${esc(s.dilution.hits[0].label)} (<span class="num">${esc(s.dilution.hits[0].form)} · ${esc(s.dilution.hits[0].date)}</span>)</div>` : ""}
+        ${s.new_low ? `<div class="left" style="color:${s.new_low.pending?"var(--bad)":"var(--good)"}">${s.new_low.pending?"⚠":"✓"} ${esc(s.new_low.why)}</div>` : ""}
+        ${s.split_zone ? `<div class="left" style="color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--muted)"}">✂️ منطقة التقسيم <span class="num">${fp(s.split_zone.sweep)} – ${fp(s.split_zone.half)}</span> · ${esc(s.split_zone.label)}${(s.split_zone.status==="above" || s.split_zone.status==="na") ? " · " + esc(s.split_zone.note) : ""}</div>` : ""}
         ${(s.news||[]).length ? `<div class="left">${sentBadge(s.news[0])} <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}
         <div class="tags">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
       </div>
@@ -342,6 +354,7 @@ function chartSVG(s){
   const p = s.plan;
   const levels = [];
   if (p.entry_zone[0]) levels.push(p.entry_zone[0], p.entry_zone[1]);
+  if (s.split_zone && s.split_zone.applies) levels.push(s.split_zone.half, s.split_zone.sweep);
   if (p.stop) levels.push(p.stop);
   (p.four_targets||[]).forEach(x => levels.push(x));
   let lo = Math.min(...c.l.filter(x=>x!=null)), hi = Math.max(...c.h.filter(x=>x!=null));
@@ -361,6 +374,7 @@ function chartSVG(s){
     `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="5 4"':""}/><text x="${pad.l+4}" y="${y(v)-4}" fill="${col}" font-size="11" font-weight="600">${label} ${fp(v)}</text>`;
   g += hl(p.support, cssv("--good"), "الدعم", false);
   g += hl(p.stop, cssv("--bad"), "الوقف", true);
+  if (s.split_zone && s.split_zone.applies){ g += hl(s.split_zone.half, cssv("--warn"), "نصف قمة التقسيم", true); g += hl(s.split_zone.sweep, cssv("--warn"), "مسح 20%", true); }
   (p.four_targets||[]).forEach((t,i) => g += hl(t, cssv("--accent"), "هدف "+(i+1), true));
   // MAs
   const path = arr => { let d = "", on = false; arr.forEach((v,i) => { if (v == null || v > hi || v < lo){ on = false; return; } d += (on ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1); on = true; }); return d; };
@@ -430,6 +444,16 @@ function openDetail(sym){
       فجوات غير مغطاة: <span class="num">${p.gaps.map(g => fp(g.from)+"→"+fp(g.to)).join(" · ") || "-"}</span></div>
     </div>
 
+    ${s.split_zone ? `<div class="card"><h3>✂️ منطقة التقسيم (طريقة عبدالإله)</h3>
+      <div class="plan">
+        <div class="pbox"><span>أعلى سعر يوم التقسيم</span><b class="num">${fp(s.split_zone.split_high)}</b><span>${esc(s.split_zone.date)} · ${esc(s.split_zone.ratio)} · قبل ${s.split_zone.days_ago} يوم</span></div>
+        <div class="pbox"><span>ارتفاع يوم التقسيم (الشرط ≤ ${s.split_zone.max_rise}%)</span><b class="num" style="color:${s.split_zone.applies?"var(--good)":"var(--bad)"}">${s.split_zone.split_day_rise!=null?"+"+s.split_zone.split_day_rise+"%":"-"}</b><span>${s.split_zone.applies ? "✓ القاعدة تنطبق" : "✗ القاعدة ما تنطبق"} · الإغلاق ${s.split_zone.split_day_close_chg!=null?(s.split_zone.split_day_close_chg>0?"+":"")+s.split_zone.split_day_close_chg+"%":"-"}</span></div>
+        <div class="pbox"><span>÷ 2 (المنطقة الأولى)</span><b class="num">${fp(s.split_zone.half)}</b><span>أدنى سعر بعد التقسيم ${fp(s.split_zone.low_since)}</span></div>
+        <div class="pbox"><span>− 20% مسح سيولة (احتياط)</span><b class="num">${fp(s.split_zone.sweep)}</b><span>${s.split_zone.touched ? "لمس المنطقة قبل ✓" : "ما لمسها بعد"}</span></div>
+      </div>
+      <div style="margin-top:8px;font-weight:600;color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--text)"}">${esc(s.split_zone.label)} — ${esc(s.split_zone.note)}</div>
+      <div class="note">${s.split_zone.window_20_50 ? "✓ داخل نافذة 20-50 يوم بعد التقسيم" : "خارج نافذة 20-50 يوم بعد التقسيم"} · المنطقة احتمال وليست وعداً — ركّز عليه مع باقي الشروط.</div></div>` : ""}
+
     <div class="card"><h3>✔ شروط سهم الارتكاز (${Math.round(I.base)} من 100 قبل تعديلات السلوك)</h3>${checksHTML(I.checks)}
       ${I.adjustments.length ? `<div style="margin-top:10px"><b>تعديلات السلوك:</b><ul class="clean">${I.adjustments.map(a => `<li><b class="num" style="color:${a.pts>0?"var(--good)":"var(--bad)"}">${a.pts>0?"+":""}${a.pts}</b> ${esc(a.name)} — <span class="note">${esc(a.detail)}</span></li>`).join("")}</ul></div>` : ""}
     </div>
@@ -465,6 +489,10 @@ function openDetail(sym){
       </dl></div>
     </div>
 
+    ${s.dilution ? `<div class="card"><h3>🏛 خطر التخفيف من ملفات SEC (آخر 90 يوم)</h3>
+      <div style="font-weight:700;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--good)"}">${{high:"⛔ خطر عالي — طرح/تسجيل حديث (آخر 30 يوم)",medium:"⚠ خطر محتمل — عنده تسجيل أو رف طرح",low:"خطر خفيف",none:"✓ ما فيه ملفات طرح خلال 90 يوم"}[s.dilution.level]}</div>
+      ${(s.dilution.hits||[]).length ? `<ul class="clean" style="margin-top:6px">${s.dilution.hits.map(h => `<li><b class="num">${esc(h.form)}</b> · <span class="num">${esc(h.date)}</span> (قبل ${h.days_ago} يوم) — ${esc(h.label)}</li>`).join("")}</ul>` : ""}
+      <div class="note" style="margin-top:6px">424B = طرح تسعّر · S-3/F-3 = رف طرح (ممكن ATM يبيع أثناء الجلسة) · S-1/F-1 = طرح أو إعادة بيع · EFFECT = التسجيل صار فعّال</div></div>` : ""}
     <div class="card"><h3>📰 الأخبار</h3>${news}<div class="note">الخبر محفز، وليس سبب دخول إذا الشارت غير جاهز.</div></div>
 
     <div class="card"><h3>✋ قائمة فحص قبل الدخول (يدوي)</h3><ul class="clean">

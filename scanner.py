@@ -31,6 +31,9 @@ import pandas as pd
 
 import faisal_rules as fr
 import news_tools
+import split_rule
+import new_low_rule
+import sec_tools
 import report
 
 ROOT = Path(__file__).resolve().parent
@@ -452,6 +455,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
             continue
         if not a:
             continue
+        split_rule.apply(a, d)  # منطقة التقسيم (عبدالإله): وسم ومعلومات فقط
+        new_low_rule.apply(a, d)  # قاع جديد: ما يترشح لين يتماسك عند الدعم الثاني ويختبره
         if a["gate_fail"] and not explicit:
             continue
         inf = infos.get(t) or {}
@@ -501,6 +506,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     rows = [r for r in results.values()
             if explicit or max(r["irtikaz"]["score"], r["momentum"]["score"]) >= min_s]
     rows.sort(key=lambda r: -r["irtikaz"]["score"])
+    if deep:
+        sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "Yahoo Finance (yfinance) — تأخير ~15 دقيقة",

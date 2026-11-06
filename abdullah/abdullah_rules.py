@@ -207,16 +207,17 @@ def consolidation(df: pd.DataFrame, start: int, max_range_pct: float) -> dict | 
         return None
     k, sup, top = best
     a = n - k
-    # اختبارات الدعم: كل نزول للدعم (ضمن 4%) بعد ارتداد واضح عنه (القمة تبعد عن الدعم)
-    band = sup * 1.04
-    bounce = sup * (1 + max(0.04, min(0.08, (top / sup - 1) / 2)))
+    # اختبارات الدعم: نزول للدعم (ضمن 3%)، واختبار جديد ينحسب بعد ما يغلق السهم فوق الدعم بـ 2.5%+.
+    # (الطريقة القديمة كانت تحتاج ارتداد كبير بالقمم، فتغلط في التماسك الضيق مثل FLYE)
+    cl = df["Close"].values
+    band = sup * 1.03
     touches, dates, armed = 0, [], True
     for i in range(a, n):
         if armed and lo[i] <= band:
             touches += 1
             dates.append(str(df.index[i])[:10])
             armed = False
-        if not armed and hi[i] >= bounce and lo[i] > band:
+        if cl[i] >= sup * 1.025:
             armed = True
     return {"len": k, "support": sup, "top": top, "range_pct": (top / sup - 1) * 100,
             "touches": touches, "touch_dates": dates, "start_i": a}
@@ -251,12 +252,15 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
     sup = cons["support"] if cons else float(after["Low"].min())
     retrace = (w["peak"] - sup) / (w["peak"] - w["low"]) * 100 if w["peak"] > w["low"] else 0
     zone_match = next((z for z in zones if z["low"] * 0.94 <= sup <= z["high"] * 1.06), None)
+    launch = next((z for z in zones if "قاعدة الانطلاقة" in z["kind"]), None)
+    at_launch = bool(launch and launch["low"] * 0.9 <= sup <= launch["high"] * 1.08)
 
     # الإبطال: يتحدد أول مرة ويبقى ثابت لنفس الموجة
     fixed = state if (state and state.get("peak_date") == w["peak_date"]) else None
     if fixed:
         inval = fixed["invalidation"]
     else:
+        # «أدنى سعر يكون وقفي» — الوقف تحت أدنى سعر في التماسك بشوي
         inval = sup * (1 - A["invalidation_below_support_pct"] / 100)
     # كسر الدعم: السعر نزل تحت قاع التماسك السابق (قبل آخر 5 جلسات) بوضوح
     prior = after.iloc[:-5] if len(after) > 10 else None
@@ -276,8 +280,8 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
     checks: list[C] = []
 
     # 1) التدبيل خلال شهر-شهرين
-    c = C("wave", "تدبيل سابق خلال شهر إلى شهرين", 20)
-    c.ok, c.progress, c.got = True, 1, 20
+    c = C("wave", "تدبيل سابق خلال شهر إلى شهرين", 15)
+    c.ok, c.progress, c.got = True, 1, 15
     c.detail = (f"من {fp(w['low'])} ({w['low_date']}) إلى {fp(w['peak'])} ({w['peak_date']}) "
                 f"= x{w['mult']:.2f} خلال {wave_len} جلسة · القمة قبل {sessions_since_peak} جلسة")
     checks.append(c)
@@ -295,29 +299,29 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
     checks.append(c)
 
     # 3) التماسك (عدد الجلسات)
-    c = C("consol", "تماسك على الدعم (عدة جلسات)", 20)
+    c = C("consol", "تماسك على الدعم (عدة جلسات)", 15)
     L = cons["len"] if cons else 0
     need = A["consolidation_min_sessions"]
     if L >= need:
-        c.ok, c.got, c.progress = True, 20, 1
+        c.ok, c.got, c.progress = True, 15, 1
         c.detail = f"متماسك {L} جلسة بين {fp(sup)} و {fp(cons['top'])} (مدى {cons['range_pct']:.0f}%)"
     else:
         c.progress = L / need
-        c.got = 20 * c.progress
+        c.got = 15 * c.progress
         c.detail = f"متماسك {L} جلسة فقط" if L else "لا يزال ينزل — ما بدأ تماسك"
         c.remaining = f"باقي {need - L} جلسات تماسك تقريباً"
     checks.append(c)
 
     # 4) اختبار الدعم مرات عديدة
-    c = C("touches", "اختبر الدعم مرات عديدة وصمد", 25)
+    c = C("touches", "اختبر الدعم مرات عديدة وصمد", 20)
     t = cons["touches"] if cons else 0
     need_t = A["min_touches"]
     if t >= need_t:
-        c.ok, c.got, c.progress = True, 25, 1
-        c.detail = f"اختبر الدعم {fp(sup)} {t} مرات ({'، '.join(cons['touch_dates'][-5:])})"
+        c.ok, c.got, c.progress = True, 20, 1
+        c.detail = f"اختبر الدعم {fp(sup)} {t} مرات وأغلق فوقه ({'، '.join(cons['touch_dates'][-5:])})"
     else:
         c.progress = t / need_t
-        c.got = 25 * c.progress * 0.8
+        c.got = 20 * c.progress * 0.8
         c.detail = f"اختبر الدعم {t} مرة" if t else "ما اختبر الدعم بعد"
         c.remaining = f"يحتاج اختبار الدعم {need_t - t} مرة إضافية ويصمد"
     checks.append(c)
@@ -336,13 +340,36 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
         c.detail = "-"
     checks.append(c)
 
-    # 6) الدعم منطقة مهمة من الشارت
-    c = C("zone", "الدعم عند منطقة مهمة (قاعدة / مقاومة سابقة / رف)", 10)
-    if zone_match:
-        c.ok, c.got, c.progress = True, 10, 1
+    # 6) رجع لبداية الانطلاقة (أقوى دعم عند عبدالله: CRE، YMAT)
+    c = C("zone", "رجع لبداية الانطلاقة (أو منطقة مهمة)", 15)
+    if at_launch:
+        c.ok, c.got, c.progress = True, 15, 1
+        c.detail = f"الدعم {fp(sup)} عند بداية الانطلاقة {fp(launch['low'])} – {fp(launch['high'])}"
+    elif zone_match:
+        c.ok, c.got, c.progress = True, 8, 0.6
         c.detail = f"يتوافق مع {zone_match['kind']} {fp(zone_match['low'])} – {fp(zone_match['high'])}"
+        if launch:
+            c.remaining = f"بداية الانطلاقة أقوى: {fp(launch['low'])} – {fp(launch['high'])}"
     else:
-        c.detail = "الدعم ما يطابق قاعدة أو مقاومة سابقة واضحة"
+        c.detail = "الدعم ما يطابق بداية الانطلاقة ولا مقاومة سابقة واضحة"
+        if launch:
+            c.remaining = f"بداية الانطلاقة عند {fp(launch['low'])} – {fp(launch['high'])}"
+    checks.append(c)
+
+    # 6ب) التوقيت: الانطلاقة غالباً بعد ~20 يوم من القمة (SSM)
+    c = C("timing", "التوقيت: حوالي 20 جلسة بعد القمة", 10)
+    lo_t, hi_t = A["timing_min_sessions"], A["timing_max_sessions"]
+    if lo_t <= sessions_since_peak <= hi_t:
+        c.ok, c.got, c.progress = True, 10, 1
+        c.detail = f"مر {sessions_since_peak} جلسة على القمة — داخل نافذة {lo_t}-{hi_t}"
+    elif sessions_since_peak < lo_t:
+        c.progress = sessions_since_peak / lo_t
+        c.got = 10 * c.progress * 0.5
+        c.detail = f"مر {sessions_since_peak} جلسة فقط على القمة"
+        c.remaining = f"باقي تقريباً {lo_t - sessions_since_peak} جلسة لنافذة التوقيت"
+    else:
+        c.got, c.progress = 4, 0.4
+        c.detail = f"مر {sessions_since_peak} جلسة على القمة — بعد النافذة المعتادة"
     checks.append(c)
 
     # 7) جفاف الفوليوم (قرينة مساعدة)
@@ -431,6 +458,18 @@ def intraday_check(h1: pd.DataFrame, support: float | None, top: float | None) -
                     inside = False
             out["h4_touches"] = tc
             out["h4_close_above_support"] = bool(h4["Close"].iloc[-1] >= support)
+        # سحب سيولة على 4 ساعات (4H Sweep): شمعة تنزل تحت أدنى قاع سابق ثم تغلق فوقه
+        lows, closes = h4["Low"].values, h4["Close"].values
+        out["h4_sweep"] = False
+        for j in range(len(h4) - 1, max(len(h4) - 4, 10), -1):
+            prev_low = lows[j - 10:j].min()
+            if lows[j] < prev_low and closes[j] > prev_low:
+                out["h4_sweep"] = True
+                out["h4_sweep_low"] = round(float(lows[j]), 4)
+                out["h4_sweep_time"] = str(h4.index[j])[:16]
+                break
+        # الهدف: قمة 4 ساعات (أعلى سعر آخر 12 شمعة)
+        out["h4_high"] = round(float(h4["High"].tail(12).max()), 4)
     if len(h1) >= 20:
         last = h1.tail(7)  # تقريباً جلسة
         avgv = float(h1["Volume"].tail(70).mean())

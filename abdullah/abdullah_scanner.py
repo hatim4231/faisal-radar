@@ -33,12 +33,14 @@ sys.path.insert(0, str(HERE))
 import scanner as data  # noqa: E402  (أدوات جلب البيانات فقط)
 import abdullah_rules as ar  # noqa: E402
 import news_tools  # noqa: E402
+import sec_tools  # noqa: E402
 
 log = data.log
 CACHE = data.CACHE
 OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
-STATE = CACHE / "abdullah_state_v2.json"
+STATE = CACHE / "abdullah_state_v3.json"
+SEEN = CACHE / "abdullah_seen.json"
 SHORT_HIST = CACHE / "short_history.json"
 
 DILUTION = re.compile(r"offering|private placement|registered direct|at-the-market|\bATM\b|warrant|"
@@ -93,6 +95,7 @@ def run(cfg, tickers=None, deep=True) -> dict:
         log("[عبدالله] الشورت المتاح ما اشتغل:", repr(e)[:120])
     hist = update_short_history(ib, list(pre), A["short_history_keep"])
     state = load_json(STATE, {})
+    seen = load_json(SEEN, {})  # أول يوم ظهر فيه السهم في القائمة (فايدة القوائم: SSM دبّل بعد ~20 يوم)
 
     results = {}
     for t, d in pre.items():
@@ -132,6 +135,12 @@ def run(cfg, tickers=None, deep=True) -> dict:
             a["flags"].append(f"سيولة ضعيفة: متوسط التداول ${a['dollar_volume'] / 1e3:,.0f}K يومياً")
         if flt and a.get("shares_out") and a["shares_out"] > flt * 3:
             a["flags"].append("عدد الأسهم أكبر بكثير من الفلووت — انتبه لأسهم مقيدة قد تنفك")
+        if a["status"] in ("ready", "near", "radar"):
+            first = seen.setdefault(t, a["date"])
+            a["list_since"] = first
+            a["list_days"] = int((pd.Timestamp(a["date"]) - pd.Timestamp(first)).days)
+        else:
+            seen.pop(t, None)
         results[t] = a
 
         # حفظ الدعم والإبطال أول مرة يصير السهم متماسك/قريب (ما يتغير بعدين لنفس الموجة)
@@ -142,6 +151,7 @@ def run(cfg, tickers=None, deep=True) -> dict:
         elif st and st.get("peak_date") == a["wave"]["peak_date"] and a["invalidated"]:
             st["broken"] = True
     STATE.write_text(json.dumps(state), encoding="utf-8")
+    SEEN.write_text(json.dumps(seen), encoding="utf-8")
     log(f"[عبدالله] أسهم فيها موجة تدبيل: {len(results)}")
 
     if deep and results:
@@ -154,6 +164,13 @@ def run(cfg, tickers=None, deep=True) -> dict:
             (r["status"] in ("ready", "near", "radar") and r["score"] >= cfg["scan"]["report_min_score"])]
     order = {"ready": 0, "near": 1, "radar": 2, "moved": 3, "invalid": 4}
     rows.sort(key=lambda r: (order[r["status"]], -r["score"]))
+    if deep:
+        sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
+        for r in rows:
+            dl = r.get("dilution") or {}
+            if dl.get("level") in ("high", "medium"):
+                h = dl["hits"][0]
+                r["flags"].insert(0, f"{'⛔' if dl['level'] == 'high' else '⚠'} SEC: {h['label']} ({h['form']} · {h['date']})")
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "Yahoo Finance + Interactive Brokers (الشورت المتاح)",
                "scanned": len(daily), "with_wave": len(results),
@@ -201,6 +218,11 @@ def deep_scan(results: dict, cfg):
                 d.index = pd.to_datetime(d.index)
                 r = results[t]
                 r["intraday"] = ar.intraday_check(d, r["support"], r["consolidation"]["top"])
+                if r["intraday"].get("h4_sweep") and r["status"] in ("ready", "near"):
+                    # 4H Sweep: نزل تحت قاع سابق ورجع فوقه = سحب سيولة (إشارة إيجابية عند عبدالله)
+                    r["score"] = round(min(100, r["score"] + 5), 1)
+                    r["flags_pos"] = r.get("flags_pos", []) + [
+                        f"سحب سيولة على 4 ساعات إلى {r['intraday']['h4_sweep_low']} ({r['intraday']['h4_sweep_time']}) ثم رجع فوق القاع"]
             except Exception:
                 pass
     except Exception as e:
