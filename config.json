@@ -19,6 +19,8 @@
     "support_watch_pct": 20,
     "entry_zone_above_support_pct": 10,
     "stop_below_support_pct": 3,
+    "stop_below_low_pct": 10,
+    "_stop_help": "الوقف = أقل سعر وصله السهم عند الدعم ناقص 10% (يتحمل مسح السيولة)",
     "chase_from_low_pct": 50,
     "min_upside_pct": 20,
     "positive_candle_days": 10

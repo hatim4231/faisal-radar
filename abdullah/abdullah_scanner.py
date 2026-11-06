@@ -40,7 +40,7 @@ log = data.log
 CACHE = data.CACHE
 OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
-STATE = CACHE / "abdullah_state_v3.json"
+STATE = CACHE / "abdullah_state_v4.json"
 SEEN = CACHE / "abdullah_seen.json"
 SHORT_HIST = CACHE / "short_history.json"
 

@@ -437,7 +437,10 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
     dist_support = pct(price, support)
     entry_lo = support * 1.0
     entry_hi = support * (1 + IR["entry_zone_above_support_pct"] / 100)
-    stop = support * (1 - IR["stop_below_support_pct"] / 100)
+    # الوقف (قرار المستخدم): أقل سعر وصله السهم عند الدعم − 10% — عشان مسح السيولة ما يضربه
+    near_lows = [float(x) for x in df["Low"].tail(20) if float(x) >= support * 0.85]
+    base_low = min([support] + near_lows)
+    stop = base_low * (1 - IR.get("stop_below_low_pct", 10) / 100)
     res = resistances_above(df, price)
     fcs = [f for f in falling_candles(df) if f["top"] > price]
     gaps = [g for g in unfilled_gaps_down(df) if g["to"] > price]

@@ -260,7 +260,7 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict, state: dict | None =
     if fixed:
         inval = fixed["invalidation"]
     else:
-        # «أدنى سعر يكون وقفي» — الوقف تحت أدنى سعر في التماسك بشوي
+        # «أدنى سعر يكون وقفي» — الوقف تحت أدنى سعر في التماسك بـ 10% (يتحمل مسح السيولة)
         inval = sup * (1 - A["invalidation_below_support_pct"] / 100)
     # كسر الدعم: السعر نزل تحت قاع التماسك السابق (قبل آخر 5 جلسات) بوضوح
     prior = after.iloc[:-5] if len(after) > 10 else None

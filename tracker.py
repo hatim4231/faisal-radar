@@ -31,6 +31,10 @@ TG_STATE = DATA / "telegram.json"
 SITE_URL = "https://hatim4231.github.io/faisal-radar"
 
 MAX_SESSIONS = 20
+# قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
+NEW_RULES = {"faisal_dev", "abdullah"}
+COOLDOWN_DAYS = 7          # ~5 جلسات قبل ما نفتح توصية جديدة لنفس السهم من نفس الرادار
+STOP_RULE_VERSION = 2
 RADARS = {
     "faisal_dev": ("📡 فيصل المطوّر", ROOT / "output" / "sig_faisal_dev.json"),
     "faisal_orig": ("📜 فيصل الأصلي", ROOT / "output" / "sig_faisal_orig.json"),
@@ -121,9 +125,31 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
     t["max_gain_pct"] = round((float(after["High"].max()) / t["entry"] - 1) * 100, 1)
     t["max_dd_pct"] = round((float(after["Low"].min()) / t["entry"] - 1) * 100, 1)
     t["ret_pct"] = round((t["last"] / t["entry"] - 1) * 100, 1)
+    new_rules = t.get("radar") in NEW_RULES
     for ix, r in after.iterrows():
         day = str(ix.date())
-        # نفس اليوم فيه الوقف والهدف: نفترض الوقف أول (الأحوط)
+        if new_rules:
+            # القواعد الجديدة: الهدف يُفحص أول (لمسه يصير خلال اليوم، والوقف ما ينحسب إلا بإغلاق اليوم تحت الوقف)
+            if t.get("t1") and r["High"] >= t["t1"] and t["result"] == "open":
+                t["result"], t["t1_date"] = "t1", day
+                events.append(f"✅ {t['symbol']} وصل الهدف الأول {fp(t['t1'])} (+{(t['t1'] / t['entry'] - 1) * 100:.0f}%) — "
+                              f"{t['radar_name']} · خذ جزء وارفع وقفك")
+            if t.get("t2") and r["High"] >= t["t2"] and t["result"] == "t1":
+                t["result"], t["closed"] = "t2", day
+                events.append(f"🏆 {t['symbol']} وصل الهدف الثاني {fp(t['t2'])} (+{(t['t2'] / t['entry'] - 1) * 100:.0f}%)")
+                break
+            if t.get("stop") and r["Close"] < t["stop"] and t["result"] in ("open", "t1"):
+                if t["result"] == "t1":
+                    t["result"], t["closed"] = "t1_then_stop", day
+                    events.append(f"🔻 {t['symbol']} أغلق تحت الوقف {fp(t['stop'])} بعد ما وصل الهدف الأول")
+                else:
+                    t["result"], t["closed"] = "stop", day
+                    events.append(f"❌ {t['symbol']} أغلق تحت الوقف {fp(t['stop'])} ({t['radar_name']})")
+                break
+            if t.get("stop") and r["Low"] < t["stop"] <= r["Close"]:
+                t.setdefault("sweeps", []).append(day)  # نزل تحت الوقف ورجع فوقه = مسح سيولة
+            continue
+        # القواعد القديمة (فيصل الأصلي والمطّلعين): لمس الوقف = وقف، ونفس اليوم فيه الوقف والهدف = وقف (الأحوط)
         if t.get("stop") and r["Low"] <= t["stop"] and t["result"] in ("open", "t1"):
             if t["result"] == "t1":
                 t["result"], t["closed"] = "t1_then_stop", day
@@ -146,6 +172,34 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
     return events
 
 
+def migrate_stops(track: dict) -> int:
+    """مرة وحدة: الوقف الجديد للتوصيات القديمة (فيصل المطوّر وعبدالله) وإعادة تقييمها من البداية."""
+    if track.get("stop_rule_version", 1) >= STOP_RULE_VERSION:
+        return 0
+    todo = [t for t in track["trades"] if t["radar"] in NEW_RULES and t.get("stop")]
+    for t in todo:
+        t["stop_old"] = t["stop"]
+        base = t["stop"] / (0.97 if t["radar"] == "faisal_dev" else 0.99)  # الدعم/أدنى سعر من الوقف القديم
+        t["stop"] = round(base * 0.90, 4)
+        t.update({"result": "open", "closed": None, "t1_date": None, "sweeps": []})
+    if todo:
+        import yfinance as yf
+        syms = sorted({t["symbol"] for t in todo})
+        data = yf.download(syms, period="3mo", interval="1d", group_by="ticker",
+                           auto_adjust=False, threads=True, progress=False)
+        for t in todo:
+            try:
+                d = data[t["symbol"]] if isinstance(data.columns, pd.MultiIndex) else data
+                d = d.dropna(subset=["Close"])
+                d.index = pd.to_datetime(d.index).tz_localize(None)
+                evaluate(t, d)  # بدون تنبيهات تيليجرام لكل حدث قديم
+            except Exception as e:
+                log("خطأ إعادة حساب", t["symbol"], repr(e)[:100])
+    track["stop_rule_version"] = STOP_RULE_VERSION
+    log(f"إعادة حساب الوقف: {len(todo)} توصية")
+    return len(todo)
+
+
 def run():
     track = load(TRACK, {"trades": []})
     # توصيات انحفظت ببيانات غلط (تُحذف من السجل)
@@ -153,6 +207,10 @@ def run():
     track["trades"] = [t for t in track["trades"] if t.get("id") not in PURGE]
     trades = track["trades"]
     new_events = []
+    migrated = migrate_stops(track)
+    if migrated:
+        new_events.append(f"🔁 أعدت حساب {migrated} توصية (فيصل المطوّر وعبدالله) بالوقف الجديد: "
+                          f"أقل سعر عند الدعم − 10%، والوقف ينحسب بإغلاق اليوم تحته.")
 
     # توصيات جديدة
     for key, (name, path) in RADARS.items():
@@ -161,9 +219,17 @@ def run():
             log(f"ما فيه نتائج لـ {name}")
             continue
         open_keys = {(t["radar"], t["symbol"]) for t in trades if t["result"] in ("open", "t1")}
+        recent_closed = {}
+        if key in NEW_RULES:
+            for x in trades:
+                if x["radar"] == key and x.get("closed"):
+                    recent_closed[x["symbol"]] = max(recent_closed.get(x["symbol"], ""), x["closed"])
         for s in signals(key, payload):
             if (key, s["symbol"]) in open_keys or not s.get("entry"):
                 continue
+            rc = recent_closed.get(s["symbol"])
+            if rc and (date.today() - datetime.strptime(rc, "%Y-%m-%d").date()).days < COOLDOWN_DAYS:
+                continue  # انقفلت قريب — ننتظر ~5 جلسات
             t = {"id": f"{key}:{s['symbol']}:{s['date']}", "radar": key, "radar_name": name, "sub1": s["entry"] < 1,
                  "opened_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "result": "open", **s}
             if any(x["id"] == t["id"] for x in trades):
