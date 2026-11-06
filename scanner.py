@@ -482,7 +482,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
                                                 "detail": "كسر أدنى قاع آخر 5 جلسات على فريم 4 ساعات"})
             r["irtikaz"]["score"] = max(0, r["irtikaz"]["score"] - 5)
 
-    # شرط الشورت: لا يرشح إلا سهم شورته 50 ألف أو أقل
+    # شرط الشورت: لا يرشح إلا سهم شورته 100 ألف أو أقل (config: max_short_shares)
     max_sh = cfg["behavior"].get("max_short_shares")
     if max_sh:
         for t in list(results):
@@ -496,7 +496,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
             if val is None:
                 # الشورت غير معروف: ما يترشح (حده الأعلى رادار)
                 r["irtikaz"]["adjustments"].append({"name": "الشورت غير معروف", "pts": 0,
-                                                    "detail": "ما يترشح لين يتأكد إن الشورت 50 ألف أو أقل"})
+                                                    "detail": f"ما يترشح لين يتأكد إن الشورت {max_sh:,} أو أقل"})
                 if r["irtikaz"]["status"] in ("ready", "near"):
                     r["irtikaz"]["status"] = "radar"
                 if r["momentum"]["status"] != "no":

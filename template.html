@@ -282,7 +282,7 @@ $("#q").oninput = render; $("#sort").onchange = render;
 
 function shortTxt(s){
   const parts = [];
-  if (s.short_used && s.short_used.value != null && s.short_used.value > s.short_used.max) parts.push("⚠ فوق 50K");
+  if (s.short_used && s.short_used.value != null && s.short_used.value > s.short_used.max) parts.push("⚠ فوق " + fM(s.short_used.max));
   if (s.short_shares != null) parts.push("\u2066" + fM(s.short_shares) + (s.short_pct_float != null ? " (" + s.short_pct_float + "%)" : "") + "\u2069");
   if (s.short_available && s.short_available.available != null) parts.push("متاح \u2066" + fM(s.short_available.available) + "\u2069");
   return parts.join(" · ") || "-";

@@ -34,7 +34,7 @@
     "_moved_help": "إذا ارتفع 25% فوق الدعم أو اخترق سقف التماسك بـ 5% = طلع، ينشال من القائمة",
     "vol_dry_ratio": 0.7,
     "min_dollar_volume": 300000,
-    "max_short_shares": 50000,
+    "max_short_shares": 100000,
     "short_history_keep": 12
   },
 
