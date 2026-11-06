@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 
 import faisal_rules as fr
+import split_rule
 
 
 def _series(segments, seed, start_price, vol_base=400_000, noise=0.025):
@@ -83,6 +84,7 @@ def build(cfg) -> dict:
     rows = []
     for sym, name, d, info in scenarios():
         a = fr.analyze(d, info, cfg)
+        split_rule.apply(a, d)
         a.update({"symbol": sym, "name": name + " (تجريبي)", "sector": "Demo", "country": "-"})
         a["news"] = [{"title": "Demo Corp awarded new contract", "title_ar": "خبر تجريبي: الشركة تفوز بعقد جديد",
                       "summary": "", "text_ar": "هذا نص الخبر الكامل (تجريبي).\n\nالفقرة الثانية من الخبر تظهر هنا كاملة بدون روابط.",
