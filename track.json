@@ -10,7 +10,7 @@
    "status": "ready",
    "label": "✅ مطابق",
    "entry": 2.165,
-   "stop": 1.9788,
+   "stop": 1.836,
    "t1": 3.255,
    "t2": 4.3675,
    "score": 96,
@@ -23,7 +23,11 @@
    "last_date": "2026-11-06",
    "max_gain_pct": -3.0,
    "max_dd_pct": -3.0,
-   "ret_pct": -3.0
+   "ret_pct": -3.0,
+   "stop_old": 1.9788,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "faisal_dev:ALP:2026-11-05",
@@ -35,7 +39,7 @@
    "status": "near",
    "label": "🟡 قريب",
    "entry": 2.95,
-   "stop": 2.6966,
+   "stop": 2.502,
    "t1": 5.22,
    "t2": 5.975,
    "score": 68.0,
@@ -48,7 +52,11 @@
    "last_date": "2026-11-06",
    "max_gain_pct": 6.3,
    "max_dd_pct": -1.0,
-   "ret_pct": 5.3
+   "ret_pct": 5.3,
+   "stop_old": 2.6966,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "faisal_dev:INHD:2026-11-05",
@@ -60,7 +68,7 @@
    "status": "near",
    "label": "🟡 قريب",
    "entry": 3.01,
-   "stop": 2.7936,
+   "stop": 2.592,
    "t1": 3.75,
    "t2": 4.94,
    "score": 56.8,
@@ -69,11 +77,15 @@
    "why": "RSI 32.7 · دعم 2.88 (عنه 4.5%) · منطقة الطلب 2.88–3.17",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.93,
+   "last": 2.86,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.2,
-   "max_dd_pct": -3.6,
-   "ret_pct": -2.7
+   "max_dd_pct": -5.0,
+   "ret_pct": -5.0,
+   "stop_old": 2.7936,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "faisal_orig:FBGL:2026-11-05",
@@ -195,11 +207,11 @@
    "why": "RSI 40.2 · دعم 2.10 (عنه 1.0%) · منطقة الطلب 2.10–2.31",
    "dilution": "medium",
    "sessions": 1,
-   "last": 2.2001,
+   "last": 2.2393,
    "last_date": "2026-11-06",
    "max_gain_pct": 8.5,
    "max_dd_pct": -0.0,
-   "ret_pct": 3.8
+   "ret_pct": 5.6
   },
   {
    "id": "faisal_orig:INHD:2026-11-05",
@@ -220,11 +232,11 @@
    "why": "RSI 32.7 · دعم 2.88 (عنه 4.5%) · منطقة الطلب 2.88–3.17",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.93,
+   "last": 2.86,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.2,
-   "max_dd_pct": -3.6,
-   "ret_pct": -2.7
+   "max_dd_pct": -5.0,
+   "ret_pct": -5.0
   },
   {
    "id": "abdullah:PN:2026-11-05",
@@ -236,7 +248,7 @@
    "status": "ready",
    "label": "🎯 متماسك",
    "entry": 2.38,
-   "stop": 2.1186,
+   "stop": 1.926,
    "t1": 2.61,
    "t2": 15.4,
    "score": 74.0,
@@ -245,11 +257,15 @@
    "why": "موجة 2.71→15.40 · دعم 2.14 · اختبر 5 مرات · تماسك 23 جلسة",
    "dilution": "medium",
    "sessions": 1,
-   "last": 2.39,
+   "last": 2.38,
    "last_date": "2026-11-06",
    "max_gain_pct": 3.4,
    "max_dd_pct": -1.6,
-   "ret_pct": 0.4
+   "ret_pct": 0.0,
+   "stop_old": 2.1186,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "abdullah:SPHL:2026-11-05",
@@ -261,7 +277,7 @@
    "status": "near",
    "label": "🟡 بدأ يتماسك",
    "entry": 2.31,
-   "stop": 2.2275,
+   "stop": 2.025,
    "t1": 2.57,
    "t2": 5.94,
    "score": 90.8,
@@ -274,7 +290,11 @@
    "last_date": "2026-11-06",
    "max_gain_pct": 1.6,
    "max_dd_pct": -2.2,
-   "ret_pct": -0.4
+   "ret_pct": -0.4,
+   "stop_old": 2.2275,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "abdullah:CAMP:2026-11-05",
@@ -286,7 +306,7 @@
    "status": "near",
    "label": "🟡 بدأ يتماسك",
    "entry": 3.72,
-   "stop": 3.4452,
+   "stop": 3.132,
    "t1": 4.15,
    "t2": 6.0,
    "score": 82.8,
@@ -295,23 +315,27 @@
    "why": "موجة 2.90→6.00 · دعم 3.48 · اختبر 2 مرات · تماسك 7 جلسة",
    "dilution": "medium",
    "sessions": 1,
-   "last": 3.8475,
+   "last": 3.88,
    "last_date": "2026-11-06",
-   "max_gain_pct": 3.8,
+   "max_gain_pct": 4.3,
    "max_dd_pct": -1.6,
-   "ret_pct": 3.4
+   "ret_pct": 4.3,
+   "stop_old": 3.4452,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "abdullah:RYOJ:2026-11-05",
    "radar": "abdullah",
    "radar_name": "🌊 عبدالله",
    "opened_at": "2026-11-06 12:25",
-   "result": "stop",
+   "result": "open",
    "symbol": "RYOJ",
    "status": "near",
    "label": "🟡 بدأ يتماسك",
    "entry": 2.33,
-   "stop": 2.2968,
+   "stop": 2.088,
    "t1": 2.761,
    "t2": 6.185,
    "score": 62.8,
@@ -325,7 +349,10 @@
    "max_gain_pct": 1.7,
    "max_dd_pct": -1.7,
    "ret_pct": 0.0,
-   "closed": "2026-11-06"
+   "closed": null,
+   "stop_old": 2.2968,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "insiders:TDIC:2026-11-05",
@@ -357,7 +384,7 @@
    "radar": "insiders",
    "radar_name": "🟢 المطّلعين",
    "opened_at": "2026-11-06 14:00",
-   "result": "open",
+   "result": "stop",
    "symbol": "LONA",
    "status": "near",
    "label": "🟡 شراء داخلي",
@@ -371,11 +398,12 @@
    "why": "1 مطّلع اشترى بـ $9,919,161,281 (متوسط 3149.47) · Portman David J. — مالك 10%+ · آخر شراء 2026-10-26",
    "dilution": "none",
    "sessions": 1,
-   "last": 4.34,
+   "last": 4.345,
    "last_date": "2026-11-06",
    "max_gain_pct": 7.7,
-   "max_dd_pct": -3.2,
-   "ret_pct": 0.0
+   "max_dd_pct": -4.8,
+   "ret_pct": 0.1,
+   "closed": "2026-11-06"
   },
   {
    "id": "faisal_orig:INSG:2026-11-06",
@@ -396,7 +424,7 @@
    "why": "RSI 41.5 · دعم 3.88 (عنه 1.9%) · منطقة الطلب 3.88–4.27",
    "dilution": "none",
    "sessions": 0,
-   "last": 3.9586,
+   "last": 3.905,
    "last_date": "2026-11-06"
   },
   {
@@ -409,7 +437,7 @@
    "status": "ready",
    "label": "🎯 متماسك",
    "entry": 1.135,
-   "stop": 1.089,
+   "stop": 0.99,
    "t1": 1.36,
    "t2": 6.0,
    "score": 89,
@@ -418,8 +446,12 @@
    "why": "موجة 1.18→6.00 · دعم 1.10 · اختبر 3 مرات · تماسك 11 جلسة",
    "dilution": "none",
    "sessions": 0,
-   "last": 1.14,
-   "last_date": "2026-11-06"
+   "last": 1.11,
+   "last_date": "2026-11-06",
+   "stop_old": 1.089,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "abdullah:LONA:2026-11-06",
@@ -431,7 +463,7 @@
    "status": "near",
    "label": "🟡 بدأ يتماسك",
    "entry": 4.42,
-   "stop": 4.158,
+   "stop": 3.78,
    "t1": 5.03,
    "t2": 5.4,
    "score": 70.5,
@@ -440,8 +472,12 @@
    "why": "موجة 2.21→5.40 · دعم 4.20 · اختبر 2 مرات · تماسك 5 جلسة",
    "dilution": "none",
    "sessions": 0,
-   "last": 4.34,
-   "last_date": "2026-11-06"
+   "last": 4.345,
+   "last_date": "2026-11-06",
+   "stop_old": 4.158,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "faisal_dev:SEGG:2026-11-06",
@@ -453,7 +489,7 @@
    "status": "ready",
    "label": "✅ مطابق",
    "entry": 1.18,
-   "stop": 1.0864,
+   "stop": 1.008,
    "t1": 1.52,
    "t2": 2.09,
    "score": 79.0,
@@ -462,8 +498,12 @@
    "why": "RSI 39.3 · دعم 1.12 (عنه 5.4%) · منطقة الطلب 1.12–1.23",
    "dilution": "none",
    "sessions": 0,
-   "last": 1.1992,
-   "last_date": "2026-11-06"
+   "last": 1.165,
+   "last_date": "2026-11-06",
+   "stop_old": 1.0864,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
   },
   {
    "id": "faisal_orig:SEGG:2026-11-06",
@@ -484,7 +524,7 @@
    "why": "RSI 39.3 · دعم 1.12 (عنه 5.4%) · منطقة الطلب 1.12–1.23",
    "dilution": "none",
    "sessions": 0,
-   "last": 1.1992,
+   "last": 1.165,
    "last_date": "2026-11-06"
   },
   {
@@ -543,7 +583,7 @@
    "status": "near",
    "label": "🟡 بدأ يتماسك",
    "entry": 0.925,
-   "stop": 0.891,
+   "stop": 0.81,
    "t1": 1.09,
    "t2": 2.13,
    "score": 85.7,
@@ -553,7 +593,35 @@
    "dilution": "none",
    "sessions": 0,
    "last": 0.9297,
+   "last_date": "2026-11-06",
+   "stop_old": 0.891,
+   "closed": null,
+   "t1_date": null,
+   "sweeps": []
+  },
+  {
+   "id": "abdullah:NUCL:2026-11-06",
+   "radar": "abdullah",
+   "radar_name": "🌊 عبدالله",
+   "sub1": false,
+   "opened_at": "2026-11-06 18:39",
+   "result": "open",
+   "symbol": "NUCL",
+   "status": "near",
+   "label": "🟡 بدأ يتماسك",
+   "entry": 4.05,
+   "stop": 3.492,
+   "t1": 4.75,
+   "t2": 12.29,
+   "score": 75.2,
+   "date": "2026-11-06",
+   "name": "Eagle Nuclear Energy Corp.",
+   "why": "موجة 5.14→12.29 · دعم 3.88 · اختبر 3 مرات · تماسك 6 جلسة",
+   "dilution": "none",
+   "sessions": 0,
+   "last": 4.06,
    "last_date": "2026-11-06"
   }
- ]
+ ],
+ "stop_rule_version": 2
 }
