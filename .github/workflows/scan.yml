@@ -51,6 +51,9 @@ jobs:
       - name: رادار عبدالله
         run: python abdullah/abdullah_scanner.py --no-open --out site/abdullah/index.html
 
+      - name: رادار فيصل — النسخة الأصلية
+        run: python faisal_original/run_original.py --out site/original/index.html
+
       - name: قفل الموقع بكلمة سر (إذا موجودة في Secrets باسم RADAR_PASSWORD)
         if: env.RADAR_PASSWORD != ''
         run: |
@@ -61,6 +64,7 @@ jobs:
                 --template-color-primary "#2f6fde" --template-color-secondary "#0e1013")
           npx --yes staticrypt@3.5.4 site/index.html "${OPTS[@]}" --template-title "📡 رادار فيصل" -d site
           npx --yes staticrypt@3.5.4 site/abdullah/index.html "${OPTS[@]}" --template-title "🌊 رادار عبدالله" -d site/abdullah
+          npx --yes staticrypt@3.5.4 site/original/index.html "${OPTS[@]}" --template-title "📜 فيصل الأصلي" -d site/original
 
       - uses: actions/upload-pages-artifact@v3
         with:

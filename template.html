@@ -135,11 +135,12 @@ ul.clean{margin:0;padding-right:18px}
 <div class="wrap">
   <header>
     <div>
-      <h1>📡 رادار طريقة فيصل</h1>
+      <h1 id="h1">📡 رادار طريقة فيصل</h1>
       <div class="sub" id="meta"></div>
     </div>
     <div style="display:flex;gap:8px;align-items:center">
-      <a class="btn" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
+      <a class="btn" id="lnk-other" href="original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" id="lnk-abd" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
       <button class="btn primary" id="rescan" style="display:none">🔄 تحديث المسح</button>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
       <button class="btn" id="theme" title="الوضع الليلي">🌓</button>
@@ -201,6 +202,14 @@ function newsHTML(list){
 }
 const DATA = /*__DATA__*/null;
 const LIVE = /*__LIVE__*/false;
+if (DATA && DATA.variant === "original"){
+  document.getElementById("h1").textContent = "📜 رادار فيصل — النسخة الأصلية";
+  document.title = "فيصل الأصلي";
+  const o = document.getElementById("lnk-other"); o.href = "../"; o.textContent = "📡 فيصل المطوّر";
+  document.getElementById("lnk-abd").href = "../abdullah/";
+} else if (DATA) {
+  document.getElementById("h1").textContent = "📡 رادار فيصل — المطوّر";
+}
 const STATUS = {ready:"✅ مطابق", near:"🟡 قريب", radar:"👀 رادار", no:"غير مطابق"};
 const MSTATUS = {ready:"🚀 زخم قوي", near:"🟡 زخم محتمل", no:"لا يوجد زخم"};
 let tab = "irtikaz", filt = null, tagF = null;

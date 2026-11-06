@@ -20,6 +20,12 @@ GitHub Pages: https://hatim4231.github.io/faisal-radar
 - استبعاد Warrants / Units / Rights.
 - الموقع يتقفل بكلمة سر (StaticCrypt في الـ workflow) إذا فيه Secret باسم `RADAR_PASSWORD`. بدونه ينشر مفتوح.
 
+## نسختين من رادار فيصل جنب بعض (طلب المستخدم)
+- **المطوّر** (`faisal_rules.py`) → الصفحة الرئيسية `/`.
+- **الأصلي** (`faisal_original/faisal_rules_original.py` = قواعد أول نسخة commit 1c5f0a0 **بدون أي تعديل**) → `/original/`.
+  يشغله `faisal_original/run_original.py` بنفس خط الجلب والفلاتر في `scanner.py` (1-5$، الشورت 50 ألف، الأخبار، بدون Warrants).
+- لا تعدّل `faisal_rules_original.py` أبداً. أي تطوير يروح للمطوّر فقط.
+
 ## رادار عبدالله (مجلد `abdullah/`)
 برنامج مستقل بنفس الفلاتر العامة (1-5$، الشورت 50 ألف وأقل، الأخبار بالعربي، بدون Warrants)، لكن بنظرية عبدالله:
 سهم دبّل (x2+) خلال شهر-شهرين ← صحح ← تماسك على دعم واختبره مرات عديدة ← **قبل ما يطلع**.
