@@ -148,6 +148,7 @@ ul.clean{margin:0;padding-right:18px}
   </header>
   <div id="demo" class="demo" style="display:none">⚠ هذا تقرير تجريبي ببيانات وهمية (رموز DEMO). شغّل <span class="ltr">python scanner.py</span> على جهازك للبيانات الحقيقية.</div>
 
+  <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles"></div>
 
   <div class="toolbar">
@@ -533,6 +534,17 @@ if (LIVE){
     }catch(e){}
   }, 4000);
 }
+
+(function(){
+  const ex = (DATA && DATA.excluded_dilution) || [];
+  if (!ex.length) return;
+  const box = document.getElementById("excl"); box.style.display = "";
+  box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم (اضغط للتفاصيل)";
+  document.getElementById("excl-body").innerHTML = ex.map(function(x){
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">' + esc(x.name||"") + '</span><ul class="clean note">' +
+      x.events.map(function(e){ return '<li><span class="num">' + esc(e.date) + '</span> — ' + esc(e.what) + '</li>'; }).join("") + '</ul></div>';
+  }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
+})();
 render();
 </script>
 </body>

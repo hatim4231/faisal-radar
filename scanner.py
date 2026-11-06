@@ -508,11 +508,13 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     rows.sort(key=lambda r: -r["irtikaz"]["score"])
     if deep:
         sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
+    # قرار المستخدم: شركات الطرح/التخفيف المتكرر ما تترشح
+    rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "Yahoo Finance (yfinance) — تأخير ~15 دقيقة",
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
-        "config": cfg, "stocks": rows,
+        "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil,
     }
     (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
     write_csv(rows)

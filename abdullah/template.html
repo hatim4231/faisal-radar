@@ -149,6 +149,7 @@ ul.clean{margin:0;padding-right:18px}
     <b>الفكرة:</b> سهم دبّل خلال شهر-شهرين ← صحح ← ثبت على دعم واختبره مرات عديدة وتماسك ← <b>قبل ما يطلع</b>.
     <span class="note">الأسهم اللي طلعت أو كسرت الدعم تنشال من القائمة. فرضية تداول نعمل عليها، وليست نظرية مثبتة النجاح. التقسيم العكسي ليس شرطاً، وقفزته الحسابية لا تُحسب تدبيل.</span>
   </div>
+  <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles"></div>
   <div class="toolbar">
     <input type="search" id="q" placeholder="ابحث برمز السهم...">
@@ -348,6 +349,17 @@ function openDetail(sym){
 function closeDetail(){ openSym = null; $("#ov").classList.remove("on"); $("#dr").classList.remove("on"); }
 $("#dclose").onclick = closeDetail; $("#ov").onclick = closeDetail;
 document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(); });
+
+(function(){
+  const ex = (DATA && DATA.excluded_dilution) || [];
+  if (!ex.length) return;
+  const box = document.getElementById("excl"); box.style.display = "";
+  box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم (اضغط للتفاصيل)";
+  document.getElementById("excl-body").innerHTML = ex.map(function(x){
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">' + esc(x.name||"") + '</span><ul class="clean note">' +
+      x.events.map(function(e){ return '<li><span class="num">' + esc(e.date) + '</span> — ' + esc(e.what) + '</li>'; }).join("") + '</ul></div>';
+  }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
+})();
 render();
 </script>
 </body>
