@@ -94,6 +94,11 @@ def build(cfg) -> dict:
                       "summary": "", "text_ar": "نص تجريبي لخبر سلبي عن طرح أسهم.", "full": True, "sentiment": "negative",
                       "why_pos": [], "why_neg": ["طرح أسهم (تخفيف)"], "url": None, "source": "Demo", "time": "2026-11-03T13:00:00Z"}]
         a["short_available"] = {"available": 10000, "fee": 12.5, "date": "2026-11-04"}
+        if sym == "DEMOF":
+            a["dilution"] = {"level": "high", "cik": 0, "hits": [
+                {"form": "424B5", "date": "2026-11-02", "label": "نشرة طرح تسعّرت", "sev": 3, "days_ago": 3, "url": ""},
+                {"form": "S-3", "date": "2026-09-10", "label": "رف طرح Shelf (S-3) — ممكن ATM", "sev": 2, "days_ago": 56, "url": ""}]}
+            a["tags"].append("⛔ تخفيف SEC")
         rows.append(a)
     rows.sort(key=lambda r: -r["irtikaz"]["score"])
     return {"generated_at": "تجريبي — بيانات وهمية", "source": "بيانات وهمية للتجربة فقط",

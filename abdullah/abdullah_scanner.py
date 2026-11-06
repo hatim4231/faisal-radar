@@ -33,6 +33,7 @@ sys.path.insert(0, str(HERE))
 import scanner as data  # noqa: E402  (أدوات جلب البيانات فقط)
 import abdullah_rules as ar  # noqa: E402
 import news_tools  # noqa: E402
+import sec_tools  # noqa: E402
 
 log = data.log
 CACHE = data.CACHE
@@ -163,6 +164,13 @@ def run(cfg, tickers=None, deep=True) -> dict:
             (r["status"] in ("ready", "near", "radar") and r["score"] >= cfg["scan"]["report_min_score"])]
     order = {"ready": 0, "near": 1, "radar": 2, "moved": 3, "invalid": 4}
     rows.sort(key=lambda r: (order[r["status"]], -r["score"]))
+    if deep:
+        sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
+        for r in rows:
+            dl = r.get("dilution") or {}
+            if dl.get("level") in ("high", "medium"):
+                h = dl["hits"][0]
+                r["flags"].insert(0, f"{'⛔' if dl['level'] == 'high' else '⚠'} SEC: {h['label']} ({h['form']} · {h['date']})")
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "Yahoo Finance + Interactive Brokers (الشورت المتاح)",
                "scanned": len(daily), "with_wave": len(results),
