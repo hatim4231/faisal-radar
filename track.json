@@ -69,11 +69,11 @@
    "why": "RSI 32.7 · دعم 2.88 (عنه 4.5%) · منطقة الطلب 2.88–3.17",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.98,
+   "last": 2.93,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.2,
    "max_dd_pct": -3.6,
-   "ret_pct": -1.0
+   "ret_pct": -2.7
   },
   {
    "id": "faisal_orig:FBGL:2026-11-05",
@@ -220,11 +220,11 @@
    "why": "RSI 32.7 · دعم 2.88 (عنه 4.5%) · منطقة الطلب 2.88–3.17",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.98,
+   "last": 2.93,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.2,
    "max_dd_pct": -3.6,
-   "ret_pct": -1.0
+   "ret_pct": -2.7
   },
   {
    "id": "abdullah:PN:2026-11-05",
@@ -245,11 +245,11 @@
    "why": "موجة 2.71→15.40 · دعم 2.14 · اختبر 5 مرات · تماسك 23 جلسة",
    "dilution": "medium",
    "sessions": 1,
-   "last": 2.37,
+   "last": 2.36,
    "last_date": "2026-11-06",
    "max_gain_pct": 3.4,
    "max_dd_pct": -1.6,
-   "ret_pct": -0.4
+   "ret_pct": -0.8
   },
   {
    "id": "abdullah:SPHL:2026-11-05",
@@ -295,18 +295,18 @@
    "why": "موجة 2.90→6.00 · دعم 3.48 · اختبر 2 مرات · تماسك 7 جلسة",
    "dilution": "medium",
    "sessions": 1,
-   "last": 3.855,
+   "last": 3.85,
    "last_date": "2026-11-06",
    "max_gain_pct": 3.8,
    "max_dd_pct": -1.6,
-   "ret_pct": 3.6
+   "ret_pct": 3.5
   },
   {
    "id": "abdullah:RYOJ:2026-11-05",
    "radar": "abdullah",
    "radar_name": "🌊 عبدالله",
    "opened_at": "2026-11-06 12:25",
-   "result": "open",
+   "result": "stop",
    "symbol": "RYOJ",
    "status": "near",
    "label": "🟡 بدأ يتماسك",
@@ -320,11 +320,12 @@
    "why": "موجة 2.55→6.18 · دعم 2.32 · اختبر 2 مرات · تماسك 7 جلسة",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.35,
+   "last": 2.33,
    "last_date": "2026-11-06",
    "max_gain_pct": 1.7,
-   "max_dd_pct": 0.9,
-   "ret_pct": 0.9
+   "max_dd_pct": -1.7,
+   "ret_pct": 0.0,
+   "closed": "2026-11-06"
   },
   {
    "id": "insiders:TDIC:2026-11-05",
@@ -395,7 +396,7 @@
    "why": "RSI 41.5 · دعم 3.88 (عنه 1.9%) · منطقة الطلب 3.88–4.27",
    "dilution": "none",
    "sessions": 0,
-   "last": 3.955,
+   "last": 3.98,
    "last_date": "2026-11-06"
   },
   {
@@ -417,7 +418,7 @@
    "why": "موجة 1.18→6.00 · دعم 1.10 · اختبر 3 مرات · تماسك 11 جلسة",
    "dilution": "none",
    "sessions": 0,
-   "last": 1.12,
+   "last": 1.14,
    "last_date": "2026-11-06"
   },
   {
@@ -461,7 +462,7 @@
    "why": "RSI 39.3 · دعم 1.12 (عنه 5.4%) · منطقة الطلب 1.12–1.23",
    "dilution": "none",
    "sessions": 0,
-   "last": 1.18,
+   "last": 1.2,
    "last_date": "2026-11-06"
   },
   {
@@ -483,7 +484,7 @@
    "why": "RSI 39.3 · دعم 1.12 (عنه 5.4%) · منطقة الطلب 1.12–1.23",
    "dilution": "none",
    "sessions": 0,
-   "last": 1.18,
+   "last": 1.2,
    "last_date": "2026-11-06"
   },
   {
@@ -506,6 +507,52 @@
    "dilution": "none",
    "sessions": 0,
    "last": 1.37,
+   "last_date": "2026-11-06"
+  },
+  {
+   "id": "faisal_orig:AIFF:2026-11-06",
+   "radar": "faisal_orig",
+   "radar_name": "📜 فيصل الأصلي",
+   "sub1": true,
+   "opened_at": "2026-11-06 18:15",
+   "result": "open",
+   "symbol": "AIFF",
+   "status": "near",
+   "label": "🟡 قريب",
+   "entry": 0.925,
+   "stop": 0.873,
+   "t1": 1.01,
+   "t2": 1.8775,
+   "score": 58.3,
+   "date": "2026-11-06",
+   "name": "Firefly Neuroscience, Inc.",
+   "why": "RSI 40.1 · دعم 0.900 (عنه 2.8%) · منطقة الطلب 0.900–0.990",
+   "dilution": "none",
+   "sessions": 0,
+   "last": 0.925,
+   "last_date": "2026-11-06"
+  },
+  {
+   "id": "abdullah:AIFF:2026-11-06",
+   "radar": "abdullah",
+   "radar_name": "🌊 عبدالله",
+   "sub1": true,
+   "opened_at": "2026-11-06 18:15",
+   "result": "open",
+   "symbol": "AIFF",
+   "status": "near",
+   "label": "🟡 بدأ يتماسك",
+   "entry": 0.925,
+   "stop": 0.891,
+   "t1": 1.09,
+   "t2": 2.13,
+   "score": 85.7,
+   "date": "2026-11-06",
+   "name": "Firefly Neuroscience, Inc.",
+   "why": "موجة 0.930→2.13 · دعم 0.900 · اختبر 2 مرات · تماسك 15 جلسة",
+   "dilution": "none",
+   "sessions": 0,
+   "last": 0.925,
    "last_date": "2026-11-06"
   }
  ]
