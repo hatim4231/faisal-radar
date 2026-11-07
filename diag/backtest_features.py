@@ -178,6 +178,8 @@ def main():
             if i % 100 == 0:
                 print(i, round(time.time() - t0), flush=True)
     df = pd.DataFrame(rows)
+    os.makedirs("diag_out", exist_ok=True)
+    df.to_csv("diag_out/features.csv.gz", index=False, compression="gzip")
     rnd = df[df.radar == "RANDOM"]
     print("الفترة:", rnd.date.min(), "→", rnd.date.max(), "· أيام-أسهم:", len(rnd))
     report(df[df.radar == "FAISAL"].dropna(axis=1, how="all"), "فيصل المطوّر", rnd)
