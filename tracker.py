@@ -32,7 +32,8 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 
 MAX_SESSIONS = 20
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
-NEW_RULES = {"faisal_dev", "abdullah"}
+NEW_RULES = {"faisal_dev", "abdullah", "accumulation"}
+MUTED = {"accumulation"}   # قرار المستخدم: رادار التجميع نراقب نتايجه بالسجل بدون رسائل تيليجرام
 COOLDOWN_DAYS = 7          # ~5 جلسات قبل ما نفتح توصية جديدة لنفس السهم من نفس الرادار
 STOP_RULE_VERSION = 2
 RADARS = {
@@ -40,10 +41,12 @@ RADARS = {
     "faisal_orig": ("📜 فيصل الأصلي", ROOT / "output" / "sig_faisal_orig.json"),
     "abdullah": ("🌊 عبدالله", ROOT / "output" / "sig_abdullah.json"),
     "insiders": ("🟢 المطّلعين", ROOT / "output" / "sig_insiders.json"),
+    "accumulation": ("🔍 التجميع", ROOT / "output" / "sig_accumulation.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
 STATUS_AR_INS = {"ready": "🟢 شراء داخلي قوي", "near": "🟡 شراء داخلي"}
+STATUS_AR_ACC = {"ready": "🔍 تجميع مؤكد", "near": "🟡 تجميع محتمل"}
 
 
 def log(*a):
@@ -68,6 +71,17 @@ def fp(x):
 def signals(key: str, payload: dict) -> list[dict]:
     out = []
     for s in payload.get("stocks", []):
+        if key == "accumulation":
+            st = s.get("status")
+            if st not in ("ready", "near"):
+                continue
+            tg = s.get("targets") or [None, None]
+            out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_ACC[st],
+                        "entry": s["price"], "stop": s.get("stop"), "t1": tg[0], "t2": tg[1],
+                        "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
+                        "why": f"قاعدة {s.get('base_len')} جلسة بين {fp(s.get('support'))} و {fp(s.get('base_top'))}",
+                        "dilution": (s.get("dilution") or {}).get("level")})
+            continue
         if key == "insiders":
             st = s.get("status")
             if st not in ("ready", "near"):
@@ -87,7 +101,7 @@ def signals(key: str, payload: dict) -> list[dict]:
                 continue
             tg = s.get("targets") or []
             out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_ABD[st],
-                        "entry": s["price"], "stop": s.get("invalidation"),
+                        "entry": s["price"], "stop": s.get("invalidation"), "zone": s.get("entry"),
                         "t1": tg[0] if tg else None, "t2": tg[-1] if len(tg) > 1 else None,
                         "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
                         "why": f"موجة {fp(s['wave']['low'])}→{fp(s['wave']['peak'])} · دعم {fp(s.get('support'))} · "
@@ -101,7 +115,7 @@ def signals(key: str, payload: dict) -> list[dict]:
             p = s["plan"]
             ft = p.get("four_targets") or []
             out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR[st],
-                        "entry": s["price"], "stop": p.get("stop"), "t1": p.get("t1"),
+                        "entry": s["price"], "stop": p.get("stop"), "t1": p.get("t1"), "zone": p.get("entry_zone"),
                         "t2": ft[1] if len(ft) > 1 else None, "score": s["irtikaz"]["score"],
                         "date": s.get("date"), "name": s.get("name"),
                         "why": f"RSI {s.get('rsi')} · دعم {fp(p.get('support'))} (عنه {p.get('dist_support_pct')}%) · "
@@ -175,6 +189,24 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
     return events
 
 
+def price_alerts(t: dict) -> list[str]:
+    """تنبيه لحظي (بتأخير ~15 دقيقة): السعر دخل منطقة الطلب، أو قرّب من الوقف. كل تنبيه مرة وحدة."""
+    out = []
+    px = t.get("last")
+    if px is None or t["result"] not in ("open", "t1"):
+        return out
+    z = t.get("zone")
+    if z and z[0] and z[1] and z[0] <= px <= z[1] and not t.get("zone_alerted"):
+        t["zone_alerted"] = t.get("last_date")
+        out.append(f"⚡ {t['symbol']} دخل منطقة الطلب {fp(z[0])} – {fp(z[1])} (السعر {fp(px)}) — {t['radar_name']}\n"
+                   f"الوقف {fp(t.get('stop'))} · الهدف 1 {fp(t.get('t1'))} · ضع طلب Limit ولا تشتري من العرض")
+    st = t.get("stop")
+    if st and st < px <= st * 1.03 and not t.get("stop_warned"):
+        t["stop_warned"] = t.get("last_date")
+        out.append(f"⚠ {t['symbol']} قرّب من الوقف {fp(st)} (السعر {fp(px)}) — {t['radar_name']} · انتبه للإغلاق")
+    return out
+
+
 def migrate_stops(track: dict) -> int:
     """مرة وحدة: الوقف الجديد للتوصيات القديمة (فيصل المطوّر وعبدالله) وإعادة تقييمها من البداية."""
     if track.get("stop_rule_version", 1) >= STOP_RULE_VERSION:
@@ -240,6 +272,8 @@ def run():
             trades.append(t)
             warn = {"high": "\n⛔ عليه خطر تخفيف SEC عالي", "medium": "\n⚠ عليه ملفات طرح محتملة"}.get(s.get("dilution"), "")
             warn = {"ready": "\n🔍 مؤكد بالتجميع (بصمات مضارب يجمع)", "near": "\n🔍 فيه بصمات تجميع محتملة"}.get(s.get("accum"), "") + warn
+            if key in MUTED:
+                continue
             new_events.append(
                 f"🔔 توصية جديدة — {name}\n{s['label']} <b>{s['symbol']}</b> ({s.get('name') or ''})\n"
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"
@@ -258,7 +292,9 @@ def run():
                 d = data[t["symbol"]] if isinstance(data.columns, pd.MultiIndex) else data
                 d = d.dropna(subset=["Close"])
                 d.index = pd.to_datetime(d.index).tz_localize(None)
-                new_events += evaluate(t, d)
+                ev = evaluate(t, d)
+                if t["radar"] not in MUTED:
+                    new_events += ev + price_alerts(t)
             except Exception as e:
                 log("خطأ متابعة", t["symbol"], repr(e)[:100])
 
