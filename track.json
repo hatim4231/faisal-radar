@@ -131,7 +131,7 @@
    "why": "RSI 43.0 · دعم 1.90 (عنه 10.0%) · منطقة الطلب 1.90–2.09",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.159,
+   "last": 2.1594,
    "last_date": "2026-11-06",
    "max_gain_pct": 10.0,
    "max_dd_pct": 0.5,
@@ -210,7 +210,7 @@
    "last": 2.24,
    "last_date": "2026-11-06",
    "max_gain_pct": 8.5,
-   "max_dd_pct": -0.0,
+   "max_dd_pct": 0.0,
    "ret_pct": 5.7
   },
   {
@@ -399,8 +399,9 @@
    "why": "RSI 41.5 · دعم 3.88 (عنه 1.9%) · منطقة الطلب 3.88–4.27",
    "dilution": "none",
    "sessions": 0,
-   "last": 3.88,
-   "last_date": "2026-11-06"
+   "last": 3.875,
+   "last_date": "2026-11-06",
+   "stop_warned": "2026-11-06"
   },
   {
    "id": "abdullah:YJ:2026-11-06",
@@ -544,7 +545,7 @@
    "why": "RSI 40.1 · دعم 0.900 (عنه 2.8%) · منطقة الطلب 0.900–0.990",
    "dilution": "none",
    "sessions": 0,
-   "last": 0.91,
+   "last": 0.9102,
    "last_date": "2026-11-06"
   },
   {
@@ -567,7 +568,7 @@
    "why": "موجة 0.930→2.13 · دعم 0.900 · اختبر 2 مرات · تماسك 15 جلسة",
    "dilution": "none",
    "sessions": 0,
-   "last": 0.91,
+   "last": 0.9102,
    "last_date": "2026-11-06",
    "stop_old": 0.891,
    "closed": null,
@@ -640,7 +641,7 @@
    "why": "RSI 33.9 · دعم 0.810 (عنه 3.7%) · منطقة الطلب 0.810–0.891",
    "dilution": "medium",
    "sessions": 0,
-   "last": 0.84,
+   "last": 0.8448,
    "last_date": "2026-11-06"
   },
   {
@@ -755,7 +756,7 @@
    "why": "RSI 33.9 · دعم 0.810 (عنه 3.7%) · منطقة الطلب 0.810–0.891",
    "dilution": "medium",
    "sessions": 0,
-   "last": 0.84,
+   "last": 0.8448,
    "last_date": "2026-11-06"
   },
   {
@@ -962,7 +963,7 @@
    "why": "2 مطّلع اشترى بـ $61,450 (متوسط 2.93) · KUMAR AMIT — عضو مجلس إدارة، Chief Executive Officer · آخر شراء 2026-10-30",
    "dilution": "none",
    "sessions": 0,
-   "last": 3.18,
+   "last": 3.175,
    "last_date": "2026-11-06"
   },
   {
@@ -1238,7 +1239,7 @@
    "why": "قاعدة 10 جلسة بين 0.433 و 0.614",
    "dilution": "none",
    "sessions": 0,
-   "last": 0.545,
+   "last": 0.5451,
    "last_date": "2026-11-06"
   },
   {
@@ -1289,7 +1290,7 @@
    "dilution": "none",
    "accum": null,
    "sessions": 0,
-   "last": 0.72,
+   "last": 0.7195,
    "last_date": "2026-11-06",
    "zone_alerted": "2026-11-06"
   },
@@ -1318,7 +1319,7 @@
    "dilution": "none",
    "accum": null,
    "sessions": 0,
-   "last": 0.72,
+   "last": 0.7195,
    "last_date": "2026-11-06",
    "zone_alerted": "2026-11-06"
   }
