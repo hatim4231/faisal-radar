@@ -101,7 +101,7 @@ def signals(key: str, payload: dict) -> list[dict]:
                 continue
             tg = s.get("targets") or []
             out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_ABD[st],
-                        "entry": s["price"], "stop": s.get("invalidation"),
+                        "entry": s["price"], "stop": s.get("invalidation"), "zone": s.get("entry"),
                         "t1": tg[0] if tg else None, "t2": tg[-1] if len(tg) > 1 else None,
                         "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
                         "why": f"موجة {fp(s['wave']['low'])}→{fp(s['wave']['peak'])} · دعم {fp(s.get('support'))} · "
@@ -115,7 +115,7 @@ def signals(key: str, payload: dict) -> list[dict]:
             p = s["plan"]
             ft = p.get("four_targets") or []
             out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR[st],
-                        "entry": s["price"], "stop": p.get("stop"), "t1": p.get("t1"),
+                        "entry": s["price"], "stop": p.get("stop"), "t1": p.get("t1"), "zone": p.get("entry_zone"),
                         "t2": ft[1] if len(ft) > 1 else None, "score": s["irtikaz"]["score"],
                         "date": s.get("date"), "name": s.get("name"),
                         "why": f"RSI {s.get('rsi')} · دعم {fp(p.get('support'))} (عنه {p.get('dist_support_pct')}%) · "
@@ -187,6 +187,24 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
         t["closed"] = t.get("last_date")
         t["result"] = "expired" if t["result"] == "open" else "t1_expired"
     return events
+
+
+def price_alerts(t: dict) -> list[str]:
+    """تنبيه لحظي (بتأخير ~15 دقيقة): السعر دخل منطقة الطلب، أو قرّب من الوقف. كل تنبيه مرة وحدة."""
+    out = []
+    px = t.get("last")
+    if px is None or t["result"] not in ("open", "t1"):
+        return out
+    z = t.get("zone")
+    if z and z[0] and z[1] and z[0] <= px <= z[1] and not t.get("zone_alerted"):
+        t["zone_alerted"] = t.get("last_date")
+        out.append(f"⚡ {t['symbol']} دخل منطقة الطلب {fp(z[0])} – {fp(z[1])} (السعر {fp(px)}) — {t['radar_name']}\n"
+                   f"الوقف {fp(t.get('stop'))} · الهدف 1 {fp(t.get('t1'))} · ضع طلب Limit ولا تشتري من العرض")
+    st = t.get("stop")
+    if st and st < px <= st * 1.03 and not t.get("stop_warned"):
+        t["stop_warned"] = t.get("last_date")
+        out.append(f"⚠ {t['symbol']} قرّب من الوقف {fp(st)} (السعر {fp(px)}) — {t['radar_name']} · انتبه للإغلاق")
+    return out
 
 
 def migrate_stops(track: dict) -> int:
@@ -276,7 +294,7 @@ def run():
                 d.index = pd.to_datetime(d.index).tz_localize(None)
                 ev = evaluate(t, d)
                 if t["radar"] not in MUTED:
-                    new_events += ev
+                    new_events += ev + price_alerts(t)
             except Exception as e:
                 log("خطأ متابعة", t["symbol"], repr(e)[:100])
 
