@@ -63,6 +63,13 @@ def gap_days(tickers):
 
 
 def detail(g):
+    try:
+        return _detail(g)
+    except Exception as e:
+        return {**g, "err": repr(e)[:60]}
+
+
+def _detail(g):
     s = pd.Timestamp(g["day"]).tz_localize(NY)
     try:
         b = A.bars([g["t"]], "5Min", (s + pd.Timedelta(hours=4)).tz_convert("UTC").to_pydatetime(),
@@ -82,6 +89,8 @@ def detail(g):
     tmin = rth.index.hour * 60 + rth.index.minute
     # عشوائي
     win = rth[(tmin >= 575) & (tmin <= 630)]
+    if len(win) < 3:
+        return {**g, "err": "no window"}
     k = random.randrange(len(win))
     e_x = float(win["Close"].iloc[k])
     after_x = rth.loc[win.index[k]:].iloc[1:]
