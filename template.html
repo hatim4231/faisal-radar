@@ -340,6 +340,7 @@ function render(){
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
         ${s.dilution && s.dilution.level!=="none" && s.dilution.level!=="low" ? `<div class="left" style="color:${s.dilution.level==="high"?"var(--bad)":"var(--warn)"}">🏛 SEC: ${esc(s.dilution.hits[0].label)} (<span class="num">${esc(s.dilution.hits[0].form)} · ${esc(s.dilution.hits[0].date)}</span>)</div>` : ""}
+        ${s.accum ? `<div class="left" style="color:var(--good)">${esc(s.accum.label)} (${Math.round(s.accum.score)}) — قاعدة ${s.accum.base_len} جلسة · ${esc(s.accum.signs.slice(0,3).join("، "))}</div>` : ""}
         ${s.compliance ? `<div class="left" style="color:${s.compliance.level==="block"?"var(--bad)":s.compliance.level==="info"?"var(--muted)":"var(--warn)"}">🏛 ${esc(s.compliance.why)}</div>` : ""}
         ${s.new_low ? `<div class="left" style="color:${s.new_low.pending?"var(--bad)":"var(--good)"}">${s.new_low.pending?"⚠":"✓"} ${esc(s.new_low.why)}</div>` : ""}
         ${s.split_zone ? `<div class="left" style="color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--muted)"}">✂️ منطقة التقسيم <span class="num">${fp(s.split_zone.sweep)} – ${fp(s.split_zone.half)}</span> · ${esc(s.split_zone.label)}${(s.split_zone.status==="above" || s.split_zone.status==="na") ? " · " + esc(s.split_zone.note) : ""}</div>` : ""}
@@ -461,6 +462,10 @@ function openDetail(sym){
       </div>
       <div style="margin-top:8px;font-weight:600;color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--text)"}">${esc(s.split_zone.label)} — ${esc(s.split_zone.note)}</div>
       <div class="note">${s.split_zone.window_20_50 ? "✓ داخل نافذة 20-50 يوم بعد التقسيم" : "خارج نافذة 20-50 يوم بعد التقسيم"} · المنطقة احتمال وليست وعداً — ركّز عليه مع باقي الشروط.</div></div>` : ""}
+
+    ${s.accum ? `<div class="card"><h3>${esc(s.accum.label)} — بصمات المضارب</h3>
+      <div class="note">نقاط التجميع <b class="num">${Math.round(s.accum.score)}</b> · قاعدة <span class="num">${s.accum.base_len}</span> جلسة بين <span class="num">${fp(s.accum.support)}</span> و <span class="num">${fp(s.accum.base_top)}</span>${s.accum.spring ? ` · هزة إلى <span class="num">${fp(s.accum.spring.low)}</span> (${esc(s.accum.spring.date)})` : ""}</div>
+      <ul class="clean" style="margin-top:6px">${s.accum.signs.map(x => `<li>✅ ${esc(x)}</li>`).join("")}</ul></div>` : ""}
 
     <div class="card"><h3>✔ شروط سهم الارتكاز (${Math.round(I.base)} من 100 قبل تعديلات السلوك)</h3>${checksHTML(I.checks)}
       ${I.adjustments.length ? `<div style="margin-top:10px"><b>تعديلات السلوك:</b><ul class="clean">${I.adjustments.map(a => `<li><b class="num" style="color:${a.pts>0?"var(--good)":"var(--bad)"}">${a.pts>0?"+":""}${a.pts}</b> ${esc(a.name)} — <span class="note">${esc(a.detail)}</span></li>`).join("")}</ul></div>` : ""}
