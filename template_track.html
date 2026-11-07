@@ -144,7 +144,8 @@ ul.clean{margin:0;padding-right:18px}
       <a class="btn" href="../afterhours/" style="text-decoration:none">🌙 الأفتر</a>
     </div>
   </header>
-  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة.
+  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة (<b>فيصل المطوّر: 10 جلسات</b> — أفضل طريقة خروج في الاختبار).
+    <br><span class="note">🎯 توصيات فيصل المطوّر بثقة منخفضة تنحفظ هنا بس، وما تنرسل بتيليجرام (🔕).</span>
     <span class="note">«نجح» = وصل الهدف الأول قبل الوقف. نفس اليوم فيه الوقف والهدف = نحسبه وقف (الأحوط). هذا سجل لقياس الرادار — مو توصية شراء.</span></div>
   <div id="stats" class="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
   <div class="toolbar">
@@ -191,7 +192,7 @@ function render(){
   const td = (s, st="") => `<td style="padding:8px;border-bottom:1px solid var(--line);white-space:nowrap;${st}">${s}</td>`;
   $("#tbl").innerHTML = `<tr>${["التاريخ","الرادار","السهم","الحالة","الدخول","الوقف","الهدف 1","النتيجة","أقصى ربح","أقصى نزول","الآن","جلسات"].map(th).join("")}</tr>` +
     (L.length ? L.map(t => { const r = RES[t.result] || [t.result,""];
-      return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name))}${td(`<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label) + (t.accum ? ' <span class="tag g">🔍</span>' : "") + (t.conf != null ? ` <span class="note" title="ثقة النجاح وقت التوصية">🎯${Math.round(t.conf*100)}%</span>` : ""))}
+      return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name))}${td(`<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label) + (t.accum ? ' <span class="tag g">🔍</span>' : "") + (t.conf != null ? ` <span class="note" title="ثقة النجاح وقت التوصية">🎯${Math.round(t.conf*100)}%${t.conf_label === "منخفضة" ? " 🔕" : ""}</span>` : ""))}
         ${td(`<span class="num">${fp(t.entry)}</span>`)}${td(`<span class="num" style="color:var(--bad)">${fp(t.stop)}</span>`)}${td(`<span class="num" style="color:var(--good)">${fp(t.t1)}</span>`)}
         ${td(r[0], "color:"+r[1]+";font-weight:600")}${td(`<span class="num ${(t.max_gain_pct||0)>0?"up":""}">${pc(t.max_gain_pct)}</span>`)}${td(`<span class="num ${(t.max_dd_pct||0)<0?"down":""}">${pc(t.max_dd_pct)}</span>`)}
         ${td(`<span class="num">${fp(t.last)} (${pc(t.ret_pct)})</span>`)}${td(`<span class="num">${t.sessions ?? 0}</span>`)}</tr>`; }).join("")

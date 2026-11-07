@@ -7,7 +7,7 @@
   2) أي سهم جديد صار ✅ مطابق / 🟡 قريب (فيصل) أو 🎯 متماسك / 🟡 بدأ يتماسك (عبدالله)
      ينحفظ كتوصية: تاريخ، سعر الدخول، الوقف، الهدف الأول والثاني.
   3) يتابع كل توصية مفتوحة يوم بيوم: هل وصل الهدف الأول قبل الوقف؟ أقصى ربح؟ أقصى نزول؟
-     التوصية تنقفل إذا ضرب الوقف أو الهدف الثاني، أو بعد 20 جلسة.
+     التوصية تنقفل إذا ضرب الوقف أو الهدف الثاني، أو بعد 20 جلسة (فيصل المطوّر: 10 جلسات — قرار المستخدم).
   4) يرسل تيليجرام: توصية جديدة، وصل هدف، ضرب وقف.
   5) يبني صفحة "📈 سجل التوصيات" بنسب النجاح لكل رادار.
 
@@ -31,9 +31,21 @@ TG_STATE = DATA / "telegram.json"
 SITE_URL = "https://hatim4231.github.io/faisal-radar"
 
 MAX_SESSIONS = 20
+# قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
+# إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
+HORIZON = {"faisal_dev": 10}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
 NEW_RULES = {"faisal_dev", "abdullah", "accumulation"}
 MUTED = {"accumulation"}   # قرار المستخدم: رادار التجميع نراقب نتايجه بالسجل بدون رسائل تيليجرام
+
+
+def is_muted(t: dict) -> bool:
+    """بدون تيليجرام: الرادارات الصامتة، وتوصيات فيصل المطوّر بثقة منخفضة (قرار المستخدم — تنحفظ بالسجل بس)."""
+    return t.get("radar") in MUTED or (t.get("radar") == "faisal_dev" and t.get("conf_label") == "منخفضة")
+
+
+def horizon(t: dict) -> int:
+    return int(t.get("horizon") or HORIZON.get(t.get("radar"), MAX_SESSIONS))
 COOLDOWN_DAYS = 7          # ~5 جلسات قبل ما نفتح توصية جديدة لنفس السهم من نفس الرادار
 STOP_RULE_VERSION = 2
 RADARS = {
@@ -146,7 +158,8 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
     t["max_dd_pct"] = round((float(after["Low"].min()) / t["entry"] - 1) * 100, 1)
     t["ret_pct"] = round((t["last"] / t["entry"] - 1) * 100, 1)
     new_rules = t.get("radar") in NEW_RULES
-    for ix, r in after.iterrows():
+    H = horizon(t)
+    for ix, r in after.iloc[:H].iterrows():
         day = str(ix.date())
         if new_rules:
             # القواعد الجديدة: الهدف يُفحص أول (لمسه يصير خلال اليوم، والوقف ما ينحسب إلا بإغلاق اليوم تحت الوقف)
@@ -186,8 +199,8 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
             t["result"], t["closed"] = "t2", day
             events.append(f"🏆 {t['symbol']} وصل الهدف الثاني {fp(t['t2'])} (+{(t['t2'] / t['entry'] - 1) * 100:.0f}%)")
             break
-    if t["result"] in ("open", "t1") and t["sessions"] >= MAX_SESSIONS:
-        t["closed"] = t.get("last_date")
+    if t["result"] in ("open", "t1") and t["sessions"] >= H:
+        t["closed"] = str(after.index[H - 1].date())
         t["result"] = "expired" if t["result"] == "open" else "t1_expired"
     return events
 
@@ -293,19 +306,24 @@ def run():
             if rc and (date.today() - datetime.strptime(rc, "%Y-%m-%d").date()).days < COOLDOWN_DAYS:
                 continue  # انقفلت قريب — ننتظر ~5 جلسات
             t = {"id": f"{key}:{s['symbol']}:{s['date']}", "radar": key, "radar_name": name, "sub1": s["entry"] < 1,
-                 "opened_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "result": "open", **s}
+                 "opened_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "result": "open",
+                 "horizon": HORIZON.get(key, MAX_SESSIONS), **s}
             if any(x["id"] == t["id"] for x in trades):
                 continue
             trades.append(t)
             warn = {"high": "\n⛔ عليه خطر تخفيف SEC عالي", "medium": "\n⚠ عليه ملفات طرح محتملة"}.get(s.get("dilution"), "")
             warn = {"ready": "\n🔍 مؤكد بالتجميع (بصمات مضارب يجمع)", "near": "\n🔍 فيه بصمات تجميع محتملة"}.get(s.get("accum"), "") + warn
-            if key in MUTED:
+            if is_muted(t):
+                if key == "faisal_dev":
+                    log(f"  🔕 {s['symbol']} ثقة منخفضة — بالسجل بدون تيليجرام")
                 continue
             if s.get("conf") is not None:
                 base = f" · متوسط التوصيات {s['conf_base'] * 100:.0f}%" if s.get("conf_base") else ""
                 sim = s.get("conf_similar") or {}
+                miss = sim.get("avg_miss", sim.get("avg_loss"))
                 simtxt = (f"\n📊 توصيات سابقة بنفس الثقة: نجحت {sim['hit'] * 100:.0f}% · لما تنجح +{sim['avg_win'] * 100:.0f}% · "
-                          f"لما توقف {sim['avg_loss'] * 100:.0f}%") if sim.get("hit") is not None and sim.get("avg_win") is not None else ""
+                          f"لما ما تنجح {miss * 100:.0f}% · المدة {t.get('horizon', 20)} جلسات") \
+                    if sim.get("hit") is not None and sim.get("avg_win") is not None and miss is not None else ""
                 warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}{simtxt}" + warn
             new_events.append(
                 f"🔔 توصية جديدة — {name}\n{s['label']} <b>{s['symbol']}</b> ({s.get('name') or ''})\n"
@@ -322,7 +340,7 @@ def run():
             try:
                 d = data[t["symbol"]]
                 ev = evaluate(t, d)
-                if t["radar"] not in MUTED:
+                if not is_muted(t):
                     new_events += ev + price_alerts(t)
             except Exception as e:
                 log("خطأ متابعة", t["symbol"], repr(e)[:100])

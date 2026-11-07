@@ -1,7 +1,8 @@
 """
 🎯 أداة الثقة لفيصل المطوّر — احتمال نجاح التوصية من تاريخ آلاف الحالات المشابهة.
 
-النجاح = نفس تعريف سجل التوصيات: السهم يوصل الهدف الأول قبل ما يسكر تحت الوقف خلال 20 جلسة.
+النجاح = نفس تعريف سجل التوصيات: السهم يوصل الهدف الأول قبل ما يسكر تحت الوقف خلال 10 جلسات
+(قرار المستخدم: مدة توصية فيصل المطوّر 10 جلسات — النموذج مدرّب على نفس المدة).
 النموذج: انحدار لوجستي (Logistic Regression) مدرّب على بيانات Alpaca (سنتين+) ومختبر على فترات ما شافها.
 الملف `confidence_model.json` فيه الأوزان (يطلع من diag/backtest_confidence.py على فرع diag-flye).
 
@@ -272,6 +273,6 @@ def predict(f: dict, model: dict | None = None) -> dict | None:
     pos = [REASONS[k][0] for k, v in reversed(contrib[-3:]) if v > 0.05]
     ts = (m.get("tier_stats") or {}).get(label) or {}
     similar = {k: (round(ts[k], 3) if isinstance(ts.get(k), float) else ts.get(k))
-               for k in ("n", "hit", "stop", "mean", "median", "avg_win", "avg_loss")} if ts else None
+               for k in ("n", "hit", "lose", "mean", "median", "avg_win", "avg_miss")} if ts else None
     return {"p": round(pr, 3), "label": label, "base": m.get("base_rate"), "pos": pos, "neg": neg,
-            "similar": similar, "n_train": m.get("n_train"), "version": m.get("version")}
+            "similar": similar, "horizon": m.get("horizon", 20), "n_train": m.get("n_train"), "version": m.get("version")}
