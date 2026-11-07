@@ -40,6 +40,32 @@ NAMES_AR = {
 }
 
 
+# أسباب مفهومة: (لما يرفع الاحتمال، لما ينزله) — بس للعوامل الواضحة والثابتة في الاختبار
+REASONS = {
+    "t1_pct": ("الهدف الأول قريب", "الهدف الأول بعيد"),
+    "stop_pct": ("الوقف بعيد ويعطيه مجال", "الوقف قريب"),
+    "dist_support": ("قريب من الدعم", "بعيد عن الدعم"),
+    "touches": ("الدعم ما انضرب كثير", "الدعم انضرب مرات كثيرة (يضعف)"),
+    "up_from_low20": ("ما صعد كثير من قاعه", "صعد كثير من قاعه (دخول متأخر)"),
+    "range_med": ("السهم نشيط الحركة", "السهم هادي الحركة"),
+    "atr20": ("تذبذب يومي عالي", "تذبذب يومي منخفض"),
+    "iwm_up": ("سوق الأسهم الصغيرة صاعد", "سوق الأسهم الصغيرة نازل"),
+    "earn_soon": ("الأرباح مو قريبة", "الأرباح قريبة (غالباً يجي بعدها طرح)"),
+    "dil90": ("ما فيه ملفات تخفيف حديثة", "فيه ملفات تخفيف حديثة في SEC"),
+    "days_rs": ("ما فيه تقسيم عكسي قريب", "تقسيم عكسي قريب"),
+    "pumps": ("ما فيه شموع قروبات", "فيه شموع قروبات"),
+    "runner": ("سبق انفجر (Former Runner)", "ما سبق انفجر"),
+    "has_w": ("نموذج W", "ما فيه نموذج W"),
+    "rel_vol": ("فوليوم اليوم عالي", "فوليوم اليوم ضعيف"),
+    "price_log": ("سعره منخفض (حركته أسرع)", "سعره أعلى (حركته أبطأ)"),
+    "pc_hold": ("فشل الهبوط واضح", "ما بيّن فشل هبوط"),
+    "pc_candle": ("شمعة إيجابية عند الدعم", "ما فيه شمعة إيجابية"),
+    "pc_macd": ("MACD يتحسن", "MACD ما يتحسن"),
+    "pc_volume": ("الفوليوم يؤكد", "الفوليوم ما يؤكد"),
+    "close_loc": ("إغلاقاته مو عند أعلى الشمعة", "يسكر قرب أعلى الشمعة (احتمال تصريف)"),
+}
+
+
 def _f(x, default=0.0, lo=None, hi=None):
     try:
         v = float(x)
@@ -139,6 +165,73 @@ def market_state(iwm: pd.DataFrame | None, closes: dict[str, pd.Series] | None, 
     return out
 
 
+def sec_dates(t: str) -> tuple[list, list]:
+    """تواريخ ملفات التخفيف (S-1/F-1/S-3/F-3/424B بدون 424B3، و8-K بند 3.02) وتواريخ الأرباح (8-K بند 2.02)."""
+    import sec_tools
+    cik = sec_tools._cik(t)
+    if not cik:
+        return [], []
+    js = sec_tools._get(f"https://data.sec.gov/submissions/CIK{cik:010d}.json")["filings"]["recent"]
+    dil, earn = [], []
+    for form, date, items in zip(js["form"], js["filingDate"], js.get("items", [""] * len(js["form"]))):
+        fu = form.upper()
+        if fu.startswith(DILUTION_FORMS) and not fu.startswith("S-1/A") and "424B3" not in fu:
+            dil.append(date)
+        if fu == "8-K" and "3.02" in (items or ""):
+            dil.append(date)
+        if fu == "8-K" and "2.02" in (items or ""):
+            earn.append(date)
+    return sorted(dil), sorted(earn)
+
+
+def sec_dates_cached(t: str) -> tuple[list, list]:
+    """نفس sec_dates مع كاش يومي (المسح كل 30 دقيقة — ما نكرر الطلبات)."""
+    from datetime import date
+    path = ROOT / "cache" / "conf_sec.json"
+    today = str(date.today())
+    try:
+        cache = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        cache = {}
+    if cache.get("_day") != today:
+        cache = {"_day": today}
+    if t not in cache:
+        try:
+            cache[t] = list(sec_dates(t))
+        except Exception:
+            return [], []
+        try:
+            path.parent.mkdir(exist_ok=True)
+            path.write_text(json.dumps(cache), encoding="utf-8")
+        except Exception:
+            pass
+    return tuple(cache[t])
+
+
+def apply(rows: list[dict], daily: dict, log=print) -> int:
+    """يضيف r["confidence"] لكل سهم (فيصل المطوّر). يرجع عدد الأسهم اللي انحسبت لها الثقة."""
+    if not load_model():
+        return 0
+    try:
+        import alpaca_data
+        iwm = alpaca_data.daily(["IWM"], days=200).get("IWM")
+    except Exception:
+        iwm = None
+    mkt = market_state(iwm, {t: d["Close"] for t, d in daily.items() if d is not None and len(d)})
+    n = 0
+    for r in rows:
+        d = daily.get(r["symbol"])
+        if d is None or len(d) < 60:
+            continue
+        try:
+            dil, earn = sec_dates_cached(r["symbol"])
+            r["confidence"] = predict(features(r, d, None, dil, earn, mkt))
+            n += 1
+        except Exception as e:
+            log("  الثقة:", r["symbol"], repr(e)[:80])
+    return n
+
+
 # ----------------------------------------------------------------------------
 # التنبؤ
 # ----------------------------------------------------------------------------
@@ -174,8 +267,11 @@ def predict(f: dict, model: dict | None = None) -> dict | None:
         pr = float(np.interp(pr, [c[0] for c in cal], [c[1] for c in cal]))
     tiers = m.get("tiers", {"high": 0.4, "mid": 0.28})
     label = "عالية" if pr >= tiers["high"] else "متوسطة" if pr >= tiers["mid"] else "منخفضة"
-    contrib.sort(key=lambda x: x[1])
-    neg = [NAMES_AR.get(k, k) for k, v in contrib[:3] if v < -0.08]
-    pos = [NAMES_AR.get(k, k) for k, v in reversed(contrib[-3:]) if v > 0.08]
+    contrib = sorted((x for x in contrib if x[0] in REASONS), key=lambda x: x[1])
+    neg = [REASONS[k][1] for k, v in contrib[:3] if v < -0.05]
+    pos = [REASONS[k][0] for k, v in reversed(contrib[-3:]) if v > 0.05]
+    ts = (m.get("tier_stats") or {}).get(label) or {}
+    similar = {k: (round(ts[k], 3) if isinstance(ts.get(k), float) else ts.get(k))
+               for k in ("n", "hit", "stop", "mean", "median", "avg_win", "avg_loss")} if ts else None
     return {"p": round(pr, 3), "label": label, "base": m.get("base_rate"), "pos": pos, "neg": neg,
-            "n_train": m.get("n_train"), "version": m.get("version")}
+            "similar": similar, "n_train": m.get("n_train"), "version": m.get("version")}
