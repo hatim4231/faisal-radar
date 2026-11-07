@@ -573,6 +573,11 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
             n_conf = confidence.apply(rows, daily, log)
             if n_conf:
                 log(f"أداة الثقة: انحسبت لـ {n_conf} سهم")
+                for r in rows:
+                    c = r.get("confidence")
+                    if c and r["irtikaz"]["status"] in ("ready", "near"):
+                        log(f"  🎯 {r['symbol']} {r['irtikaz']['status']} · ثقة {c['p'] * 100:.0f}% ({c['label']}) · "
+                            f"معها: {'، '.join(c['pos']) or '-'} · ضدها: {'، '.join(c['neg']) or '-'}")
         except Exception as e:
             log("أداة الثقة تعطلت:", repr(e)[:150])
     payload = {
