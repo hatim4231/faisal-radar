@@ -58,10 +58,11 @@ def run_one(args):
         if a:
             I = a["irtikaz"]
             row = {**base, "radar": "FAISAL", "score": I["score"], "base": I.get("base"), "status": I["status"],
-                   "rsi": a.get("rsi")}
+                   "rsi": a.get("rsi"), "adj": I["score"] - (I.get("base") or 0)}
             for c in I["checks"]:
                 row["ok_" + c["key"]] = int(bool(c["ok"]))
                 row["pc_" + c["key"]] = (c["got"] / c["weight"]) if c["weight"] else 0
+                row["w_" + c["key"]] = c["weight"]
             out.append(row)
         try:
             b = ar.analyze(hist, info, ACFG)
@@ -72,6 +73,7 @@ def run_one(args):
             for c in b["checks"]:
                 row["ok_" + c["key"]] = int(bool(c["ok"]))
                 row["pc_" + c["key"]] = (c["got"] / c["weight"]) if c["weight"] else 0
+                row["w_" + c["key"]] = c["weight"]
             out.append(row)
     return out
 
@@ -164,7 +166,7 @@ def report(df, name, rnd):
             print(f"  {lo}-{hi}$: n={len(s)} +20%قبل−10%={pct(s.u10.mean())} طار30%={pct(s.up30.mean())}")
 
 
-def main():
+def collect():
     cfg = scanner.load_cfg()
     tickers = [x for x in scanner.get_universe(cfg) if not (len(x) == 5 and x[-1] in "WRU") and "-" not in x]
     daily = scanner.download_daily(tickers, cfg)
@@ -177,7 +179,11 @@ def main():
             rows += r
             if i % 100 == 0:
                 print(i, round(time.time() - t0), flush=True)
-    df = pd.DataFrame(rows)
+    return pd.DataFrame(rows)
+
+
+def main():
+    df = collect()
     os.makedirs("diag_out", exist_ok=True)
     df.to_csv("diag_out/features.csv.gz", index=False, compression="gzip")
     rnd = df[df.radar == "RANDOM"]

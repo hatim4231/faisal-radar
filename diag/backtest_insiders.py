@@ -85,7 +85,14 @@ def score(buys, price, day):
     status = "ready" if pts >= 65 and (above is None or above <= 20) else "near" if pts >= 45 else "radar"
     if above is not None and above > 30:
         status = "radar"
-    return {"score": pts, "status": status, "total": total, "n": n, "top": top, "above": above}
+    # المقترح: المنصب أكبر وزن (40)، العدد 20، المبلغ 10، الحداثة 10، القرب 5 — و«قوي» لازم CEO/CFO/الرئيس
+    alt = (40 if top else 15 if director else 5) + (20 if n >= 3 else 15 if n == 2 else 8)
+    alt += 10 if total >= 100_000 else 6
+    alt += 10 if days <= 7 else 6 if days <= 14 else 3
+    alt += 5 if above is not None and above <= 25 else 0
+    alt_status = "ready" if alt >= 65 and top else "near" if alt >= 45 else "radar"
+    return {"score": pts, "status": status, "total": total, "n": n, "top": top, "above": above,
+            "alt": alt, "alt_status": alt_status}
 
 
 def outcome(fut, entry):
@@ -194,6 +201,13 @@ def main():
     line(df[df.above.notna() & (df.above < 0)], "السعر تحت متوسطهم")
     line(df[df.above.notna() & (df.above > 20)], "السعر فوق متوسطهم 20%+")
     mid = df.day.sort_values().iloc[len(df) // 2]
+    print("\n==== الأوزان الحالية مقابل المقترحة (لكل نص من الفترة) ====")
+    for half, sub in (("النص الأول", df[df.day < mid]), ("النص الثاني", df[df.day >= mid])):
+        print(f" {half}:")
+        line(sub[sub.status == "ready"], "  الحالي: شراء قوي")
+        line(sub[sub.status.isin(["ready", "near"])], "  الحالي: قوي+داخلي")
+        line(sub[sub.alt_status == "ready"], "  المقترح: شراء قوي")
+        line(sub[sub.alt_status.isin(["ready", "near"])], "  المقترح: قوي+داخلي")
     line(df[df.day < mid], "النص الأول من الفترة")
     line(df[df.day >= mid], "النص الثاني من الفترة")
     print("\nأمثلة ready:", ", ".join(f"{r.t}@{r.day}:{r.ret20 * 100:+.0f}%" for r in df[df.status == "ready"].tail(15).itertuples()))
