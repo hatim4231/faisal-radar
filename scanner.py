@@ -566,6 +566,15 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
     # قرار المستخدم: شركات الطرح/التخفيف المتكرر ما تترشح
     rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
+    # 🎯 أداة الثقة: احتمال نجاح التوصية (فيصل المطوّر فقط — النسخة الأصلية ما تتغير)
+    if getattr(fr, "__name__", "") == "faisal_rules":
+        try:
+            import confidence
+            n_conf = confidence.apply(rows, daily, log)
+            if n_conf:
+                log(f"أداة الثقة: انحسبت لـ {n_conf} سهم")
+        except Exception as e:
+            log("أداة الثقة تعطلت:", repr(e)[:150])
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",

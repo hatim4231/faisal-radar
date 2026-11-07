@@ -168,6 +168,7 @@ ul.clean{margin:0;padding-right:18px}
       <option value="rvol">الأعلى RVOL</option>
       <option value="float">الأقل فلووت</option>
       <option value="upside">الأكبر مساحة صعود</option>
+      <option value="conf">🎯 الأعلى ثقة</option>
     </select>
   </div>
   <div class="chips" id="chips"></div>
@@ -297,6 +298,27 @@ function remainingList(s){
   return ch.filter(c => !c.ok && c.remaining).sort((a,b)=>b.weight-a.weight).map(c => c.remaining);
 }
 
+// 🎯 أداة الثقة
+const confColor = c => c.label === "عالية" ? "var(--good)" : c.label === "متوسطة" ? "var(--warn)" : "var(--bad)";
+function confLine(c){
+  return `<div class="left" style="color:${confColor(c)};font-weight:600">🎯 ثقة النجاح <span class="num">${Math.round(c.p*100)}%</span> (${esc(c.label)})`
+    + (c.base != null ? ` <span class="note">· متوسط التوصيات <span class="num">${Math.round(c.base*100)}%</span></span>` : "")
+    + (c.neg && c.neg.length ? ` <span class="note">· ضدها: ${c.neg.map(esc).join("، ")}</span>` : "") + `</div>`;
+}
+function confCard(c){
+  if (!c) return "";
+  return `<div class="card"><h3>🎯 أداة الثقة — احتمال نجاح التوصية</h3>
+    <div class="plan">
+      <div class="pbox"><span>احتمال النجاح</span><b class="num" style="color:${confColor(c)}">${Math.round(c.p*100)}%</b><span>الثقة: ${esc(c.label)}</span></div>
+      <div class="pbox"><span>متوسط توصيات فيصل (✅+🟡)</span><b class="num">${c.base != null ? Math.round(c.base*100)+"%" : "-"}</b><span>تاريخياً</span></div>
+      <div class="pbox"><span>✅ معها</span><b style="font-size:13px">${(c.pos||[]).map(esc).join("، ") || "-"}</b><span>أقوى الأسباب اللي ترفع الاحتمال</span></div>
+      <div class="pbox"><span>⚠ ضدها</span><b style="font-size:13px">${(c.neg||[]).map(esc).join("، ") || "-"}</b><span>أقوى الأسباب اللي تنزله</span></div>
+    </div>
+    <div class="note" style="margin-top:8px">النجاح = يوصل الهدف الأول قبل ما يسكر تحت الوقف خلال 20 جلسة (نفس سجل التوصيات).
+      محسوب من ${c.n_train ? Number(c.n_train).toLocaleString("en") : "آلاف"} حالة تاريخية (Alpaca) ومختبر على فترات ما شافها النموذج${c.version ? " · نسخة " + esc(c.version) : ""}.
+      احتمال مو ضمان — التزم بالوقف دائماً.</div></div>`;
+}
+
 function render(){
   tiles(); chips();
   const q = $("#q").value.trim().toUpperCase();
@@ -313,6 +335,7 @@ function render(){
     rvol: (a,b) => (b.rel_volume ?? 0) - (a.rel_volume ?? 0),
     float: (a,b) => (a.float ?? 1e12) - (b.float ?? 1e12),
     upside: (a,b) => (b.plan.upside_pct ?? -1e9) - (a.plan.upside_pct ?? -1e9),
+    conf: (a,b) => ((b.confidence||{}).p ?? -1) - ((a.confidence||{}).p ?? -1),
   };
   L.sort(S[key]);
   if (!L.length){ $("#list").innerHTML = `<div class="empty">لا توجد أسهم بهذا الفلتر حالياً. ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
@@ -341,6 +364,7 @@ function render(){
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
+        ${isI && s.confidence ? confLine(s.confidence) : ""}
         ${s.dilution && s.dilution.level!=="none" && s.dilution.level!=="low" ? `<div class="left" style="color:${s.dilution.level==="high"?"var(--bad)":"var(--warn)"}">🏛 SEC: ${esc(s.dilution.hits[0].label)} (<span class="num">${esc(s.dilution.hits[0].form)} · ${esc(s.dilution.hits[0].date)}</span>)</div>` : ""}
         ${s.accum ? `<div class="left" style="color:var(--good)">${esc(s.accum.label)} (${Math.round(s.accum.score)}) — قاعدة ${s.accum.base_len} جلسة · ${esc(s.accum.signs.slice(0,3).join("، "))}</div>` : ""}
         ${s.compliance ? `<div class="left" style="color:${s.compliance.level==="block"?"var(--bad)":s.compliance.level==="info"?"var(--muted)":"var(--warn)"}">🏛 ${esc(s.compliance.why)}</div>` : ""}
@@ -441,6 +465,7 @@ function openDetail(sym){
       <div class="legend"><span><i style="background:var(--ma20)"></i>MA20</span><span><i style="background:var(--ma50)"></i>MA50</span><span><i style="background:var(--good)"></i>الدعم</span><span><i style="background:var(--zone);height:9px"></i>منطقة الطلب</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--accent)"></i>الأهداف الأربعة</span></div>
     </div>
 
+    ${confCard(s.confidence)}
     <div class="card"><h3>📋 خطة فيصل المقترحة (Limit داخل منطقة الطلب — لا تشتري من العرض)</h3>
       <div class="plan">
         <div class="pbox"><span>الدعم الحقيقي</span><b class="num">${fp(p.support)}</b><span>${esc(p.support_kind)} · لمسات ${p.support_touches}</span></div>

@@ -172,7 +172,8 @@ function statsHTML(){
       <b class="num" style="color:var(--good)">${s.hit_pct ?? "-"}%</b><span>نجحت (وصلت الهدف 1) من ${s.n} توصية انحسمت</span>
       <div class="note" style="margin-top:6px">❌ وقف ${s.stop_pct ?? "-"}% · ⏳ مفتوحة ${s.open} · متوسط أقصى ربح ${pc(s.avg_max_gain)}<br>
       المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
-      تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}</div></div>`;
+      تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}
+      ${k === "faisal_dev" ? "<br>🎯 حسب الثقة: " + ["عالية","متوسطة","منخفضة"].map(l => { const c = DATA.stats_status["faisal_dev:conf:"+l] || {}; return l + " " + (c.hit_pct ?? "-") + "% من " + (c.n ?? 0); }).join(" · ") : ""}</div></div>`;
   }).join("");
 }
 function tabsHTML(){
@@ -190,7 +191,7 @@ function render(){
   const td = (s, st="") => `<td style="padding:8px;border-bottom:1px solid var(--line);white-space:nowrap;${st}">${s}</td>`;
   $("#tbl").innerHTML = `<tr>${["التاريخ","الرادار","السهم","الحالة","الدخول","الوقف","الهدف 1","النتيجة","أقصى ربح","أقصى نزول","الآن","جلسات"].map(th).join("")}</tr>` +
     (L.length ? L.map(t => { const r = RES[t.result] || [t.result,""];
-      return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name))}${td(`<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label) + (t.accum ? ' <span class="tag g">🔍</span>' : ""))}
+      return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name))}${td(`<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label) + (t.accum ? ' <span class="tag g">🔍</span>' : "") + (t.conf != null ? ` <span class="note" title="ثقة النجاح وقت التوصية">🎯${Math.round(t.conf*100)}%</span>` : ""))}
         ${td(`<span class="num">${fp(t.entry)}</span>`)}${td(`<span class="num" style="color:var(--bad)">${fp(t.stop)}</span>`)}${td(`<span class="num" style="color:var(--good)">${fp(t.t1)}</span>`)}
         ${td(r[0], "color:"+r[1]+";font-weight:600")}${td(`<span class="num ${(t.max_gain_pct||0)>0?"up":""}">${pc(t.max_gain_pct)}</span>`)}${td(`<span class="num ${(t.max_dd_pct||0)<0?"down":""}">${pc(t.max_dd_pct)}</span>`)}
         ${td(`<span class="num">${fp(t.last)} (${pc(t.ret_pct)})</span>`)}${td(`<span class="num">${t.sessions ?? 0}</span>`)}</tr>`; }).join("")

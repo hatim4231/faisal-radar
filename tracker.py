@@ -121,7 +121,9 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "why": f"RSI {s.get('rsi')} · دعم {fp(p.get('support'))} (عنه {p.get('dist_support_pct')}%) · "
                                f"منطقة الطلب {fp(p['entry_zone'][0])}–{fp(p['entry_zone'][1])}",
                         "dilution": (s.get("dilution") or {}).get("level"),
-                        "accum": (s.get("accum") or {}).get("status")})
+                        "accum": (s.get("accum") or {}).get("status"),
+                        "conf": (s.get("confidence") or {}).get("p"), "conf_label": (s.get("confidence") or {}).get("label"),
+                        "conf_base": (s.get("confidence") or {}).get("base")})
     return out
 
 
@@ -298,6 +300,9 @@ def run():
             warn = {"ready": "\n🔍 مؤكد بالتجميع (بصمات مضارب يجمع)", "near": "\n🔍 فيه بصمات تجميع محتملة"}.get(s.get("accum"), "") + warn
             if key in MUTED:
                 continue
+            if s.get("conf") is not None:
+                base = f" · متوسط التوصيات {s['conf_base'] * 100:.0f}%" if s.get("conf_base") else ""
+                warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}" + warn
             new_events.append(
                 f"🔔 توصية جديدة — {name}\n{s['label']} <b>{s['symbol']}</b> ({s.get('name') or ''})\n"
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"
@@ -395,6 +400,8 @@ def build_page(track):
     for k in RADARS:  # مع تأكيد التجميع مقابل بدونه
         by_status[f"{k}:acc"] = stats([t for t in trades if t["radar"] == k and t.get("accum")])
         by_status[f"{k}:noacc"] = stats([t for t in trades if t["radar"] == k and not t.get("accum")])
+    for lab in ("عالية", "متوسطة", "منخفضة"):  # أداة الثقة: نتايج حقيقية حسب مستوى الثقة (للتأكد إنها صادقة)
+        by_status[f"faisal_dev:conf:{lab}"] = stats([t for t in trades if t["radar"] == "faisal_dev" and t.get("conf_label") == lab])
     for k in RADARS:  # الأسهم تحت 1$ مقابل فوقه
         by_status[f"{k}:sub1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 9) < 1])
         by_status[f"{k}:over1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 0) >= 1])
