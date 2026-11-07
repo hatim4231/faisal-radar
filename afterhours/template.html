@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار الأفتر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0}
+h2{font-size:17px;margin:22px 0 10px}
+.sub,.note{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer;text-decoration:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.muted-box{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow)}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.sym{font-weight:700;font-size:18px}
+.badge{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:600}
+.b-good{background:var(--good-bg);color:var(--good)} .b-bad{background:var(--bad-bg);color:var(--bad)} .b-warn{background:var(--warn-bg);color:var(--warn)}
+.plan{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.pbox{background:var(--panel2);border-radius:8px;padding:6px 8px}
+.pbox span{display:block;font-size:11.5px;color:var(--muted)}
+.pbox b{font-size:15px}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th,.tbl td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+.tbl th{color:var(--muted);font-weight:600}
+.scroll{overflow-x:auto}
+@media (max-width:700px){.tiles{grid-template-columns:repeat(2,1fr)}.plan{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>🌙 رادار الأفتر</h1><div class="sub" id="meta"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <a class="btn" href="../">📡 فيصل المطوّر</a>
+      <a class="btn" href="../original/">📜 فيصل الأصلي</a>
+      <a class="btn" href="../abdullah/">🌊 عبدالله</a>
+      <a class="btn" href="../insiders/">🟢 المطّلعين</a>
+      <a class="btn" href="../accumulation/">🔍 التجميع</a>
+      <a class="btn" href="../track/">📈 السجل</a>
+      <button class="btn" id="theme">🌓</button>
+    </div>
+  </header>
+  <div class="muted-box">🔇 رادار تجريبي صامت: ما يرسل تيليجرام. نراقب نتايجه الحقيقية قبل ما نعتمده.</div>
+  <div class="card"><b>الفكرة:</b> سهم قفز في الأفتر 15% أو أكثر بفوليوم حقيقي، وحافظ على 70% من قفزته لين آخر الأفتر.
+    <b>الخطة:</b> طلب Limit عند <b>متوسط سعر الأفتر (VWAP)</b> وتنتظر البري ينزل له. الهدف +10% ثم +15%، والوقف −10%. والبيع غالباً بالبري أو أول الافتتاح.
+    <div class="note" style="margin-top:6px">الاختبار التاريخي (سنة كاملة، بيانات Alpaca): بالدخول عند متوسط الأفتر وصل +10% قبل −10% في 62% من الحالات، و71% إذا فوليوم البري قوي.
+    أما اللي يشتري بآخر سعر وهو طاير فوصل الهدف 34% بس. <b>لا تشتري من العرض.</b> ليس توصية شراء.</div></div>
+
+  <h2>📊 النتايج الحقيقية</h2>
+  <div class="tiles" id="tiles"></div>
+  <div class="note" id="tiles-note" style="margin-top:6px"></div>
+
+  <div id="prelim"></div>
+  <h2 id="final-h">🌙 آخر قائمة</h2>
+  <div class="grid" id="final"></div>
+
+  <h2>📜 السجل</h2>
+  <div class="card scroll"><table class="tbl" id="hist"></table></div>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+const $ = s => document.querySelector(s);
+$("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx); }catch(e){} };
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = v => v == null ? "—" : (v >= 1 ? (+v).toFixed(2) : (+v).toFixed(4)) + "$";
+const fk = v => v == null ? "—" : v >= 1e6 ? (v/1e6).toFixed(1) + "M" : v >= 1e3 ? Math.round(v/1e3) + "K" : v;
+const RES = {t2:["🎯 +15%","b-good"], t1:["✅ +10%","b-good"], stop:["❌ وقف","b-bad"], flat:["➖ ما تحرك","b-warn"], nofill:["⏸ ما نزل للـ Limit",""]};
+
+const D = DATA || {today:[], last_final:[], history:[], stats:{eligible:{n:0}, all:{n:0}}};
+$("#meta").textContent = D.error ? "⛔ " + D.error : `آخر تحديث ${D.generated_at || "—"}`;
+const st = D.stats.eligible, sa = D.stats.all;
+$("#tiles").innerHTML = st.n ? `
+  <div class="tile"><b class="num">${st.n}</b><span>صفقة انتهت (المؤهلة)</span></div>
+  <div class="tile"><b class="num" style="color:var(--good)">${st.t1}%</b><span>وصلت +10% قبل الوقف</span></div>
+  <div class="tile"><b class="num" style="color:var(--good)">${st.t2}%</b><span>وصلت +15%</span></div>
+  <div class="tile"><b class="num" style="color:var(--bad)">${st.stop}%</b><span>ضربت الوقف −10%</span></div>`
+  : `<div class="tile" style="grid-column:1/-1"><span>لسا ما فيه صفقات انتهت. النتايج تطلع بعد أول يوم تداول من بداية الرادار.</span></div>`;
+$("#tiles-note").textContent = (st.n ? `ما نزلت للـ Limit (ما دخلت): ${st.nofill} · ` : "") +
+  (sa.n ? `كل الإشارات مع اللي ما تنطبق عليها الفلاتر: ${sa.n} صفقة · +10%: ${sa.t1}% · وقف ${sa.stop}%` : "");
+
+function card(f){
+  const ok = f.eligible;
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+      <div><span class="sym">${esc(f.symbol)}</span> <span class="note">${esc(f.name || "")}</span></div>
+      <span class="badge ${ok ? "b-good" : "b-bad"}">${ok ? "مؤهل" : "خارج الشروط"}</span></div>
+    <div class="note" style="margin-top:4px">إغلاق <span class="num">${fp(f.close)}</span> · أعلى الأفتر <span class="num">${fp(f.ah_high)}</span> (+${f.jump_pct}%)
+      · آخر سعر <span class="num">${fp(f.ah_last)}</span> · حافظ ${f.hold_pct}% · فوليوم الأفتر <span class="num">${fk(f.ah_vol)}</span>
+      · الشورت <span class="num">${fk(f.short)}</span></div>
+    <div class="plan">
+      <div class="pbox"><span>Limit (متوسط الأفتر)</span><b class="num">${fp(f.limit)}</b></div>
+      <div class="pbox"><span>الهدف 1 (+10%)</span><b class="num" style="color:var(--good)">${fp(f.t1)}</b></div>
+      <div class="pbox"><span>الهدف 2 (+15%)</span><b class="num" style="color:var(--good)">${fp(f.t2)}</b></div>
+      <div class="pbox"><span>الوقف (−10%)</span><b class="num" style="color:var(--bad)">${fp(f.stop)}</b></div></div>
+    ${(f.flags || []).length ? `<div class="note" style="margin-top:6px;color:var(--bad)">${f.flags.map(esc).join(" · ")}</div>` : ""}
+    ${f.dilution_level ? `<div class="note" style="margin-top:4px;color:var(--warn)">🏛 تنبيه تخفيف من SEC (${esc(f.dilution_level)})</div>` : ""}
+    ${f.result ? `<div style="margin-top:6px"><span class="badge ${(RES[f.result]||["",""])[1]}">${(RES[f.result]||[f.result])[0]}</span></div>` : ""}
+  </div>`;
+}
+if ((D.today || []).length){
+  $("#prelim").innerHTML = `<h2>⏳ مبدئي: أفتر ${esc(D.day)} (لسا ما خلص)</h2><div class="grid">${D.today.map(card).join("")}</div>`;
+}
+$("#final-h").textContent = D.last_final_day ? `🌙 آخر قائمة نهائية: أفتر ${D.last_final_day} (الدخول اليوم اللي بعده)` : "🌙 آخر قائمة نهائية";
+$("#final").innerHTML = (D.last_final || []).length ? D.last_final.map(card).join("")
+  : `<div class="card note">لسا ما فيه قائمة. الرادار يسجل بعد ما يخلص الأفتر (8 مساء نيويورك).</div>`;
+
+const H = D.history || [];
+$("#hist").innerHTML = `<tr><th>السهم</th><th>يوم الأفتر</th><th>القفزة</th><th>حافظ</th><th>Limit</th><th>أعلى البري</th><th>النتيجة</th><th>مؤهل</th></tr>` +
+  (H.length ? H.map(s => `<tr><td><b>${esc(s.symbol)}</b></td><td class="num">${esc(s.D)}</td><td class="num">+${s.jump_pct}%</td><td class="num">${s.hold_pct}%</td>
+    <td class="num">${fp(s.limit)}</td><td class="num">${s.pm_high_pct == null ? "—" : (s.pm_high_pct > 0 ? "+" : "") + s.pm_high_pct + "%"}</td>
+    <td>${s.result ? `<span class="badge ${(RES[s.result]||["",""])[1]}">${(RES[s.result]||[s.result])[0]}</span>${s.flat_pct != null ? ` <span class="num note">${s.flat_pct}%</span>` : ""}` : `<span class="note">ننتظر</span>`}</td>
+    <td>${s.eligible ? "✅" : "—"}</td></tr>`).join("") : `<tr><td colspan="8" class="note">فاضي</td></tr>`);
+</script>
+</body>
+</html>

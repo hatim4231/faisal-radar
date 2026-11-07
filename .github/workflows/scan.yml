@@ -6,6 +6,7 @@ on:
     - cron: "17 12 * * 1-5"         # قبل الافتتاح (بري ماركت)
     - cron: "17,47 13-21 * * 1-5"   # كل 30 دقيقة وقت السوق (قرار المستخدم: الخيار 4)
     - cron: "37 22 * * 1-5"         # بعد الإغلاق
+    - cron: "22 1 * * 2-6"          # بعد ما يخلص الأفتر (رادار الأفتر)
   workflow_dispatch:          # زر Run workflow للتحديث اليدوي (حتى من الجوال)
 
 permissions:
@@ -72,6 +73,9 @@ jobs:
       - name: رادار التجميع
         run: python accumulation/accum_scanner.py --out site/accumulation/index.html
 
+      - name: رادار الأفتر (صامت)
+        run: python afterhours/ah_scanner.py --out site/afterhours/index.html || echo "رادار الأفتر تعطل — نكمل"
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -98,6 +102,9 @@ jobs:
           npx --yes staticrypt@3.5.4 site/track/index.html "${OPTS[@]}" --template-title "📈 سجل التوصيات" -d site/track
           npx --yes staticrypt@3.5.4 site/insiders/index.html "${OPTS[@]}" --template-title "🟢 رادار المطّلعين" -d site/insiders
           npx --yes staticrypt@3.5.4 site/accumulation/index.html "${OPTS[@]}" --template-title "🔍 رادار التجميع" -d site/accumulation
+          if [ -f site/afterhours/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/afterhours/index.html "${OPTS[@]}" --template-title "🌙 رادار الأفتر" -d site/afterhours
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
