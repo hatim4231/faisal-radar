@@ -104,6 +104,15 @@ def detail(sig):
 def main():
     if not A.available():
         print("⛔ مفاتيح Alpaca مو موجودة في Secrets"); return
+    # فحص المفاتيح أول
+    try:
+        t = A.bars(["AAPL"], "1Day", datetime.now(timezone.utc) - timedelta(days=10))
+        print("✅ مفاتيح Alpaca شغالة · AAPL شموع:", len(t.get("AAPL", [])), flush=True)
+    except Exception as e:
+        k = os.environ.get("ALPACA_KEY_ID", "")
+        print(f"⛔ Alpaca رفض المفاتيح: {repr(e)[:160]} · طول المفتاح {len(k)} يبدأ بـ {k[:2]!r} · "
+              f"طول السر {len(os.environ.get('ALPACA_SECRET_KEY', ''))}", flush=True)
+        sys.exit(1)
     cfg = scanner.load_cfg()
     tickers = [x for x in scanner.get_universe(cfg) if not (len(x) == 5 and x[-1] in "WRU") and "-" not in x]
     print("tickers", len(tickers), flush=True)
@@ -122,6 +131,8 @@ def main():
     with ThreadPoolExecutor(3) as ex:
         rows = list(ex.map(detail, sigs))
     df = pd.DataFrame([r for r in rows if "err" not in r])
+    if df.empty:
+        print("ما فيه إشارات بالتفصيل"); return
     print("بالتفصيل (5 دقائق):", len(df), "· أخطاء:", sum("err" in r for r in rows), flush=True)
 
     def summ(sub, name):
