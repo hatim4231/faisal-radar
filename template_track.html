@@ -171,7 +171,6 @@ function statsHTML(){
       <b class="num" style="color:var(--good)">${s.hit_pct ?? "-"}%</b><span>نجحت (وصلت الهدف 1) من ${s.n} توصية انحسمت</span>
       <div class="note" style="margin-top:6px">❌ وقف ${s.stop_pct ?? "-"}% · ⏳ مفتوحة ${s.open} · متوسط أقصى ربح ${pc(s.avg_max_gain)}<br>
       المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
-      🔍 مع تأكيد التجميع: ${(DATA.stats_status[k+":acc"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":acc"]||{}).n ?? 0} · بدونه: ${(DATA.stats_status[k+":noacc"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":noacc"]||{}).n ?? 0}<br>
       تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}</div></div>`;
   }).join("");
 }

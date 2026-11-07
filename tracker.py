@@ -32,7 +32,8 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 
 MAX_SESSIONS = 20
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
-NEW_RULES = {"faisal_dev", "abdullah"}
+NEW_RULES = {"faisal_dev", "abdullah", "accumulation"}
+MUTED = {"accumulation"}   # قرار المستخدم: رادار التجميع نراقب نتايجه بالسجل بدون رسائل تيليجرام
 COOLDOWN_DAYS = 7          # ~5 جلسات قبل ما نفتح توصية جديدة لنفس السهم من نفس الرادار
 STOP_RULE_VERSION = 2
 RADARS = {
@@ -40,10 +41,12 @@ RADARS = {
     "faisal_orig": ("📜 فيصل الأصلي", ROOT / "output" / "sig_faisal_orig.json"),
     "abdullah": ("🌊 عبدالله", ROOT / "output" / "sig_abdullah.json"),
     "insiders": ("🟢 المطّلعين", ROOT / "output" / "sig_insiders.json"),
+    "accumulation": ("🔍 التجميع", ROOT / "output" / "sig_accumulation.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
 STATUS_AR_INS = {"ready": "🟢 شراء داخلي قوي", "near": "🟡 شراء داخلي"}
+STATUS_AR_ACC = {"ready": "🔍 تجميع مؤكد", "near": "🟡 تجميع محتمل"}
 
 
 def log(*a):
@@ -68,6 +71,17 @@ def fp(x):
 def signals(key: str, payload: dict) -> list[dict]:
     out = []
     for s in payload.get("stocks", []):
+        if key == "accumulation":
+            st = s.get("status")
+            if st not in ("ready", "near"):
+                continue
+            tg = s.get("targets") or [None, None]
+            out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_ACC[st],
+                        "entry": s["price"], "stop": s.get("stop"), "t1": tg[0], "t2": tg[1],
+                        "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
+                        "why": f"قاعدة {s.get('base_len')} جلسة بين {fp(s.get('support'))} و {fp(s.get('base_top'))}",
+                        "dilution": (s.get("dilution") or {}).get("level")})
+            continue
         if key == "insiders":
             st = s.get("status")
             if st not in ("ready", "near"):
@@ -240,6 +254,8 @@ def run():
             trades.append(t)
             warn = {"high": "\n⛔ عليه خطر تخفيف SEC عالي", "medium": "\n⚠ عليه ملفات طرح محتملة"}.get(s.get("dilution"), "")
             warn = {"ready": "\n🔍 مؤكد بالتجميع (بصمات مضارب يجمع)", "near": "\n🔍 فيه بصمات تجميع محتملة"}.get(s.get("accum"), "") + warn
+            if key in MUTED:
+                continue
             new_events.append(
                 f"🔔 توصية جديدة — {name}\n{s['label']} <b>{s['symbol']}</b> ({s.get('name') or ''})\n"
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"
@@ -258,7 +274,9 @@ def run():
                 d = data[t["symbol"]] if isinstance(data.columns, pd.MultiIndex) else data
                 d = d.dropna(subset=["Close"])
                 d.index = pd.to_datetime(d.index).tz_localize(None)
-                new_events += evaluate(t, d)
+                ev = evaluate(t, d)
+                if t["radar"] not in MUTED:
+                    new_events += ev
             except Exception as e:
                 log("خطأ متابعة", t["symbol"], repr(e)[:100])
 
