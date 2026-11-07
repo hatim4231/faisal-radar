@@ -123,7 +123,8 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "dilution": (s.get("dilution") or {}).get("level"),
                         "accum": (s.get("accum") or {}).get("status"),
                         "conf": (s.get("confidence") or {}).get("p"), "conf_label": (s.get("confidence") or {}).get("label"),
-                        "conf_base": (s.get("confidence") or {}).get("base")})
+                        "conf_base": (s.get("confidence") or {}).get("base"),
+                        "conf_similar": (s.get("confidence") or {}).get("similar")})
     return out
 
 
@@ -302,7 +303,10 @@ def run():
                 continue
             if s.get("conf") is not None:
                 base = f" · متوسط التوصيات {s['conf_base'] * 100:.0f}%" if s.get("conf_base") else ""
-                warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}" + warn
+                sim = s.get("conf_similar") or {}
+                simtxt = (f"\n📊 توصيات سابقة بنفس الثقة: نجحت {sim['hit'] * 100:.0f}% · لما تنجح +{sim['avg_win'] * 100:.0f}% · "
+                          f"لما توقف {sim['avg_loss'] * 100:.0f}%") if sim.get("hit") is not None and sim.get("avg_win") is not None else ""
+                warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}{simtxt}" + warn
             new_events.append(
                 f"🔔 توصية جديدة — {name}\n{s['label']} <b>{s['symbol']}</b> ({s.get('name') or ''})\n"
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"

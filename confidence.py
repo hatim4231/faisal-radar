@@ -40,6 +40,32 @@ NAMES_AR = {
 }
 
 
+# أسباب مفهومة: (لما يرفع الاحتمال، لما ينزله) — بس للعوامل الواضحة والثابتة في الاختبار
+REASONS = {
+    "t1_pct": ("الهدف الأول قريب", "الهدف الأول بعيد"),
+    "stop_pct": ("الوقف بعيد ويعطيه مجال", "الوقف قريب"),
+    "dist_support": ("قريب من الدعم", "بعيد عن الدعم"),
+    "touches": ("الدعم ما انضرب كثير", "الدعم انضرب مرات كثيرة (يضعف)"),
+    "up_from_low20": ("ما صعد كثير من قاعه", "صعد كثير من قاعه (دخول متأخر)"),
+    "range_med": ("السهم نشيط الحركة", "السهم هادي الحركة"),
+    "atr20": ("تذبذب يومي عالي", "تذبذب يومي منخفض"),
+    "iwm_up": ("سوق الأسهم الصغيرة صاعد", "سوق الأسهم الصغيرة نازل"),
+    "earn_soon": ("الأرباح مو قريبة", "الأرباح قريبة (غالباً يجي بعدها طرح)"),
+    "dil90": ("ما فيه ملفات تخفيف حديثة", "فيه ملفات تخفيف حديثة في SEC"),
+    "days_rs": ("ما فيه تقسيم عكسي قريب", "تقسيم عكسي قريب"),
+    "pumps": ("ما فيه شموع قروبات", "فيه شموع قروبات"),
+    "runner": ("سبق انفجر (Former Runner)", "ما سبق انفجر"),
+    "has_w": ("نموذج W", "ما فيه نموذج W"),
+    "rel_vol": ("فوليوم اليوم عالي", "فوليوم اليوم ضعيف"),
+    "price_log": ("سعره منخفض (حركته أسرع)", "سعره أعلى (حركته أبطأ)"),
+    "pc_hold": ("فشل الهبوط واضح", "ما بيّن فشل هبوط"),
+    "pc_candle": ("شمعة إيجابية عند الدعم", "ما فيه شمعة إيجابية"),
+    "pc_macd": ("MACD يتحسن", "MACD ما يتحسن"),
+    "pc_volume": ("الفوليوم يؤكد", "الفوليوم ما يؤكد"),
+    "close_loc": ("إغلاقاته مو عند أعلى الشمعة", "يسكر قرب أعلى الشمعة (احتمال تصريف)"),
+}
+
+
 def _f(x, default=0.0, lo=None, hi=None):
     try:
         v = float(x)
@@ -241,8 +267,11 @@ def predict(f: dict, model: dict | None = None) -> dict | None:
         pr = float(np.interp(pr, [c[0] for c in cal], [c[1] for c in cal]))
     tiers = m.get("tiers", {"high": 0.4, "mid": 0.28})
     label = "عالية" if pr >= tiers["high"] else "متوسطة" if pr >= tiers["mid"] else "منخفضة"
-    contrib.sort(key=lambda x: x[1])
-    neg = [NAMES_AR.get(k, k) for k, v in contrib[:3] if v < -0.08]
-    pos = [NAMES_AR.get(k, k) for k, v in reversed(contrib[-3:]) if v > 0.08]
+    contrib = sorted((x for x in contrib if x[0] in REASONS), key=lambda x: x[1])
+    neg = [REASONS[k][1] for k, v in contrib[:3] if v < -0.05]
+    pos = [REASONS[k][0] for k, v in reversed(contrib[-3:]) if v > 0.05]
+    ts = (m.get("tier_stats") or {}).get(label) or {}
+    similar = {k: (round(ts[k], 3) if isinstance(ts.get(k), float) else ts.get(k))
+               for k in ("n", "hit", "stop", "mean", "median", "avg_win", "avg_loss")} if ts else None
     return {"p": round(pr, 3), "label": label, "base": m.get("base_rate"), "pos": pos, "neg": neg,
-            "n_train": m.get("n_train"), "version": m.get("version")}
+            "similar": similar, "n_train": m.get("n_train"), "version": m.get("version")}

@@ -314,6 +314,11 @@ function confCard(c){
       <div class="pbox"><span>✅ معها</span><b style="font-size:13px">${(c.pos||[]).map(esc).join("، ") || "-"}</b><span>أقوى الأسباب اللي ترفع الاحتمال</span></div>
       <div class="pbox"><span>⚠ ضدها</span><b style="font-size:13px">${(c.neg||[]).map(esc).join("، ") || "-"}</b><span>أقوى الأسباب اللي تنزله</span></div>
     </div>
+    ${c.similar ? `<div class="note" style="margin-top:8px;font-size:13.5px;color:var(--text)">📊 <b>توصيات سابقة بنفس مستوى الثقة (${esc(c.label)})</b> — ${Number(c.similar.n).toLocaleString("en")} حالة في فترات اختبار ما شافها النموذج:
+      نجحت <b class="num">${Math.round(c.similar.hit*100)}%</b> · ضربت الوقف <b class="num">${Math.round(c.similar.stop*100)}%</b> ·
+      لما تنجح متوسط الربح <b class="num" style="color:var(--good)">+${(c.similar.avg_win*100).toFixed(1)}%</b> ·
+      لما توقف متوسط الخسارة <b class="num" style="color:var(--bad)">${(c.similar.avg_loss*100).toFixed(1)}%</b> ·
+      متوسط النتيجة <b class="num">${c.similar.mean>=0?"+":""}${(c.similar.mean*100).toFixed(1)}%</b></div>` : ""}
     <div class="note" style="margin-top:8px">النجاح = يوصل الهدف الأول قبل ما يسكر تحت الوقف خلال 20 جلسة (نفس سجل التوصيات).
       محسوب من ${c.n_train ? Number(c.n_train).toLocaleString("en") : "آلاف"} حالة تاريخية (Alpaca) ومختبر على فترات ما شافها النموذج${c.version ? " · نسخة " + esc(c.version) : ""}.
       احتمال مو ضمان — التزم بالوقف دائماً.</div></div>`;
