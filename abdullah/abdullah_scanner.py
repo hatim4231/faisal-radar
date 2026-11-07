@@ -175,7 +175,7 @@ def run(cfg, tickers=None, deep=True) -> dict:
                 r["flags"].insert(0, f"{'⛔' if dl['level'] == 'high' else '⚠'} SEC: {h['label']} ({h['form']} · {h['date']})")
     rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-               "source": "Yahoo Finance + Interactive Brokers (الشورت المتاح)",
+               "source": "الأسعار: Alpaca · الشركة والأخبار: Yahoo · الشورت المتاح: Interactive Brokers",
                "scanned": len(daily), "with_wave": len(results),
                "moved": counts.get("moved", 0), "invalid": counts.get("invalid", 0), "seconds": round(time.time() - t0),
                "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil}
@@ -212,8 +212,7 @@ def deep_scan(results: dict, cfg):
                 r["dilution_news"] = [x.get("title_ar") or x["title"] for x in dil[:3]]
     news_tools.save_cache()
     try:
-        h = yf.download(syms, period="60d", interval="1h", prepost=True, group_by="ticker",
-                        auto_adjust=False, threads=True, progress=False)
+        h = data.intraday(syms, "1h", 60)
         for t in syms:
             try:
                 d = h[t] if isinstance(h.columns, pd.MultiIndex) else h

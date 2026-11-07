@@ -9,7 +9,7 @@
     python scanner.py --watchlist my_list.txt     # فحص قائمتك (سهم في كل سطر)
     python scanner.py --demo          # تقرير تجريبي ببيانات وهمية (بدون إنترنت)
 
-المصدر: Yahoo Finance عبر مكتبة yfinance (مجانية، بتأخير ~15 دقيقة).
+المصدر: الأسعار من Alpaca (قرار المستخدم، ياهو للطوارئ بس) · معلومات الشركة والأخبار من Yahoo Finance. تأخير ~15 دقيقة.
 """
 from __future__ import annotations
 
@@ -129,10 +129,50 @@ def get_universe(cfg) -> list[str]:
 # ----------------------------------------------------------------------------
 
 def download_daily(tickers: list[str], cfg) -> dict[str, pd.DataFrame]:
+    """الشارت اليومي: من Alpaca دائماً (قرار المستخدم). ياهو للطوارئ بس: إذا Alpaca تعطل أو المفاتيح مو موجودة.
+    السهم اللي Alpaca ما عنده بيانات كافية (أقل من 60 جلسة) ما ينجاب من ياهو — ينكتب اسمه في السجل."""
+    out: dict[str, pd.DataFrame] = {}
+    failed: list[str] = []
+    if cfg["scan"].get("data_source", "alpaca") != "alpaca":
+        return _download_daily_yahoo(tickers, cfg)
+    try:
+        import alpaca_data
+        if not alpaca_data.available():
+            log("⚠ مفاتيح Alpaca مو موجودة — طوارئ: الأسعار من ياهو")
+            return _download_daily_yahoo(tickers, cfg)
+        for i in range(0, len(tickers), 100):
+            batch = tickers[i:i + 100]
+            got = None
+            for attempt in range(3):
+                try:
+                    got = alpaca_data.daily(batch, days=730)
+                    break
+                except Exception as e:
+                    log(f"  Alpaca خطأ (محاولة {attempt + 1}):", repr(e)[:120])
+                    time.sleep(5 * (attempt + 1))
+            if got is None:
+                failed += batch
+                continue
+            out.update({t: d for t, d in got.items() if len(d) >= 60})
+    except Exception as e:
+        log("⚠ Alpaca ما اشتغل — طوارئ: الأسعار من ياهو:", repr(e)[:120])
+        return _download_daily_yahoo(tickers, cfg)
+    missing = [t for t in tickers if t not in out and t not in failed]
+    log(f"الشارت اليومي من Alpaca: {len(out)} من {len(tickers)}"
+        + (f" · ما عنده بيانات كافية ({len(missing)}): {', '.join(missing[:20])}" if missing else ""))
+    if failed:
+        log(f"⚠ طوارئ: {len(failed)} سهم Alpaca تعطل معها ← من ياهو")
+        out.update(_download_daily_yahoo(failed, cfg))
+    return out
+
+
+def _download_daily_yahoo(tickers: list[str], cfg) -> dict[str, pd.DataFrame]:
     import yfinance as yf
     S = cfg["scan"]
     out: dict[str, pd.DataFrame] = {}
     bs = S["batch_size"]
+    if tickers:
+        log(f"الشارت اليومي من ياهو: {len(tickers)} سهم")
     for i in range(0, len(tickers), bs):
         batch = tickers[i:i + bs]
         log(f"تحميل الشارت اليومي {i + 1}-{i + len(batch)} من {len(tickers)}")
@@ -164,6 +204,22 @@ def download_daily(tickers: list[str], cfg) -> dict[str, pd.DataFrame]:
             except Exception:
                 pass
     return out
+
+
+def intraday(syms: list[str], interval: str, days: int) -> pd.DataFrame:
+    """شموع داخل اليوم فيها البري والأفتر، بشكل yf.download(group_by='ticker'). Alpaca أولاً ثم ياهو."""
+    try:
+        import alpaca_data
+        if alpaca_data.available():
+            tf = {"1h": "1Hour", "5m": "5Min", "15m": "15Min"}[interval]
+            f = alpaca_data.intraday_frame(syms, tf, days)
+            if not f.empty:
+                return f
+    except Exception as e:
+        log("  Alpaca (داخل اليوم) ما اشتغل، نكمل بياهو:", repr(e)[:100])
+    import yfinance as yf
+    return yf.download(syms, period=f"{days}d" if interval != "5m" else "1d", interval=interval, prepost=True,
+                       group_by="ticker", auto_adjust=False, threads=True, progress=False)
 
 
 INFO_KEYS = ["marketCap", "floatShares", "sharesOutstanding", "sharesShort",
@@ -354,8 +410,7 @@ def deep_scan(results: dict, cfg):
 
     # فريم 4 ساعات (يشمل البري والأفتر)
     try:
-        h = yf.download(syms, period="60d", interval="1h", prepost=True, group_by="ticker",
-                        auto_adjust=False, threads=True, progress=False)
+        h = intraday(syms, "1h", 60)
         for t in syms:
             try:
                 d = h[t] if isinstance(h.columns, pd.MultiIndex) else h
@@ -384,8 +439,7 @@ def deep_scan(results: dict, cfg):
     mom = [r["symbol"] for r in cands if r["momentum"]["status"] != "no"][:25]
     if mom:
         try:
-            m5 = yf.download(mom, period="1d", interval="5m", group_by="ticker",
-                             auto_adjust=False, threads=True, progress=False)
+            m5 = intraday(mom, "5m", 1)
             for t in mom:
                 try:
                     d = m5[t] if isinstance(m5.columns, pd.MultiIndex) else m5
@@ -514,7 +568,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "source": "Yahoo Finance (yfinance) — تأخير ~15 دقيقة",
+        "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
         "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil,
     }

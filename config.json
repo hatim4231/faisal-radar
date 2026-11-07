@@ -49,7 +49,9 @@
     "info_workers": 8,
     "deep_scan_min_score": 45,
     "deep_scan_max": 100,
-    "report_min_score": 40
+    "report_min_score": 40,
+    "data_source": "alpaca",
+    "_data_source_help": "alpaca = أسعار Alpaca (كل البورصات، فوليوم البري والأفتر صحيح) وياهو احتياط · yahoo = ياهو فقط"
   },
   "accumulation": {
     "_ملاحظة": "رادار التجميع: بصمات تجميع المضارب داخل قاعدة عرضية",
