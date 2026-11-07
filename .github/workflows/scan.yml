@@ -2,6 +2,10 @@ name: رادار فيصل وعبدالله - مسح السوق (فرع تشخي�
 
 on:
   workflow_dispatch:
+    inputs:
+      script:
+        description: "diag script"
+        default: "diag/backtest_features.py"
 
 permissions:
   contents: read
@@ -19,4 +23,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python diag/backtest_features.py
+      - run: python "${{ inputs.script }}"
