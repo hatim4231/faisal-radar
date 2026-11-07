@@ -76,6 +76,9 @@ jobs:
       - name: رادار الأفتر (صامت)
         run: python afterhours/ah_scanner.py --out site/afterhours/index.html || echo "رادار الأفتر تعطل — نكمل"
 
+      - name: رادار VWAP (صامت)
+        run: python vwap/vwap_scanner.py --out site/vwap/index.html || echo "رادار VWAP تعطل — نكمل"
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -102,6 +105,9 @@ jobs:
           npx --yes staticrypt@3.5.4 site/track/index.html "${OPTS[@]}" --template-title "📈 سجل التوصيات" -d site/track
           npx --yes staticrypt@3.5.4 site/insiders/index.html "${OPTS[@]}" --template-title "🟢 رادار المطّلعين" -d site/insiders
           npx --yes staticrypt@3.5.4 site/accumulation/index.html "${OPTS[@]}" --template-title "🔍 رادار التجميع" -d site/accumulation
+          if [ -f site/vwap/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/vwap/index.html "${OPTS[@]}" --template-title "📈 رادار VWAP" -d site/vwap
+          fi
           if [ -f site/afterhours/index.html ]; then
             npx --yes staticrypt@3.5.4 site/afterhours/index.html "${OPTS[@]}" --template-title "🌙 رادار الأفتر" -d site/afterhours
           fi
