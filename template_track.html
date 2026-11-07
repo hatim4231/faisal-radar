@@ -171,6 +171,7 @@ function statsHTML(){
       <b class="num" style="color:var(--good)">${s.hit_pct ?? "-"}%</b><span>نجحت (وصلت الهدف 1) من ${s.n} توصية انحسمت</span>
       <div class="note" style="margin-top:6px">❌ وقف ${s.stop_pct ?? "-"}% · ⏳ مفتوحة ${s.open} · متوسط أقصى ربح ${pc(s.avg_max_gain)}<br>
       المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
+      🔍 مع تأكيد التجميع: ${(DATA.stats_status[k+":acc"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":acc"]||{}).n ?? 0} · بدونه: ${(DATA.stats_status[k+":noacc"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":noacc"]||{}).n ?? 0}<br>
       تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}</div></div>`;
   }).join("");
 }
@@ -189,7 +190,7 @@ function render(){
   const td = (s, st="") => `<td style="padding:8px;border-bottom:1px solid var(--line);white-space:nowrap;${st}">${s}</td>`;
   $("#tbl").innerHTML = `<tr>${["التاريخ","الرادار","السهم","الحالة","الدخول","الوقف","الهدف 1","النتيجة","أقصى ربح","أقصى نزول","الآن","جلسات"].map(th).join("")}</tr>` +
     (L.length ? L.map(t => { const r = RES[t.result] || [t.result,""];
-      return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name))}${td(`<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label))}
+      return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name))}${td(`<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label) + (t.accum ? ' <span class="tag g">🔍</span>' : ""))}
         ${td(`<span class="num">${fp(t.entry)}</span>`)}${td(`<span class="num" style="color:var(--bad)">${fp(t.stop)}</span>`)}${td(`<span class="num" style="color:var(--good)">${fp(t.t1)}</span>`)}
         ${td(r[0], "color:"+r[1]+";font-weight:600")}${td(`<span class="num ${(t.max_gain_pct||0)>0?"up":""}">${pc(t.max_gain_pct)}</span>`)}${td(`<span class="num ${(t.max_dd_pct||0)<0?"down":""}">${pc(t.max_dd_pct)}</span>`)}
         ${td(`<span class="num">${fp(t.last)} (${pc(t.ret_pct)})</span>`)}${td(`<span class="num">${t.sessions ?? 0}</span>`)}</tr>`; }).join("")

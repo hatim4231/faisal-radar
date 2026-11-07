@@ -34,6 +34,7 @@ import news_tools
 import split_rule
 import new_low_rule
 import compliance_rule
+import accum_confirm
 import sec_tools
 import report
 
@@ -459,6 +460,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         split_rule.apply(a, d)  # منطقة التقسيم (عبدالإله): وسم ومعلومات فقط
         new_low_rule.apply(a, d)  # قاع جديد: ما يترشح لين يتماسك عند الدعم الثاني ويختبره
         compliance_rule.apply_faisal(a, d)  # امتثال ناسداك للأسهم تحت 1$
+        if a["irtikaz"]["status"] in ("ready", "near"):
+            accum_confirm.apply_faisal(a, d, inf_t, cfg)  # تأكيد التجميع (وسم فقط)
         if a["gate_fail"] and not explicit:
             continue
         inf = infos.get(t) or {}

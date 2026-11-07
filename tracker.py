@@ -78,7 +78,8 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
                         "why": f"{s['insiders']} مطّلع اشترى بـ ${s['total']:,} (متوسط {fp(s.get('avg_price'))}) · "
                                f"{p0.get('name', '')} — {'، '.join(p0.get('roles', []))} · آخر شراء {s.get('last_buy')}",
-                        "dilution": (s.get("dilution") or {}).get("level")})
+                        "dilution": (s.get("dilution") or {}).get("level"),
+                        "accum": (s.get("accum") or {}).get("status")})
             continue
         if key == "abdullah":
             st = s.get("status")
@@ -91,7 +92,8 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
                         "why": f"موجة {fp(s['wave']['low'])}→{fp(s['wave']['peak'])} · دعم {fp(s.get('support'))} · "
                                f"اختبر {s['consolidation']['touches']} مرات · تماسك {s['consolidation']['len']} جلسة",
-                        "dilution": (s.get("dilution") or {}).get("level")})
+                        "dilution": (s.get("dilution") or {}).get("level"),
+                        "accum": (s.get("accum") or {}).get("status")})
         else:
             st = s["irtikaz"]["status"]
             if st not in ("ready", "near"):
@@ -104,7 +106,8 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "date": s.get("date"), "name": s.get("name"),
                         "why": f"RSI {s.get('rsi')} · دعم {fp(p.get('support'))} (عنه {p.get('dist_support_pct')}%) · "
                                f"منطقة الطلب {fp(p['entry_zone'][0])}–{fp(p['entry_zone'][1])}",
-                        "dilution": (s.get("dilution") or {}).get("level")})
+                        "dilution": (s.get("dilution") or {}).get("level"),
+                        "accum": (s.get("accum") or {}).get("status")})
     return out
 
 
@@ -236,6 +239,7 @@ def run():
                 continue
             trades.append(t)
             warn = {"high": "\n⛔ عليه خطر تخفيف SEC عالي", "medium": "\n⚠ عليه ملفات طرح محتملة"}.get(s.get("dilution"), "")
+            warn = {"ready": "\n🔍 مؤكد بالتجميع (بصمات مضارب يجمع)", "near": "\n🔍 فيه بصمات تجميع محتملة"}.get(s.get("accum"), "") + warn
             new_events.append(
                 f"🔔 توصية جديدة — {name}\n{s['label']} <b>{s['symbol']}</b> ({s.get('name') or ''})\n"
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"
@@ -332,6 +336,9 @@ def build_page(track):
     by = {k: stats([t for t in trades if t["radar"] == k]) for k in RADARS}
     by_status = {f"{k}:{s}": stats([t for t in trades if t["radar"] == k and t["status"] == s])
                  for k in RADARS for s in ("ready", "near")}
+    for k in RADARS:  # مع تأكيد التجميع مقابل بدونه
+        by_status[f"{k}:acc"] = stats([t for t in trades if t["radar"] == k and t.get("accum")])
+        by_status[f"{k}:noacc"] = stats([t for t in trades if t["radar"] == k and not t.get("accum")])
     for k in RADARS:  # الأسهم تحت 1$ مقابل فوقه
         by_status[f"{k}:sub1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 9) < 1])
         by_status[f"{k}:over1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 0) >= 1])
