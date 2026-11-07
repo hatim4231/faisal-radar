@@ -126,7 +126,7 @@ def run(cfg, tickers=None) -> dict:
     from collections import Counter
     c = Counter(r["status"] for r in rows)
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-               "source": "Yahoo Finance + Interactive Brokers + SEC", "scanned": len(pre), "moved": moved,
+               "source": "الأسعار: Alpaca + الشركة: Yahoo + Interactive Brokers + SEC", "scanned": len(pre), "moved": moved,
                "seconds": round(time.time() - t0), "stocks": rows, "excluded_dilution": excluded}
     log(f"## رادار التجميع: مؤكد {c['ready']} · محتمل {c['near']} · مراقبة {c['radar']} · خلص في {payload['seconds']} ثانية")
     for r in rows[:15]:

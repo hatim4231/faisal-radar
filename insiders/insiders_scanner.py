@@ -285,7 +285,7 @@ def run(cfg, tickers=None) -> dict:
     order = {"ready": 0, "near": 1, "radar": 2}
     rows.sort(key=lambda r: (order[r["status"]], -r["score"]))
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-               "source": "SEC EDGAR (Form 4) + Yahoo Finance", "scanned": len(pre), "found": len(found),
+               "source": "SEC EDGAR (Form 4) + الأسعار: Alpaca + الشركة: Yahoo", "scanned": len(pre), "found": len(found),
                "min_total": MIN_TOTAL, "lookback": LOOKBACK, "seconds": round(time.time() - t0),
                "stocks": rows, "excluded_dilution": excluded}
     from collections import Counter

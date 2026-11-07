@@ -207,6 +207,34 @@ def price_alerts(t: dict) -> list[str]:
     return out
 
 
+def daily_prices(syms: list[str]) -> dict[str, pd.DataFrame]:
+    """أسعار المتابعة اليومية من Alpaca دائماً (قرار المستخدم). ياهو للطوارئ بس إذا Alpaca تعطل."""
+    try:
+        import alpaca_data
+        if alpaca_data.available():
+            out = {}
+            for i in range(0, len(syms), 100):
+                out.update(alpaca_data.daily(syms[i:i + 100], days=100))
+            log(f"أسعار المتابعة من Alpaca: {len(out)} من {len(syms)}")
+            return out
+        log("⚠ مفاتيح Alpaca مو موجودة — طوارئ: أسعار المتابعة من ياهو")
+    except Exception as e:
+        log("⚠ Alpaca تعطل — طوارئ: أسعار المتابعة من ياهو:", repr(e)[:120])
+    import yfinance as yf
+    data = yf.download(syms, period="3mo", interval="1d", group_by="ticker",
+                       auto_adjust=False, threads=True, progress=False)
+    out = {}
+    for s in syms:
+        try:
+            d = data[s] if isinstance(data.columns, pd.MultiIndex) else data
+            d = d.dropna(subset=["Close"])
+            d.index = pd.to_datetime(d.index).tz_localize(None)
+            out[s] = d
+        except Exception:
+            pass
+    return out
+
+
 def migrate_stops(track: dict) -> int:
     """مرة وحدة: الوقف الجديد للتوصيات القديمة (فيصل المطوّر وعبدالله) وإعادة تقييمها من البداية."""
     if track.get("stop_rule_version", 1) >= STOP_RULE_VERSION:
@@ -218,15 +246,11 @@ def migrate_stops(track: dict) -> int:
         t["stop"] = round(base * 0.90, 4)
         t.update({"result": "open", "closed": None, "t1_date": None, "sweeps": []})
     if todo:
-        import yfinance as yf
         syms = sorted({t["symbol"] for t in todo})
-        data = yf.download(syms, period="3mo", interval="1d", group_by="ticker",
-                           auto_adjust=False, threads=True, progress=False)
+        data = daily_prices(syms)
         for t in todo:
             try:
-                d = data[t["symbol"]] if isinstance(data.columns, pd.MultiIndex) else data
-                d = d.dropna(subset=["Close"])
-                d.index = pd.to_datetime(d.index).tz_localize(None)
+                d = data[t["symbol"]]
                 evaluate(t, d)  # بدون تنبيهات تيليجرام لكل حدث قديم
             except Exception as e:
                 log("خطأ إعادة حساب", t["symbol"], repr(e)[:100])
@@ -282,16 +306,12 @@ def run():
     # متابعة المفتوحة
     open_t = [t for t in trades if t["result"] in ("open", "t1")]
     if open_t:
-        import yfinance as yf
         syms = sorted({t["symbol"] for t in open_t})
         log(f"متابعة {len(open_t)} توصية مفتوحة ({len(syms)} سهم)")
-        data = yf.download(syms, period="3mo", interval="1d", group_by="ticker",
-                           auto_adjust=False, threads=True, progress=False)
+        data = daily_prices(syms)
         for t in open_t:
             try:
-                d = data[t["symbol"]] if isinstance(data.columns, pd.MultiIndex) else data
-                d = d.dropna(subset=["Close"])
-                d.index = pd.to_datetime(d.index).tz_localize(None)
+                d = data[t["symbol"]]
                 ev = evaluate(t, d)
                 if t["radar"] not in MUTED:
                     new_events += ev + price_alerts(t)

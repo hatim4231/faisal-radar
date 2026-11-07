@@ -9,7 +9,7 @@
     python scanner.py --watchlist my_list.txt     # فحص قائمتك (سهم في كل سطر)
     python scanner.py --demo          # تقرير تجريبي ببيانات وهمية (بدون إنترنت)
 
-المصدر: Yahoo Finance عبر مكتبة yfinance (مجانية، بتأخير ~15 دقيقة).
+المصدر: الأسعار من Alpaca (قرار المستخدم، ياهو للطوارئ بس) · معلومات الشركة والأخبار من Yahoo Finance. تأخير ~15 دقيقة.
 """
 from __future__ import annotations
 
@@ -129,25 +129,40 @@ def get_universe(cfg) -> list[str]:
 # ----------------------------------------------------------------------------
 
 def download_daily(tickers: list[str], cfg) -> dict[str, pd.DataFrame]:
-    """الشارت اليومي: من Alpaca (أدق، كل البورصات) إذا المفاتيح موجودة، وياهو للباقي أو إذا Alpaca تعطل."""
+    """الشارت اليومي: من Alpaca دائماً (قرار المستخدم). ياهو للطوارئ بس: إذا Alpaca تعطل أو المفاتيح مو موجودة.
+    السهم اللي Alpaca ما عنده بيانات كافية (أقل من 60 جلسة) ما ينجاب من ياهو — ينكتب اسمه في السجل."""
     out: dict[str, pd.DataFrame] = {}
-    if cfg["scan"].get("data_source", "alpaca") == "alpaca":
-        try:
-            import alpaca_data
-            if alpaca_data.available():
-                for i in range(0, len(tickers), 100):
-                    batch = tickers[i:i + 100]
-                    try:
-                        got = alpaca_data.daily(batch, days=730)
-                        out.update({t: d for t, d in got.items() if len(d) >= 60})
-                    except Exception as e:
-                        log("  Alpaca خطأ (نكمل بياهو):", repr(e)[:120])
-                log(f"الشارت اليومي من Alpaca: {len(out)} من {len(tickers)}")
-        except Exception as e:
-            log("Alpaca ما اشتغل:", repr(e)[:120])
-    rest = [t for t in tickers if t not in out]
-    if rest:
-        out.update(_download_daily_yahoo(rest, cfg))
+    failed: list[str] = []
+    if cfg["scan"].get("data_source", "alpaca") != "alpaca":
+        return _download_daily_yahoo(tickers, cfg)
+    try:
+        import alpaca_data
+        if not alpaca_data.available():
+            log("⚠ مفاتيح Alpaca مو موجودة — طوارئ: الأسعار من ياهو")
+            return _download_daily_yahoo(tickers, cfg)
+        for i in range(0, len(tickers), 100):
+            batch = tickers[i:i + 100]
+            got = None
+            for attempt in range(3):
+                try:
+                    got = alpaca_data.daily(batch, days=730)
+                    break
+                except Exception as e:
+                    log(f"  Alpaca خطأ (محاولة {attempt + 1}):", repr(e)[:120])
+                    time.sleep(5 * (attempt + 1))
+            if got is None:
+                failed += batch
+                continue
+            out.update({t: d for t, d in got.items() if len(d) >= 60})
+    except Exception as e:
+        log("⚠ Alpaca ما اشتغل — طوارئ: الأسعار من ياهو:", repr(e)[:120])
+        return _download_daily_yahoo(tickers, cfg)
+    missing = [t for t in tickers if t not in out and t not in failed]
+    log(f"الشارت اليومي من Alpaca: {len(out)} من {len(tickers)}"
+        + (f" · ما عنده بيانات كافية ({len(missing)}): {', '.join(missing[:20])}" if missing else ""))
+    if failed:
+        log(f"⚠ طوارئ: {len(failed)} سهم Alpaca تعطل معها ← من ياهو")
+        out.update(_download_daily_yahoo(failed, cfg))
     return out
 
 
@@ -553,7 +568,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
-        "source": "Yahoo Finance (yfinance) — تأخير ~15 دقيقة",
+        "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
         "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil,
     }
