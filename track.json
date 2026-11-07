@@ -236,7 +236,8 @@
    "last_date": "2026-11-06",
    "max_gain_pct": 6.0,
    "max_dd_pct": -5.3,
-   "ret_pct": -5.3
+   "ret_pct": -5.3,
+   "stop_warned": "2026-11-06"
   },
   {
    "id": "abdullah:PN:2026-11-05",
