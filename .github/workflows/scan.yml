@@ -6,6 +6,9 @@ on:
       script:
         description: "diag script"
         default: "diag/backtest_features.py"
+      message:
+        description: "رسالة تيليجرام (اختياري)"
+        default: ""
 
 permissions:
   contents: read
@@ -17,6 +20,8 @@ jobs:
     env:
       ALPACA_KEY_ID: ${{ secrets.ALPACA_KEY_ID }}
       ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -24,6 +29,12 @@ jobs:
           python-version: "3.12"
       - run: pip install -r requirements.txt
       - run: python "${{ inputs.script }}"
+        if: inputs.message == ''
+      - name: رسالة تيليجرام
+        if: inputs.message != ''
+        env:
+          MESSAGE: ${{ inputs.message }}
+        run: python diag/notify.py
       - uses: actions/upload-artifact@v4
         if: always()
         with:
