@@ -47,7 +47,9 @@ def run_one(args):
         f10, f20 = d.iloc[end:end + H10], d.iloc[end:end + H20]
         base = {"t": t, "date": str(hist.index[-1].date()), "u10": u10(f10, px),
                 "up30": int(float(f20["High"].max()) / px - 1 >= 0.30),
-                "ret10": float(f10["Close"].iloc[-1]) / px - 1, "px": px}
+                "ret10": float(f10["Close"].iloc[-1]) / px - 1, "px": px,
+                "dd10": int(float(f10["Low"].min()) < px * 0.9),
+                "atr": float(((hist["High"] - hist["Low"]) / hist["Close"]).tail(20).mean())}
         out.append({**base, "radar": "RANDOM"})
         try:
             a = fr.analyze(hist, info, cfg)
@@ -80,7 +82,8 @@ def pct(x):
 
 def report(df, name, rnd):
     print(f"\n\n######## {name} ########")
-    print(f"العشوائي: +20% قبل −10% = {pct(rnd.u10.mean())} · طار 30% = {pct(rnd.up30.mean())} (n={len(rnd)})")
+    print(f"العشوائي: +20% قبل −10% = {pct(rnd.u10.mean())} · طار 30% = {pct(rnd.up30.mean())} · نزل−10% {pct(rnd.dd10.mean())} "
+          f"· عائد10 وسيط {rnd.ret10.median() * 100:+.1f}% (n={len(rnd)})")
     # 1) هل النقاط الأعلى = نجاح أكثر؟
     print("\n-- حسب النقاط --")
     bins = [0, 30, 40, 50, 60, 70, 80, 101]
@@ -92,7 +95,21 @@ def report(df, name, rnd):
         print(f"  {k}: n={r.n:<6} +20%قبل−10%={pct(r.u10):>6} طار30%={pct(r.up30):>6} عائد10(وسيط)={r.ret10 * 100:+.1f}%")
     print("\n-- حسب الحالة --")
     for st, sub in df.groupby("status"):
-        print(f"  {st}: n={len(sub)} +20%قبل−10%={pct(sub.u10.mean())} طار30%={pct(sub.up30.mean())}")
+        print(f"  {st}: n={len(sub)} +20%قبل−10%={pct(sub.u10.mean())} طار30%={pct(sub.up30.mean())} "
+              f"نزل−10%={pct(sub.dd10.mean())} عائد10(وسيط)={sub.ret10.median() * 100:+.1f}% ATR={sub.atr.median() * 100:.1f}%")
+    # 1ب) الحالة مقابل عشوائي بنفس التذبذب
+    edges = rnd["atr"].quantile([0, .2, .4, .6, .8, 1]).to_numpy().copy()
+    edges[0], edges[-1] = -1, 99
+    rq = pd.cut(rnd["atr"], edges, labels=False)
+    base_u = rnd.groupby(rq)["u10"].mean()
+    base_r = rnd.groupby(rq)["ret10"].median()
+    print("\n-- الحالة مقابل عشوائي بنفس التذبذب --")
+    for st, sub in df.groupby("status"):
+        q = pd.cut(sub["atr"], edges, labels=False)
+        exp_u = q.map(base_u).mean()
+        exp_r = q.map(base_r).mean()
+        print(f"  {st}: نجاح {pct(sub.u10.mean())} مقابل عشوائي مماثل {pct(exp_u)} ({(sub.u10.mean() - exp_u) * 100:+.1f}) · "
+              f"عائد10 وسيط {sub.ret10.median() * 100:+.1f}% مقابل {exp_r * 100:+.1f}%")
     # 2) كل شرط: متحقق مقابل مو متحقق — في كل الأسهم، وفي المرشحين (نقاط 50+)
     for label, pop in (("كل الأسهم", df), ("المرشحين (نقاط 50+)", df[df.score >= 50])):
         print(f"\n-- الشروط: {label} (n={len(pop)}) — الفرق = نجاح لما يتحقق − لما ما يتحقق --")
@@ -109,7 +126,25 @@ def report(df, name, rnd):
             d2 = h2[h2[col] == 1].u10.mean() - h2[h2[col] == 0].u10.mean()
             res.append((col[3:], len(on), on.u10.mean(), off.u10.mean(), on.u10.mean() - off.u10.mean(),
                         on.up30.mean() - off.up30.mean(), d1, d2))
+        # نفس التذبذب: نقارن داخل كل خُمس من ATR (عشان الشرط ما ينحسب له أو عليه بس لأنه يختار أسهم أهدى/أعنف)
+        pop = pop.assign(aq=pd.qcut(pop["atr"], 5, labels=False, duplicates="drop"))
+        vm, rk = {}, {}
+        for col in [c for c in pop.columns if c.startswith("ok_")]:
+            diffs, ws, dds, rets = [], [], [], []
+            for _, g in pop.groupby("aq"):
+                on, off = g[g[col] == 1], g[g[col] == 0]
+                if len(on) >= 15 and len(off) >= 15:
+                    w = len(on)
+                    diffs.append((on.u10.mean() - off.u10.mean()) * w)
+                    dds.append((on.dd10.mean() - off.dd10.mean()) * w)
+                    rets.append((on.ret10.median() - off.ret10.median()) * w)
+                    ws.append(w)
+            if ws:
+                vm[col[3:]] = (sum(diffs) / sum(ws), sum(dds) / sum(ws), sum(rets) / sum(ws))
         for k, non, a, b, d, d30, d1, d2 in sorted(res, key=lambda x: -x[4]):
+            v = vm.get(k)
+            if v:
+                print(f"  {'':<14} ↳ بنفس التذبذب: نجاح {v[0] * 100:+.1f} · نزل −10% {v[1] * 100:+.1f} · عائد10 وسيط {v[2] * 100:+.1f}")
             stable = "✅ ثابت" if (d1 > 0) == (d2 > 0) else "⚠ متقلب"
             print(f"  {k:<14} متحقق n={non:<6} نجاح {pct(a):>6} | ما تحقق {pct(b):>6} | الفرق {d * 100:+.1f} نقطة "
                   f"· طار30% {d30 * 100:+.1f} · نصف1 {d1 * 100:+.1f} نصف2 {d2 * 100:+.1f} {stable}")
