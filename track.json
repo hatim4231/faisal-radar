@@ -79,7 +79,7 @@
    "sessions": 1,
    "last": 2.85,
    "last_date": "2026-11-06",
-   "max_gain_pct": 4.2,
+   "max_gain_pct": 6.0,
    "max_dd_pct": -5.3,
    "ret_pct": -5.3,
    "stop_old": 2.7936,
@@ -131,7 +131,7 @@
    "why": "RSI 43.0 · دعم 1.90 (عنه 10.0%) · منطقة الطلب 1.90–2.09",
    "dilution": "none",
    "sessions": 1,
-   "last": 2.1594,
+   "last": 2.159,
    "last_date": "2026-11-06",
    "max_gain_pct": 10.0,
    "max_dd_pct": 0.5,
@@ -234,7 +234,7 @@
    "sessions": 1,
    "last": 2.85,
    "last_date": "2026-11-06",
-   "max_gain_pct": 4.2,
+   "max_gain_pct": 6.0,
    "max_dd_pct": -5.3,
    "ret_pct": -5.3
   },
@@ -346,7 +346,7 @@
    "sessions": 1,
    "last": 2.32,
    "last_date": "2026-11-06",
-   "max_gain_pct": 1.7,
+   "max_gain_pct": 2.1,
    "max_dd_pct": -1.7,
    "ret_pct": -0.4,
    "closed": null,
@@ -376,7 +376,7 @@
    "last": 1.52,
    "last_date": "2026-11-06",
    "max_gain_pct": 4.0,
-   "max_dd_pct": -0.0,
+   "max_dd_pct": -0.7,
    "ret_pct": 0.7
   },
   {
@@ -398,7 +398,7 @@
    "why": "RSI 41.5 · دعم 3.88 (عنه 1.9%) · منطقة الطلب 3.88–4.27",
    "dilution": "none",
    "sessions": 0,
-   "last": 3.875,
+   "last": 3.88,
    "last_date": "2026-11-06"
   },
   {
@@ -543,7 +543,7 @@
    "why": "RSI 40.1 · دعم 0.900 (عنه 2.8%) · منطقة الطلب 0.900–0.990",
    "dilution": "none",
    "sessions": 0,
-   "last": 0.9102,
+   "last": 0.91,
    "last_date": "2026-11-06"
   },
   {
@@ -566,7 +566,7 @@
    "why": "موجة 0.930→2.13 · دعم 0.900 · اختبر 2 مرات · تماسك 15 جلسة",
    "dilution": "none",
    "sessions": 0,
-   "last": 0.9102,
+   "last": 0.91,
    "last_date": "2026-11-06",
    "stop_old": 0.891,
    "closed": null,
@@ -639,7 +639,7 @@
    "why": "RSI 33.9 · دعم 0.810 (عنه 3.7%) · منطقة الطلب 0.810–0.891",
    "dilution": "medium",
    "sessions": 0,
-   "last": 0.8448,
+   "last": 0.84,
    "last_date": "2026-11-06"
   },
   {
@@ -754,7 +754,7 @@
    "why": "RSI 33.9 · دعم 0.810 (عنه 3.7%) · منطقة الطلب 0.810–0.891",
    "dilution": "medium",
    "sessions": 0,
-   "last": 0.8448,
+   "last": 0.84,
    "last_date": "2026-11-06"
   },
   {
@@ -961,7 +961,7 @@
    "why": "2 مطّلع اشترى بـ $61,450 (متوسط 2.93) · KUMAR AMIT — عضو مجلس إدارة، Chief Executive Officer · آخر شراء 2026-10-30",
    "dilution": "none",
    "sessions": 0,
-   "last": 3.175,
+   "last": 3.18,
    "last_date": "2026-11-06"
   },
   {
@@ -1123,6 +1123,29 @@
    "dilution": "medium",
    "sessions": 0,
    "last": 1.63,
+   "last_date": "2026-11-06"
+  },
+  {
+   "id": "abdullah:TDIC:2026-11-06",
+   "radar": "abdullah",
+   "radar_name": "🌊 عبدالله",
+   "sub1": false,
+   "opened_at": "2026-11-07 07:57",
+   "result": "open",
+   "symbol": "TDIC",
+   "status": "near",
+   "label": "🟡 بدأ يتماسك",
+   "entry": 1.52,
+   "stop": 1.314,
+   "t1": 1.82,
+   "t2": 3.9,
+   "score": 80.0,
+   "date": "2026-11-06",
+   "name": "Dreamland Limited",
+   "why": "موجة 1.51→3.90 · دعم 1.46 · اختبر 2 مرات · تماسك 5 جلسة",
+   "dilution": "none",
+   "sessions": 0,
+   "last": 1.52,
    "last_date": "2026-11-06"
   }
  ],
