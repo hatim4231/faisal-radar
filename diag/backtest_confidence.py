@@ -118,15 +118,18 @@ def collect():
     print("أسهم فيها بيانات كافية:", len(daily), "· IWM:", None if iwm is None else len(iwm), flush=True)
     # وضع السوق لكل يوم
     closes = pd.DataFrame({t: d["Close"] for t, d in daily.items()})
-    above = (closes > closes.rolling(50).mean()).where(closes.rolling(50).count() >= 50)
-    breadth = above.sum(axis=1) / above.count(axis=1)
+    above = (closes > closes.rolling(50).mean()).astype(float).where(closes.rolling(50).count() >= 50)
+    breadth = (above.sum(axis=1) / above.count(axis=1).replace(0, np.nan)).astype(float)
     iw = iwm["Close"].astype(float)
     iwm_up = (iw > iw.rolling(50).mean()).astype(float)
     iwm_r20 = (iw / iw.shift(20) - 1) * 100
     mkt = {}
     for day in closes.index:
-        mkt[day] = {"breadth": float(breadth.get(day, np.nan)) if not np.isnan(breadth.get(day, np.nan)) else 0.4,
-                    "iwm_up": float(iwm_up.get(day, 0.5)), "iwm_ret20": float(iwm_r20.get(day, 0) if not np.isnan(iwm_r20.get(day, np.nan)) else 0)}
+        br = breadth.get(day, np.nan)
+        up = iwm_up.get(day, np.nan)
+        r20 = iwm_r20.get(day, np.nan)
+        mkt[day] = {"breadth": 0.4 if pd.isna(br) else float(br), "iwm_up": 0.5 if pd.isna(up) else float(up),
+                    "iwm_ret20": 0.0 if pd.isna(r20) else float(r20)}
     infos = scanner.get_info(list(daily), cfg)
     t0 = time.time()
     sec = {}
