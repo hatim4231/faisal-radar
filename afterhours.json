@@ -1,0 +1,32 @@
+{
+ "signals": [
+  {
+   "symbol": "SMX",
+   "D": "2026-11-06",
+   "close": 1.745,
+   "ah_high": 2.24,
+   "ah_last": 2.15,
+   "ah_vwap": 1.9138,
+   "jump_pct": 28.4,
+   "hold_pct": 82,
+   "ah_vol": 2142229,
+   "rth_vol": 1225658,
+   "limit": 1.9138,
+   "name": "SMX (Security Matters) Public L",
+   "price": 2.15,
+   "float": 791704,
+   "short": 150000,
+   "short_src": "المتاح للاقتراض",
+   "flags": [
+    "الشورت 150,000 فوق 100,000"
+   ],
+   "news": [],
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 2.1052,
+   "t2": 2.2009,
+   "stop": 1.7224
+  }
+ ]
+}
