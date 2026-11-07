@@ -9,10 +9,11 @@ permissions:
 jobs:
   diag:
     runs-on: ubuntu-latest
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python diag/full_case.py SVRE
+      - run: python diag/backtest_acc.py

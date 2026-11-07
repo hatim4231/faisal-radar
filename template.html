@@ -142,6 +142,7 @@ ul.clean{margin:0;padding-right:18px}
       <a class="btn" id="lnk-other" href="original/" style="text-decoration:none">📜 فيصل الأصلي</a>
       <a class="btn" id="lnk-abd" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
       <a class="btn" id="lnk-ins" href="insiders/" style="text-decoration:none">🟢 المطّلعين</a>
+      <a class="btn" id="lnk-acc" href="accumulation/" style="text-decoration:none">🔍 التجميع</a>
       <a class="btn" id="lnk-track" href="track/" style="text-decoration:none">📈 السجل</a>
       <button class="btn primary" id="rescan" style="display:none">🔄 تحديث المسح</button>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
@@ -212,6 +213,7 @@ if (DATA && DATA.variant === "original"){
   document.getElementById("lnk-abd").href = "../abdullah/";
   document.getElementById("lnk-track").href = "../track/";
   document.getElementById("lnk-ins").href = "../insiders/";
+  document.getElementById("lnk-acc").href = "../accumulation/";
 } else if (DATA) {
   document.getElementById("h1").textContent = "📡 رادار فيصل — المطوّر";
 }
@@ -282,7 +284,7 @@ $("#q").oninput = render; $("#sort").onchange = render;
 
 function shortTxt(s){
   const parts = [];
-  if (s.short_used && s.short_used.value != null && s.short_used.value > s.short_used.max) parts.push("⚠ فوق 50K");
+  if (s.short_used && s.short_used.value != null && s.short_used.value > s.short_used.max) parts.push("⚠ فوق " + fM(s.short_used.max));
   if (s.short_shares != null) parts.push("\u2066" + fM(s.short_shares) + (s.short_pct_float != null ? " (" + s.short_pct_float + "%)" : "") + "\u2069");
   if (s.short_available && s.short_available.available != null) parts.push("متاح \u2066" + fM(s.short_available.available) + "\u2069");
   return parts.join(" · ") || "-";
@@ -338,6 +340,7 @@ function render(){
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
         ${s.dilution && s.dilution.level!=="none" && s.dilution.level!=="low" ? `<div class="left" style="color:${s.dilution.level==="high"?"var(--bad)":"var(--warn)"}">🏛 SEC: ${esc(s.dilution.hits[0].label)} (<span class="num">${esc(s.dilution.hits[0].form)} · ${esc(s.dilution.hits[0].date)}</span>)</div>` : ""}
+        ${s.compliance ? `<div class="left" style="color:${s.compliance.level==="block"?"var(--bad)":s.compliance.level==="info"?"var(--muted)":"var(--warn)"}">🏛 ${esc(s.compliance.why)}</div>` : ""}
         ${s.new_low ? `<div class="left" style="color:${s.new_low.pending?"var(--bad)":"var(--good)"}">${s.new_low.pending?"⚠":"✓"} ${esc(s.new_low.why)}</div>` : ""}
         ${s.split_zone ? `<div class="left" style="color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--muted)"}">✂️ منطقة التقسيم <span class="num">${fp(s.split_zone.sweep)} – ${fp(s.split_zone.half)}</span> · ${esc(s.split_zone.label)}${(s.split_zone.status==="above" || s.split_zone.status==="na") ? " · " + esc(s.split_zone.note) : ""}</div>` : ""}
         ${(s.news||[]).length ? `<div class="left">${sentBadge(s.news[0])} <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}

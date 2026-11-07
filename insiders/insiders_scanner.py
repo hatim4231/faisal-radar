@@ -6,7 +6,7 @@
 (Form 4، رمز العملية P). "المطّلع يبيع لأسباب كثيرة، بس يشتري لسبب واحد."
 
 الفلاتر العامة نفس باقي الرادارات: 1-5$، فوليوم، قيمة سوقية، فلووت، بدون Warrants،
-الشورت 50 ألف وأقل، واستبعاد شركات الطرح/التخفيف المتكرر.
+الشورت 100 ألف وأقل، واستبعاد شركات الطرح/التخفيف المتكرر.
 الحد الأدنى: مجموع الشراء 25 ألف دولار خلال آخر 30 يوم (يتجاهل الشراء الرمزي).
 
 ملاحظة: الشركات الأجنبية (أغلب الصينية) ما تقدم Form 4، فالرادار يغطي الشركات الأمريكية فقط.
@@ -197,7 +197,8 @@ def run(cfg, tickers=None) -> dict:
     if not explicit:
         tickers = [t for t in tickers if not (len(t) == 5 and t[-1] in "WRU") and "-" not in t]
     daily = data.download_daily(tickers, cfg)
-    U = cfg["universe"]
+    U = dict(cfg["universe"])
+    U["min_price"] = max(U["min_price"], 1.0)  # قرار المستخدم: المطّلعين يبقى من 1$ (التوسيع لـ 0.50$ لفيصل وعبدالله فقط)
     pre = {t: d for t, d in daily.items()
            if explicit or (U["min_price"] <= float(d["Close"].iloc[-1]) <= U["max_price"]
                            and float(d["Volume"].tail(30).mean()) >= U["min_avg_volume"] * 0.7)}
@@ -233,7 +234,7 @@ def run(cfg, tickers=None) -> dict:
         ib = data.load_ib_short()
     except Exception:
         ib = {}
-    max_sh = cfg["behavior"].get("max_short_shares", 50000)
+    max_sh = cfg["behavior"].get("max_short_shares", 100000)
     rows = []
     for t, buys in found.items():
         d = pre[t]

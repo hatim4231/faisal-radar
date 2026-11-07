@@ -3,7 +3,7 @@
 
   "universe": {
     "exchanges": ["NASDAQ"],
-    "min_price": 1.0,
+    "min_price": 0.5,
     "max_price": 5.0,
     "max_market_cap": 300000000,
     "max_float": 50000000,
@@ -24,8 +24,8 @@
     "min_touches": 3,
     "_touches_help": "كم مرة لازم يختبر الدعم ويصمد",
     "tight_range_pct": 15,
-    "invalidation_below_support_pct": 1,
-    "_invalidation_help": "الوقف = أدنى سعر في التماسك ناقص 1% (أدنى سعر يكون وقفي)",
+    "invalidation_below_support_pct": 10,
+    "_invalidation_help": "الوقف = أدنى سعر في التماسك ناقص 10% (قرار المستخدم: يتحمل مسح السيولة)",
     "timing_min_sessions": 12,
     "timing_max_sessions": 35,
     "entry_above_support_pct": 5,
@@ -34,7 +34,7 @@
     "_moved_help": "إذا ارتفع 25% فوق الدعم أو اخترق سقف التماسك بـ 5% = طلع، ينشال من القائمة",
     "vol_dry_ratio": 0.7,
     "min_dollar_volume": 300000,
-    "max_short_shares": 50000,
+    "max_short_shares": 100000,
     "short_history_keep": 12
   },
 

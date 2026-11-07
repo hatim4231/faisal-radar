@@ -140,6 +140,7 @@ ul.clean{margin:0;padding-right:18px}
       <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
       <a class="btn" href="../abdullah/" style="text-decoration:none">🌊 عبدالله</a>
       <a class="btn" href="../insiders/" style="text-decoration:none">🟢 المطّلعين</a>
+      <a class="btn" href="../accumulation/" style="text-decoration:none">🔍 التجميع</a>
     </div>
   </header>
   <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة.
@@ -169,7 +170,8 @@ function statsHTML(){
     return `<div class="tile" style="cursor:default"><span style="font-weight:700;color:var(--text)">${esc(name)}</span>
       <b class="num" style="color:var(--good)">${s.hit_pct ?? "-"}%</b><span>نجحت (وصلت الهدف 1) من ${s.n} توصية انحسمت</span>
       <div class="note" style="margin-top:6px">❌ وقف ${s.stop_pct ?? "-"}% · ⏳ مفتوحة ${s.open} · متوسط أقصى ربح ${pc(s.avg_max_gain)}<br>
-      المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}</div></div>`;
+      المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
+      تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}</div></div>`;
   }).join("");
 }
 function tabsHTML(){

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 رادار فيصل — النسخة الأصلية (قواعد التحليل كما كانت في أول نسخة، commit 1c5f0a0).
-نفس الفلاتر اللي اختارها المستخدم (1-5$، الشورت 50 ألف، الأخبار، بدون Warrants) لأنها في scanner.py و config.json،
+نفس الفلاتر اللي اختارها المستخدم (1-5$، الشورت 100 ألف، الأخبار، بدون Warrants) لأنها في scanner.py و config.json،
 لكن الحساب والتصنيف من faisal_rules_original.py بدون أي تعديل.
 
     python faisal_original/run_original.py --out site/original/index.html
