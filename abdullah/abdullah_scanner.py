@@ -212,8 +212,7 @@ def deep_scan(results: dict, cfg):
                 r["dilution_news"] = [x.get("title_ar") or x["title"] for x in dil[:3]]
     news_tools.save_cache()
     try:
-        h = yf.download(syms, period="60d", interval="1h", prepost=True, group_by="ticker",
-                        auto_adjust=False, threads=True, progress=False)
+        h = data.intraday(syms, "1h", 60)
         for t in syms:
             try:
                 d = h[t] if isinstance(h.columns, pd.MultiIndex) else h
