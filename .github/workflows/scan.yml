@@ -19,4 +19,4 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python diag/backtest_ah_alpaca.py
+      - run: python diag/backtest_vwap.py
