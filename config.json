@@ -1,8 +1,9 @@
 {
   "_ملاحظة": "كل الأرقام هنا قابلة للتعديل. القيم الافتراضية مأخوذة من دليل طريقة فيصل.",
-
   "universe": {
-    "exchanges": ["NASDAQ"],
+    "exchanges": [
+      "NASDAQ"
+    ],
     "_exchanges_help": "أضف \"NYSE_AMERICAN\" أو \"NYSE\" لو تبي توسع البحث",
     "min_price": 0.5,
     "max_price": 5.0,
@@ -10,7 +11,6 @@
     "max_float": 50000000,
     "min_avg_volume": 100000
   },
-
   "irtikaz": {
     "rsi_ideal_low": 23,
     "rsi_ideal_high": 27,
@@ -25,7 +25,6 @@
     "min_upside_pct": 20,
     "positive_candle_days": 10
   },
-
   "momentum": {
     "min_rel_volume": 2,
     "strong_rel_volume": 3,
@@ -35,7 +34,6 @@
     "max_float": 20000000,
     "late_chase_pct": 50
   },
-
   "behavior": {
     "former_runner_pct": 100,
     "pump_upper_wick_pct": 15,
@@ -45,7 +43,6 @@
     "max_short_shares": 100000,
     "_max_short_help": "لا يُرشَّح إلا سهم شورته 100 ألف سهم أو أقل (الشورت المتاح للاقتراض، وإذا ما توفر: Short Interest)"
   },
-
   "scan": {
     "history_period": "2y",
     "batch_size": 80,
@@ -53,5 +50,18 @@
     "deep_scan_min_score": 45,
     "deep_scan_max": 100,
     "report_min_score": 40
+  },
+  "accumulation": {
+    "_ملاحظة": "رادار التجميع: بصمات تجميع المضارب داخل قاعدة عرضية",
+    "base_min": 10,
+    "base_max": 60,
+    "base_max_range_pct": 30,
+    "breakout_pct": 8,
+    "ready_score": 70,
+    "ready_base": 15,
+    "near_score": 55,
+    "stop_below_low_pct": 10,
+    "report_min_score": 40,
+    "deep_max": 40
   }
 }

@@ -68,6 +68,9 @@ jobs:
       - name: رادار المطّلعين
         run: python insiders/insiders_scanner.py --out site/insiders/index.html
 
+      - name: رادار التجميع
+        run: python accumulation/accum_scanner.py --out site/accumulation/index.html
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -93,6 +96,7 @@ jobs:
           npx --yes staticrypt@3.5.4 site/original/index.html "${OPTS[@]}" --template-title "📜 فيصل الأصلي" -d site/original
           npx --yes staticrypt@3.5.4 site/track/index.html "${OPTS[@]}" --template-title "📈 سجل التوصيات" -d site/track
           npx --yes staticrypt@3.5.4 site/insiders/index.html "${OPTS[@]}" --template-title "🟢 رادار المطّلعين" -d site/insiders
+          npx --yes staticrypt@3.5.4 site/accumulation/index.html "${OPTS[@]}" --template-title "🔍 رادار التجميع" -d site/accumulation
 
       - uses: actions/upload-pages-artifact@v3
         with:
