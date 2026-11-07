@@ -45,6 +45,9 @@ def outcome(bars: pd.DataFrame, entry: float, tgt: float, stop: float = 0.10):
     return "none"
 
 
+DIAG = {"days": 0, "ah_bars": 0, "ah_zero_vol": 0, "pm_days": 0, "jumps15": 0}
+
+
 def scan_ticker(t: str, d: pd.DataFrame):
     out = []
     d = sessions(d)
@@ -73,7 +76,14 @@ def scan_ticker(t: str, d: pd.DataFrame):
                "ah_last_vs_close": ah_last / close - 1,
                "maxup": float(nb["High"].max()) / ah_last - 1, "dd": float(nb["Low"].min()) / ah_last - 1,
                "close_next": float(rth2["Close"].iloc[-1]) / ah_last - 1 if not rth2.empty else np.nan}
-        if jump >= 0.15 and ah_vol >= 50_000:
+        DIAG["days"] += 1
+        DIAG["ah_bars"] += len(ah)
+        DIAG["ah_zero_vol"] += int((ah["Volume"] == 0).sum())
+        DIAG["pm_days"] += int(not pm.empty)
+        if jump >= 0.15:
+            DIAG["jumps15"] += 1
+        rth_vol = float(rth["Volume"].sum())
+        if jump >= 0.15 and rth_vol >= 100_000:
             kind = "AH_HOLD" if hold >= 0.7 else "AH_FADE"
             rec["sig"] = kind
             for tg in (0.10, 0.15, 0.30):
@@ -116,6 +126,7 @@ def main():
             except Exception:
                 pass
         print(i, len(rows), flush=True)
+    print("== تشخيص البيانات:", DIAG, flush=True)
     df = pd.DataFrame(rows)
     # ملفات طرح بعد القفزة (للإشارات فقط)
     sig = df[df.sig.isin(["AH_HOLD", "AH_FADE"])].copy()
