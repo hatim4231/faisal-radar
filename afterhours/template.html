@@ -71,9 +71,10 @@ h2{font-size:17px;margin:22px 0 10px}
   </header>
   <div class="muted-box">🔇 رادار تجريبي صامت: ما يرسل تيليجرام. نراقب نتايجه الحقيقية قبل ما نعتمده.</div>
   <div class="card"><b>الفكرة:</b> سهم قفز في الأفتر 15% أو أكثر بفوليوم حقيقي، وحافظ على 70% من قفزته لين آخر الأفتر.
-    <b>الخطة:</b> طلب Limit عند <b>متوسط سعر الأفتر (VWAP)</b> وتنتظر البري ينزل له. الهدف +10% ثم +15%، والوقف −10%. والبيع غالباً بالبري أو أول الافتتاح.
-    <div class="note" style="margin-top:6px">الاختبار التاريخي (سنة كاملة، بيانات Alpaca): بالدخول عند متوسط الأفتر وصل +10% قبل −10% في 62% من الحالات، و71% إذا فوليوم البري قوي.
-    أما اللي يشتري بآخر سعر وهو طاير فوصل الهدف 34% بس. <b>لا تشتري من العرض.</b> ليس توصية شراء.</div></div>
+    <b>الخطة:</b> طلب Limit عند <b>متوسط سعر الأفتر (VWAP)</b> وتنتظر البري ينزل له، <b>بشرط فوليوم البري لين لحظة الشراء ≥ 7% من فوليوم الأفتر</b>.
+    الهدف +10%، وإلا بيع عند الإغلاق. الوقف −10%. <b>لا تبيع عند الافتتاح</b>: الاختبار بيّن إن البري يطلع وبعدين يطيح قبل الافتتاح (متوسط −2.7%).
+    <div class="note" style="margin-top:6px">الاختبار التاريخي (سنة كاملة، بيانات Alpaca): بالدخول عند متوسط الأفتر، متوسط الصفقة +1.4%، ومع شرط فوليوم البري +2.2% (رابحة 60%، وقف 37%).
+    الربح بسيط وفرق العرض والطلب في البري ممكن ياكل جزء منه — استخدم Limit دائماً. اللي يشتري بآخر سعر وهو طاير وصل الهدف 34% بس. <b>لا تشتري من العرض.</b> ليس توصية شراء.</div></div>
 
   <h2>📊 النتايج الحقيقية</h2>
   <div class="tiles" id="tiles"></div>
@@ -123,6 +124,7 @@ function card(f){
       <div class="pbox"><span>الهدف 1 (+10%)</span><b class="num" style="color:var(--good)">${fp(f.t1)}</b></div>
       <div class="pbox"><span>الهدف 2 (+15%)</span><b class="num" style="color:var(--good)">${fp(f.t2)}</b></div>
       <div class="pbox"><span>الوقف (−10%)</span><b class="num" style="color:var(--bad)">${fp(f.stop)}</b></div></div>
+    ${f.pm_min_vol ? `<div class="note" style="margin-top:6px">📊 ادخل بس إذا فوليوم البري لين لحظة الشراء ≥ <b class="num">${fk(f.pm_min_vol)}</b> سهم (7% من فوليوم الأفتر). بيع: +10% وإلا عند الإغلاق.</div>` : ""}
     ${(f.flags || []).length ? `<div class="note" style="margin-top:6px;color:var(--bad)">${f.flags.map(esc).join(" · ")}</div>` : ""}
     ${f.dilution_level ? `<div class="note" style="margin-top:4px;color:var(--warn)">🏛 تنبيه تخفيف من SEC (${esc(f.dilution_level)})</div>` : ""}
     ${f.result ? `<div style="margin-top:6px"><span class="badge ${(RES[f.result]||["",""])[1]}">${(RES[f.result]||[f.result])[0]}</span></div>` : ""}

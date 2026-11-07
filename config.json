@@ -23,7 +23,18 @@
     "_stop_help": "الوقف = أقل سعر وصله السهم عند الدعم ناقص 10% (يتحمل مسح السيولة)",
     "chase_from_low_pct": 50,
     "min_upside_pct": 20,
-    "positive_candle_days": 10
+    "positive_candle_days": 10,
+    "weights": {
+      "support": 20,
+      "rsi": 25,
+      "hold": 10,
+      "candle": 5,
+      "macd": 15,
+      "volume": 5,
+      "ma": 5,
+      "upside": 15
+    },
+    "_weights_help": "أوزان الشروط (المجموع 100) — من اختبار سنة ببيانات Alpaca (نوفمبر 2026، قرار المستخدم): RSI وMACD ومساحة الصعود أقوى، المتوسطات والفوليوم والشمعة أضعف"
   },
   "momentum": {
     "min_rel_volume": 2,

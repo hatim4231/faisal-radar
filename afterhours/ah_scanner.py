@@ -37,6 +37,7 @@ STORE = ROOT / "trackdata" / "afterhours.json"
 
 MIN_JUMP, MIN_HOLD, MIN_AH_VOL, MIN_RTH_VOL = 0.15, 0.70, 50_000, 100_000
 T1, T2, STOP = 0.10, 0.15, 0.10
+PM_VOL_RATIO = 0.07   # فوليوم البري لين التنفيذ ÷ فوليوم الأفتر — فوقه: متوسط الصفقة +2.2% بدل +1.4%
 
 
 def now_ny() -> pd.Timestamp:
@@ -219,6 +220,8 @@ def run(cfg) -> dict:
             f["eligible"] = not f["flags"]
             f["t1"], f["t2"], f["stop"] = (round(f["limit"] * (1 + T1), 4), round(f["limit"] * (1 + T2), 4),
                                            round(f["limit"] * (1 - STOP), 4))
+            # شرط فوليوم البري (اختبار سنة): ادخل بس إذا فوليوم البري لين لحظة الشراء ≥ 7% من فوليوم الأفتر
+            f["pm_min_vol"] = int(f["ah_vol"] * PM_VOL_RATIO)
 
     # 4) نسجل بس لما الأفتر يخلص (ما نكرر نفس السهم لنفس اليوم)
     if done and found:

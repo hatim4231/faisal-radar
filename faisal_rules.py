@@ -620,6 +620,12 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
         c.detail = "لا توجد مقاومات واضحة فوق (قمم تاريخية؟)"
     checks.append(c)
 
+    # أوزان الشروط من الإعدادات (اختبار سنة): نفس حساب كل شرط، بس نعيد توزيع النقاط
+    for x in checks:
+        nw = (IR.get("weights") or {}).get(x.key)
+        if nw is not None and x.weight:
+            x.got = x.got * nw / x.weight
+            x.weight = nw
     base = sum(x.got for x in checks)
 
     # ---- تعديلات السلوك (مكافآت / خصومات)

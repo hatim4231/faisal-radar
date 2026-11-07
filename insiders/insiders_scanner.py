@@ -162,23 +162,27 @@ def score(buys: list[dict], price: float, df: pd.DataFrame) -> dict:
     days = (date.today() - datetime.strptime(last[:10], "%Y-%m-%d").date()).days
     above = (price / avg - 1) * 100 if avg else None
 
+    # الأوزان من الاختبار التاريخي (ملفات SEC، نوفمبر 2024 - أبريل 2026، قرار المستخدم):
+    # المنصب أقوى شرط (CEO/CFO/الرئيس)، العدد والمبلغ وقرب السعر من متوسطهم فرقهم بسيط
     pts, why = 0, []
-    c = 40 if n >= 3 else 30 if n == 2 else 15
-    pts += c
-    why.append(f"{n} مطّلع اشترى" + (" (Cluster قوي)" if n >= 2 else ""))
-    r = 20 if top else 12 if director else 8
+    r = 40 if top else 15 if director else 5
     pts += r
     why.append("المدير التنفيذي/المالي/الرئيس اشترى" if top else "عضو مجلس إدارة" if director else "مالك كبير")
-    a = 20 if total >= 250_000 else 15 if total >= 100_000 else 10
+    c = 20 if n >= 3 else 15 if n == 2 else 8
+    pts += c
+    why.append(f"{n} مطّلع اشترى" + (" (Cluster)" if n >= 2 else ""))
+    a = 10 if total >= 100_000 else 6
     pts += a
-    rec = 10 if days <= 7 else 7 if days <= 14 else 4
+    rec = 10 if days <= 7 else 6 if days <= 14 else 3
     pts += rec
-    near = 10 if above is not None and above <= 10 else 5 if above is not None and above <= 25 else 0
+    near = 5 if above is not None and above <= 25 else 0
     pts += near
     # الشارت: فوق قاع 20 يوم وما كسر قاع جديد = أفضل
     low20 = float(df["Low"].tail(20).min())
     stop = round(max(price * 0.85, low20 * 0.97), 4)
-    status = "ready" if pts >= 65 and (above is None or above <= 20) else "near" if pts >= 45 else "radar"
+    status = "ready" if pts >= 65 and top and (above is None or above <= 20) else "near" if pts >= 45 else "radar"
+    if pts >= 65 and not top:
+        why.append("«شراء قوي» يحتاج المدير التنفيذي أو المالي أو الرئيس")
     if above is not None and above > 30:
         status = "radar"
         why.append(f"السعر فوق متوسط شرائهم بـ {above:.0f}% — لا تطارد")
