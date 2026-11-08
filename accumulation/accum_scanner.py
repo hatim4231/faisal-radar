@@ -3,7 +3,7 @@
 🔍 رادار التجميع — يكشف الأسهم اللي فيها بصمات تجميع مضارب قبل الانطلاق.
 
 نفس الفلاتر العامة: 0.50-5$ (مع طبقة امتثال ناسداك)، الفوليوم، القيمة السوقية، الفلووت، بدون Warrants،
-الشورت 100 ألف وأقل، استبعاد التخفيف المتكرر، والأخبار بالعربي.
+الشورت 50 ألف وأقل (قرار المستخدم)، استبعاد التخفيف المتكرر، والأخبار بالعربي.
 تحذير خاص: ملف إعادة بيع (424B3 / F-1 / S-1) = أصحاب الأسهم جاهزين يبيعون — كثير من مضخات الأسهم الصينية يسبقها.
 
     python accumulation/accum_scanner.py --out site/accumulation/index.html
@@ -58,7 +58,7 @@ def run(cfg, tickers=None) -> dict:
         hist = json.loads(SHORT_HIST.read_text(encoding="utf-8"))
     except Exception:
         hist = {}
-    max_sh = cfg["behavior"].get("max_short_shares")  # None = الشورت مفتوح
+    max_sh = cfg["behavior"].get("max_short_shares")  # 50 ألف (None = مفتوح)
     rows, moved = [], 0
     for t, d in pre.items():
         inf = infos.get(t) or {}

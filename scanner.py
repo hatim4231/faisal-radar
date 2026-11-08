@@ -536,8 +536,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
                                                 "detail": "كسر أدنى قاع آخر 5 جلسات على فريم 4 ساعات"})
             r["irtikaz"]["score"] = max(0, r["irtikaz"]["score"] - 5)
 
-    # شرط الشورت: لا يرشح إلا سهم شورته 100 ألف أو أقل (config: max_short_shares)
-    max_sh = cfg["behavior"].get("max_short_shares")  # None = قرار المستخدم: الشورت مفتوح (للعرض بس)
+    # شرط الشورت (قرار المستخدم، نوفمبر 2026): فوق 50 ألف ما يترشح (config: behavior.max_short_shares، None = مفتوح)
+    max_sh = cfg["behavior"].get("max_short_shares")
     if True:
         for t in list(results):
             r = results[t]
@@ -593,18 +593,51 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
                             f"معها: {'، '.join(c['pos']) or '-'} · ضدها: {'، '.join(c['neg']) or '-'}")
         except Exception as e:
             log("أداة الثقة تعطلت:", repr(e)[:150])
+    # صفحة فيصل المطوّر: الحالات اللي تنعرض من config (scan.dev_page_statuses). قرار المستخدم (نوفمبر 2026):
+    # المطابق ✅ ثم القريب 🟡 ثم تحت الرادار 👀 بالترتيب، و«غير مطابق» ما ينعرض. لو «تحت الرادار» مو من الحالات المعروضة
+    # يبقى ملخص خفيف مطوي (ليش مو جاهز). النسخة الأصلية تعرض الكل زي ما هي.
+    from collections import Counter
+    all_rows, hidden, status_first = rows, None, False
+    show = cfg["scan"].get("dev_page_statuses")
+    if show and getattr(fr, "__name__", "") == "faisal_rules" and not explicit:
+        rows = [r for r in all_rows if r["irtikaz"]["status"] in show]
+        status_first = True
+        if "radar" not in show:
+            hidden = [radar_brief(r) for r in all_rows if r["irtikaz"]["status"] == "radar"]
+        n = Counter(r["irtikaz"]["status"] for r in rows)
+        log(f"صفحة فيصل المطوّر: {len(rows)} سهم (✅ {n['ready']} · 🟡 {n['near']} · 👀 {n['radar']})"
+            + (f" · مخفي تحت الرادار {len(hidden)}" if hidden is not None else ""))
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
         "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil, "excluded_hrt": excluded_hrt,
         "hrt_report": {k: hrt_info.get(k) for k in ("name", "period", "filed", "n")} if hrt_info else None,
+        "hidden_radar": hidden, "status_first": status_first,
+        "status_counts": dict(Counter(r["irtikaz"]["status"] for r in all_rows)),
     }
     (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
-    write_csv(rows)
+    write_csv(all_rows)
     log(f"خلص المسح في {payload['seconds']} ثانية — {len(rows)} سهم في التقرير")
-    write_summary(rows)
+    write_summary(all_rows)
     return payload
+
+
+def radar_brief(r: dict) -> dict:
+    """ملخص خفيف لسهم «تحت الرادار» (بدون شارت ولا أخبار): وين وصل وليش مو جاهز."""
+    I, p = r["irtikaz"], r.get("plan") or {}
+    why = []
+    if I.get("status_before_new_low"):
+        why.append("قاع جديد — ينتظر تماسك الدعم الثاني")
+    if I.get("status_before_compliance"):
+        why.append("امتثال ناسداك (تحت 1$)")
+    if any(x.get("name") == "الشورت غير معروف" for x in I.get("adjustments") or []):
+        why.append("الشورت غير معروف — ما يترشح لين يتأكد")
+    miss = [c.get("remaining") for c in sorted(I.get("checks") or [], key=lambda c: -(c.get("weight") or 0))
+            if not c.get("ok") and c.get("remaining")]
+    return {"symbol": r["symbol"], "flag": r.get("flag"), "country_ar": r.get("country_ar"), "price": r.get("price"),
+            "change_pct": r.get("change_pct"), "score": round(I["score"]), "rsi": r.get("rsi"),
+            "dist_support_pct": p.get("dist_support_pct"), "why": why + miss[:2]}
 
 
 def write_summary(rows):

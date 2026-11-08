@@ -87,7 +87,7 @@ def evaluate(sig: dict) -> None:
     D = pd.Timestamp(sig["D"]).date()
     s = pd.Timestamp(sig["D"]).tz_localize(NY) + pd.Timedelta(days=1)
     b = A.bars([sig["symbol"]], "5Min", s.tz_convert("UTC").to_pydatetime(),
-               min(now_ny(), s + pd.Timedelta(days=5)).tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
+               min(now_ny() - pd.Timedelta(minutes=16), s + pd.Timedelta(days=5)).tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
     if b is None or b.empty:
         return
     b = b[b.index.date > D]
@@ -192,13 +192,13 @@ def run(cfg) -> dict:
                 found.append(x)
     log(f"[الأفتر] يوم {D} · الأفتر {'خلص' if done else 'ما خلص (مبدئي)'} · قفزات محافظة: {len(found)}")
 
-    # 3) الفلاتر العامة: الشورت 100 ألف + التخفيف المتكرر (نسجل الكل ونفصل المؤهل)
+    # 3) الفلاتر العامة: الشورت (حد config، قرار المستخدم 50 ألف) + التخفيف المتكرر (نسجل الكل ونفصل المؤهل)
     try:
         ib = data.load_ib_short()
     except Exception:
         ib = {}
     infos = data.get_info([f["symbol"] for f in found], cfg) if found else {}
-    max_sh = cfg["behavior"].get("max_short_shares")  # None = الشورت مفتوح
+    max_sh = cfg["behavior"].get("max_short_shares")  # 50 ألف (None = مفتوح)
     for f in found:
         inf = infos.get(f["symbol"]) or {}
         sa = (ib.get(f["symbol"]) or {}).get("available")

@@ -29,7 +29,7 @@
   --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Twemoji Country Flags","IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
 .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
 .num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -130,6 +130,22 @@ ul.clean{margin:0;padding-right:18px}
 .newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:420px;overflow-y:auto;padding-left:6px}
 .newsitem .why{font-size:12px;color:var(--muted);margin-top:2px}
 </style>
+<script>
+/* أعلام الدول: ويندوز (كروم/إيدج) يعرض العلم حرفين مثل «US» ← خط أعلام Twemoji (CC-BY 4.0، country-flag-emoji-polyfill)
+   يتحمّل بس على الأجهزة اللي ما تعرض الأعلام. الملف في assets/ والاحتياط من jsDelivr. */
+(function(){try{
+  var F='"Twemoji Mozilla","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","EmojiOne Color","Android Emoji",sans-serif';
+  function px(t,s,c){t.clearRect(0,0,100,100);t.fillStyle=c;t.fillText(s,0,0);return t.getImageData(0,0,1,1).data.join(",");}
+  function ok(s){var c=document.createElement("canvas");c.width=c.height=1;var t=c.getContext("2d",{willReadFrequently:true});
+    t.textBaseline="top";t.font="100px "+F;t.scale(.01,.01);var w=px(t,s,"#fff"),b=px(t,s,"#000");return b===w&&b.indexOf("0,0,0,")!==0;}
+  if(window.FORCE_FLAG_FONT||(ok("\uD83D\uDE0A")&&!ok("\uD83C\uDDE8\uD83C\uDDED"))){
+    var p=(location.pathname.indexOf("/original/")>=0?"../":""),st=document.createElement("style");
+    st.textContent='@font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E0063,U+E0065,U+E0067,U+E006C,U+E006E,U+E0073-E0074,U+E0077,U+E007F;'+
+      'src:url("'+p+'assets/TwemojiCountryFlags.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.10/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}';
+    document.head.appendChild(st);
+  }
+}catch(e){}})();
+</script>
 </head>
 <body>
 <div class="wrap">
@@ -138,11 +154,13 @@ ul.clean{margin:0;padding-right:18px}
       <h1 id="h1">📡 رادار طريقة فيصل</h1>
       <div class="sub" id="meta"></div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <a class="btn" id="lnk-other" href="original/" style="text-decoration:none">📜 فيصل الأصلي</a>
       <a class="btn" id="lnk-abd" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
       <a class="btn" id="lnk-ins" href="insiders/" style="text-decoration:none">🟢 المطّلعين</a>
       <a class="btn" id="lnk-acc" href="accumulation/" style="text-decoration:none">🔍 التجميع</a>
+      <a class="btn" id="lnk-ah" href="afterhours/" style="text-decoration:none">🌙 الأفتر</a>
+      <a class="btn" id="lnk-sch" href="schools/" style="text-decoration:none">🧭 المدارس</a>
       <a class="btn" id="lnk-track" href="track/" style="text-decoration:none">📈 السجل</a>
       <button class="btn primary" id="rescan" style="display:none">🔄 تحديث المسح</button>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
@@ -152,6 +170,7 @@ ul.clean{margin:0;padding-right:18px}
   <div id="demo" class="demo" style="display:none">⚠ هذا تقرير تجريبي ببيانات وهمية (رموز DEMO). شغّل <span class="ltr">python scanner.py</span> على جهازك للبيانات الحقيقية.</div>
 
   <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
+  <details id="exclhrt" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="exclhrt-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles"></div>
 
   <div class="toolbar">
@@ -167,10 +186,12 @@ ul.clean{margin:0;padding-right:18px}
       <option value="rvol">الأعلى RVOL</option>
       <option value="float">الأقل فلووت</option>
       <option value="upside">الأكبر مساحة صعود</option>
+      <option value="conf">🎯 الأعلى ثقة</option>
     </select>
   </div>
   <div class="chips" id="chips"></div>
   <div class="list" id="list"></div>
+  <details id="hidradar" class="card" style="display:none;margin-top:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="hidradar-body" style="margin-top:8px"></div></details>
 
   <div class="disc">
     هذا الرادار أداة تعليمية تطبّق القواعد المكتوبة في دليل طريقة فيصل بشكل آلي (RSI، المتوسطات، الدعم، الفوليوم، السلوك السابق، التقسيم، الشورت...).
@@ -214,10 +235,13 @@ if (DATA && DATA.variant === "original"){
   document.getElementById("lnk-track").href = "../track/";
   document.getElementById("lnk-ins").href = "../insiders/";
   document.getElementById("lnk-acc").href = "../accumulation/";
+  document.getElementById("lnk-ah").href = "../afterhours/";
+  document.getElementById("lnk-sch").href = "../schools/";
 } else if (DATA) {
   document.getElementById("h1").textContent = "📡 رادار فيصل — المطوّر";
 }
 const STATUS = {ready:"✅ مطابق", near:"🟡 قريب", radar:"👀 رادار", no:"غير مطابق"};
+const RANK = {ready:0, near:1, radar:2, no:3};
 const MSTATUS = {ready:"🚀 زخم قوي", near:"🟡 زخم محتمل", no:"لا يوجد زخم"};
 let tab = "irtikaz", filt = null, tagF = null;
 
@@ -247,12 +271,14 @@ if (DATA && DATA.demo) $("#demo").style.display = "block";
 function tiles(){
   const c = k => stocks.filter(s => s.irtikaz.status === k).length;
   const m = stocks.filter(s => s.momentum.status !== "no").length;
+  const hid = DATA && DATA.hidden_radar;   // فيصل المطوّر: «تحت الرادار» مخفي (قرار المستخدم: نركز على المطابق والقريب)
   const T = [["ready","مطابق للشروط",c("ready")],["near","قريب (باقي شرط أو شرطين)",c("near")],
-             ["radar","تحت الرادار",c("radar")],["mom","زخم اليوم",m]];
+             hid ? ["hidden","تحت الرادار (مخفية)",hid.length] : ["radar","تحت الرادار",c("radar")],["mom","زخم اليوم",m]];
   $("#tiles").innerHTML = T.map(([k,l,n]) =>
     `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n}</b><span>${l}</span></div>`).join("");
   document.querySelectorAll(".tile").forEach(el => el.onclick = () => {
     const k = el.dataset.k;
+    if (k === "hidden"){ const d = $("#hidradar"); d.open = true; d.scrollIntoView({behavior:"smooth", block:"start"}); return; }
     if (k === "mom"){ setTab("momentum"); filt = null; }
     else { if (tab !== "irtikaz") setTab("irtikaz"); filt = filt === k ? null : k; }
     render();
@@ -295,6 +321,33 @@ function remainingList(s){
   return ch.filter(c => !c.ok && c.remaining).sort((a,b)=>b.weight-a.weight).map(c => c.remaining);
 }
 
+// 🎯 أداة الثقة
+const confColor = c => c.label === "عالية" ? "var(--good)" : c.label === "متوسطة" ? "var(--warn)" : "var(--bad)";
+function confLine(c){
+  return `<div class="left" style="color:${confColor(c)};font-weight:600">🎯 ثقة النجاح <span class="num">${Math.round(c.p*100)}%</span> (${esc(c.label)})`
+    + (c.base != null ? ` <span class="note">· متوسط التوصيات <span class="num">${Math.round(c.base*100)}%</span></span>` : "")
+    + (c.neg && c.neg.length ? ` <span class="note">· ضدها: ${c.neg.map(esc).join("، ")}</span>` : "") + `</div>`;
+}
+function confCard(c){
+  if (!c) return "";
+  return `<div class="card"><h3>🎯 أداة الثقة — احتمال نجاح التوصية</h3>
+    <div class="plan">
+      <div class="pbox"><span>احتمال النجاح</span><b class="num" style="color:${confColor(c)}">${Math.round(c.p*100)}%</b><span>الثقة: ${esc(c.label)}</span></div>
+      <div class="pbox"><span>متوسط توصيات فيصل (✅+🟡)</span><b class="num">${c.base != null ? Math.round(c.base*100)+"%" : "-"}</b><span>تاريخياً</span></div>
+      <div class="pbox"><span>✅ معها</span><b style="font-size:13px">${(c.pos||[]).map(esc).join("، ") || "-"}</b><span>أقوى الأسباب اللي ترفع الاحتمال</span></div>
+      <div class="pbox"><span>⚠ ضدها</span><b style="font-size:13px">${(c.neg||[]).map(esc).join("، ") || "-"}</b><span>أقوى الأسباب اللي تنزله</span></div>
+    </div>
+    ${c.similar ? `<div class="note" style="margin-top:8px;font-size:13.5px;color:var(--text)">📊 <b>توصيات سابقة بنفس مستوى الثقة (${esc(c.label)})</b> — ${Number(c.similar.n).toLocaleString("en")} حالة في فترات اختبار ما شافها النموذج:
+      نجحت <b class="num">${Math.round(c.similar.hit*100)}%</b> · خسرت <b class="num">${Math.round((c.similar.lose ?? c.similar.stop ?? 0)*100)}%</b> ·
+      لما تنجح متوسط الربح <b class="num" style="color:var(--good)">+${(c.similar.avg_win*100).toFixed(1)}%</b> ·
+      لما ما تنجح متوسط النتيجة <b class="num" style="color:var(--bad)">${((c.similar.avg_miss ?? c.similar.avg_loss ?? 0)*100).toFixed(1)}%</b> ·
+      متوسط النتيجة <b class="num">${c.similar.mean>=0?"+":""}${(c.similar.mean*100).toFixed(1)}%</b></div>` : ""}
+    <div class="note" style="margin-top:8px">النجاح = يوصل الهدف الأول قبل ما يسكر تحت الوقف خلال ${c.horizon || 20} جلسة (نفس سجل التوصيات).
+      ${c.label === "منخفضة" ? "<b>🔕 ثقة منخفضة: هالتوصية ما تنرسل بتيليجرام.</b> " : ""}${c.horizon === 10 ? "إذا ما وصل الهدف الأول خلال 10 جلسات الأفضل تطلع (أثبت طريقة خروج في الاختبار). " : ""}
+      محسوب من ${c.n_train ? Number(c.n_train).toLocaleString("en") : "آلاف"} حالة تاريخية (Alpaca) ومختبر على فترات ما شافها النموذج${c.version ? " · نسخة " + esc(c.version) : ""}.
+      احتمال مو ضمان — التزم بالوقف دائماً.</div></div>`;
+}
+
 function render(){
   tiles(); chips();
   const q = $("#q").value.trim().toUpperCase();
@@ -305,15 +358,17 @@ function render(){
   const key = $("#sort").value;
   const sc = s => tab === "irtikaz" ? s.irtikaz.score : s.momentum.score;
   const S = {
-    score: (a,b) => sc(b) - sc(a),
+    // فيصل المطوّر: المطابق ثم القريب ثم تحت الرادار، وداخل كل حالة الأعلى جاهزية (قرار المستخدم)
+    score: (a,b) => (DATA && DATA.status_first && tab === "irtikaz" ? (RANK[a.irtikaz.status] ?? 9) - (RANK[b.irtikaz.status] ?? 9) : 0) || (sc(b) - sc(a)),
     support: (a,b) => (a.plan.dist_support_pct ?? 1e9) - (b.plan.dist_support_pct ?? 1e9),
     rsi: (a,b) => (a.rsi ?? 1e9) - (b.rsi ?? 1e9),
     rvol: (a,b) => (b.rel_volume ?? 0) - (a.rel_volume ?? 0),
     float: (a,b) => (a.float ?? 1e12) - (b.float ?? 1e12),
     upside: (a,b) => (b.plan.upside_pct ?? -1e9) - (a.plan.upside_pct ?? -1e9),
+    conf: (a,b) => ((b.confidence||{}).p ?? -1) - ((a.confidence||{}).p ?? -1),
   };
   L.sort(S[key]);
-  if (!L.length){ $("#list").innerHTML = `<div class="empty">لا توجد أسهم بهذا الفلتر حالياً. ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">${DATA && DATA.hidden_radar && !filt && !q && tab === "irtikaz" ? "ما فيه سهم ✅ مطابق أو 🟡 قريب حالياً — اللي تحت الرادار تحت (مخفية)." : "لا توجد أسهم بهذا الفلتر حالياً."} ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
   $("#list").innerHTML = L.map(s => {
     const isI = tab === "irtikaz";
     const score = isI ? s.irtikaz.score : s.momentum.score;
@@ -330,7 +385,7 @@ function render(){
     const warn = !isI && s.momentum.warnings.length ? `<div class="left"><span class="k">⚠</span> ${esc(s.momentum.warnings[0])}</div>` : "";
     return `<div class="row" data-s="${esc(s.symbol)}">
       <div>
-        <div class="sym ltr">${esc(s.symbol)}</div>
+        <div class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</div>
         <div class="name" title="${esc(s.name)}">${esc(s.name)}</div>
         <div class="px"><span class="num">$${fp(s.price)}</span> <span class="num ${chg>=0?"up":"down"}">${fpct(chg)}</span></div>
       </div>
@@ -339,6 +394,7 @@ function render(){
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
+        ${isI && s.confidence ? confLine(s.confidence) : ""}
         ${s.dilution && s.dilution.level!=="none" && s.dilution.level!=="low" ? `<div class="left" style="color:${s.dilution.level==="high"?"var(--bad)":"var(--warn)"}">🏛 SEC: ${esc(s.dilution.hits[0].label)} (<span class="num">${esc(s.dilution.hits[0].form)} · ${esc(s.dilution.hits[0].date)}</span>)</div>` : ""}
         ${s.accum ? `<div class="left" style="color:var(--good)">${esc(s.accum.label)} (${Math.round(s.accum.score)}) — قاعدة ${s.accum.base_len} جلسة · ${esc(s.accum.signs.slice(0,3).join("، "))}</div>` : ""}
         ${s.compliance ? `<div class="left" style="color:${s.compliance.level==="block"?"var(--bad)":s.compliance.level==="info"?"var(--muted)":"var(--warn)"}">🏛 ${esc(s.compliance.why)}</div>` : ""}
@@ -421,7 +477,7 @@ function openDetail(sym){
   const s = stocks.find(x => x.symbol === sym); if (!s) return;
   openSym = sym;
   const p = s.plan, I = s.irtikaz, M = s.momentum;
-  $("#dtitle").innerHTML = `<span class="sym ltr">${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · ${esc(s.country||"")} · بيانات ${esc(s.date)}</div>`;
+  $("#dtitle").innerHTML = `<span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span>${s.country_ar ? ` <span class="note">${esc(s.country_ar)}</span>` : ""} <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · ${esc(s.country||"")} · بيانات ${esc(s.date)}</div>`;
   const rs = s.reverse_splits.length ? s.reverse_splits.map(r => `${r.ratio} (${r.date}، قبل ${r.days_ago} يوم)`).join("<br>") : "لا يوجد خلال سنتين";
   const h4 = s.h4 ? `RSI 4س: <b class="num">${s.h4.rsi}</b> · ${s.h4.new_low_recent ? "<span style='color:var(--bad)'>كسر قاع 5 جلسات</span>" : "ما كسر قاع 5 جلسات ✓"} · شموع 20%+: <span class="num">${s.h4.big_candles}</span>` : "يظهر للمرشحين فقط";
   const news = newsHTML(s.news);
@@ -439,6 +495,7 @@ function openDetail(sym){
       <div class="legend"><span><i style="background:var(--ma20)"></i>MA20</span><span><i style="background:var(--ma50)"></i>MA50</span><span><i style="background:var(--good)"></i>الدعم</span><span><i style="background:var(--zone);height:9px"></i>منطقة الطلب</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--accent)"></i>الأهداف الأربعة</span></div>
     </div>
 
+    ${confCard(s.confidence)}
     <div class="card"><h3>📋 خطة فيصل المقترحة (Limit داخل منطقة الطلب — لا تشتري من العرض)</h3>
       <div class="plan">
         <div class="pbox"><span>الدعم الحقيقي</span><b class="num">${fp(p.support)}</b><span>${esc(p.support_kind)} · لمسات ${p.support_touches}</span></div>
@@ -558,6 +615,30 @@ if (LIVE){
   }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
 })();
 render();
+
+(function(){
+  const hr = DATA && DATA.hidden_radar;
+  if (!hr) return;
+  const box = document.getElementById("hidradar"); box.style.display = "";
+  box.querySelector("summary").textContent = "📡 تحت الرادار: " + hr.length + " سهم — مخفية عشان نركز على المطابق والقريب (اضغط للعرض)";
+  document.getElementById("hidradar-body").innerHTML = (hr.length ? hr.map(function(x){
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)">' + (x.flag ? '<span title="' + esc(x.country_ar||"") + '">' + x.flag + '</span> ' : "") +
+      '<b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">· جاهزية <span class="num">' + x.score + '%</span> · عن الدعم <span class="num">' + fpct(x.dist_support_pct) + '</span> · RSI <span class="num">' + (x.rsi ?? "-") + '</span></span>' +
+      ((x.why||[]).length ? '<div class="note">ليش مو جاهز: ' + x.why.map(esc).join(" · ") + '</div>' : "") + '</div>';
+  }).join("") : '<div class="note">ما فيه.</div>') +
+    '<div class="note" style="margin-top:6px">قرارك: الصفحة تعرض ✅ المطابق و🟡 القريب بس. أي سهم من هذي إذا اكتملت شروطه يطلع فوق تلقائياً بالمسح الجاي.</div>';
+})();
+
+(function(){
+  const ex = (DATA && DATA.excluded_hrt) || [];
+  if (!ex.length) return;
+  const box = document.getElementById("exclhrt"); if (!box) return; box.style.display = "";
+  const per = ex[0].period || "";
+  box.querySelector("summary").textContent = "⛔ مستبعد لأن صندوق HRT من الملاك: " + ex.length + " سهم (اضغط للتفاصيل)";
+  document.getElementById("exclhrt-body").innerHTML = ex.map(function(x){
+    return '<span style="display:inline-block;margin:3px 8px 3px 0"><b class="ltr">' + esc(x.symbol) + '</b> <span class="note num">' + Number(x.shares||0).toLocaleString("en") + ' سهم</span></span>';
+  }).join("") + '<div class="note" style="margin-top:6px">قرار المستخدم: الأسهم اللي يملك فيها HRT Financial LP (Hudson River Trading) ما تترشح. المصدر: تقرير 13F في SEC لنهاية ' + esc(per) + ' — التقرير يطلع بعد الربع بـ 45 يوم، فالملكية ممكن تكون تغيرت.</div>';
+})();
 </script>
 </body>
 </html>

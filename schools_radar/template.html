@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار المدارس</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --info:#5b5bd6; --info-bg:#ececfd;
+  --up:#16a36a; --down:#e04848; --ma20:#e39a1c; --ma50:#7c5cd6; --zone:rgba(19,149,92,.13);
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+    --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+  --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Twemoji Country Flags","IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.demo{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{outline:2px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;background:var(--panel2);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:inherit;padding:6px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
+input[type=search]{flex:1;min-width:140px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;display:grid;grid-template-columns:150px 1fr 210px;gap:14px;align-items:center}
+.row:hover{border-color:var(--accent)}
+.sym{font-weight:700;font-size:17px}
+.name{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.px{font-size:14px}
+.up{color:var(--up)} .down{color:var(--down)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:600}
+.left{font-size:13px;margin-top:5px}
+.left .k{color:var(--warn);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.tag.g{background:var(--good-bg);color:var(--good);border-color:transparent}
+.tag.w{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.tag.b{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag.i{background:var(--info-bg);color:var(--info);border-color:transparent}
+.score{display:flex;flex-direction:column;gap:5px}
+.score .top{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.badge.ready{background:var(--good-bg);color:var(--good)}
+.badge.near{background:var(--warn-bg);color:var(--warn)}
+.badge.radar{background:var(--info-bg);color:var(--info)}
+.badge.no{background:var(--panel2);color:var(--muted)}
+.pct{font-size:20px;font-weight:700}
+.bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+/* detail */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20}
+.overlay.on{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(860px,100%);background:var(--bg);z-index:21;overflow-y:auto;transform:translateX(-102%);transition:transform .2s ease;border-right:1px solid var(--line)}
+.drawer.on{transform:none}
+.dhead{position:sticky;top:0;background:var(--bg);padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:2}
+#dtitle{min-width:0;flex:1} #dtitle .name{white-space:normal} #dclose{flex-shrink:0}
+.dbody{padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.check{display:grid;grid-template-columns:22px 1fr 60px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);align-items:start}
+.check:last-child{border-bottom:0}
+.check .ic{font-size:15px;line-height:1.4}
+.check .t{font-weight:600;font-size:14px}
+.check .d{color:var(--muted);font-size:13px}
+.check .r{color:var(--warn);font-size:13px;font-weight:500}
+.check .p{font-size:12px;color:var(--muted);text-align:left}
+.mini{height:5px;background:var(--panel2);border-radius:99px;margin-top:4px;overflow:hidden}
+.mini i{display:block;height:100%}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pbox{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.pbox span{display:block;color:var(--muted);font-size:12px}
+.pbox b{font-size:16px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.newsitem{padding:9px 0;border-bottom:1px solid var(--line)} .newsitem:last-of-type{border-bottom:0}
+.newsitem .nt{font-weight:600;font-size:14px} .newsitem .ns{font-size:13.5px;margin:3px 0;line-height:1.7}
+.news a{color:var(--accent);text-decoration:none}
+.news li{margin-bottom:6px;font-size:13.5px}
+.links a{color:var(--accent);margin-left:14px;font-size:13.5px;text-decoration:none}
+.note{font-size:12.5px;color:var(--muted)}
+.disc{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+ul.clean{margin:0;padding-right:18px}
+@media (max-width:820px){
+  .row{grid-template-columns:1fr;gap:8px}
+  .name{max-width:none}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .plan{grid-template-columns:repeat(2,1fr)}
+}
+.sent{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.sent.positive{background:var(--good-bg);color:var(--good)} .sent.negative{background:var(--bad-bg);color:var(--bad)} .sent.neutral{background:var(--panel2);color:var(--muted)}
+.newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:420px;overflow-y:auto;padding-left:6px}
+.newsitem .why{font-size:12px;color:var(--muted);margin-top:2px}
+
+.sch{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;margin:2px 4px 2px 0}
+.sch.classic{background:var(--info-bg);color:var(--info)} .sch.wyckoff{background:var(--warn-bg);color:var(--warn)} .sch.elliott{background:var(--good-bg);color:var(--good)}
+.badge.strong{background:var(--good-bg);color:var(--good)} .badge.good{background:var(--warn-bg);color:var(--warn)} .badge.watch{background:var(--info-bg);color:var(--info)}
+.conf{font-size:13px;font-weight:700}
+.setupbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px}
+.setupbox .t{font-weight:700;font-size:14px}
+</style>
+<script>
+/* أعلام الدول: ويندوز (كروم/إيدج) يعرض العلم حرفين مثل «US» ← خط أعلام Twemoji (CC-BY 4.0، country-flag-emoji-polyfill)
+   يتحمّل بس على الأجهزة اللي ما تعرض الأعلام. الملف في assets/ والاحتياط من jsDelivr. */
+(function(){try{
+  var F='"Twemoji Mozilla","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","EmojiOne Color","Android Emoji",sans-serif';
+  function px(t,s,c){t.clearRect(0,0,100,100);t.fillStyle=c;t.fillText(s,0,0);return t.getImageData(0,0,1,1).data.join(",");}
+  function ok(s){var c=document.createElement("canvas");c.width=c.height=1;var t=c.getContext("2d",{willReadFrequently:true});
+    t.textBaseline="top";t.font="100px "+F;t.scale(.01,.01);var w=px(t,s,"#fff"),b=px(t,s,"#000");return b===w&&b.indexOf("0,0,0,")!==0;}
+  if(window.FORCE_FLAG_FONT||(ok("\uD83D\uDE0A")&&!ok("\uD83C\uDDE8\uD83C\uDDED"))){
+    var p="../",st=document.createElement("style");
+    st.textContent='@font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E0063,U+E0065,U+E0067,U+E006C,U+E006E,U+E0073-E0074,U+E0077,U+E007F;'+
+      'src:url("'+p+'assets/TwemojiCountryFlags.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.10/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}';
+    document.head.appendChild(st);
+  }
+}catch(e){}})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>🧭 رادار المدارس</h1><div class="sub" id="meta"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
+      <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" href="../abdullah/" style="text-decoration:none">🌊 عبدالله</a>
+      <a class="btn" href="../insiders/" style="text-decoration:none">🟢 المطّلعين</a>
+      <a class="btn" href="../accumulation/" style="text-decoration:none">🔍 التجميع</a>
+      <a class="btn" href="../afterhours/" style="text-decoration:none">🌙 الأفتر</a>
+      <a class="btn" href="../track/" style="text-decoration:none">📈 السجل</a>
+      <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
+      <button class="btn" id="theme">🌓</button>
+    </div>
+  </header>
+  <div class="card" style="margin-bottom:12px;border-color:var(--warn)">🔇 <b>رادار تجريبي صامت:</b> ما يرسل تيليجرام. فرص 🎯 قوي و🟡 جيد تنحفظ في <a href="../track/" style="color:var(--accent)">سجل التوصيات</a> (10 جلسات)،
+    ومع كل وحدة 3 أسهم عشوائية من نفس اليوم بنفس الهدف والوقف ونفس التذبذب — عشان نعرف هل النمط فعلاً يفرق.
+    <div class="note" style="margin-top:6px">⚠ في الاختبار التاريخي (877 سهم، سبتمبر 2024 → أكتوبر 2026) <b>ما تفوق على الدخول العشوائي بنفس الهدف والوقف</b>.
+    🎲 تحت كل سهم: كم مرة يوصل الهدف الأول قبل الوقف لو دخلت عشوائي بنفس المسافات — نسبة النجاح العالية غالباً سببها إن الهدف قريب، مو النمط.</div></div>
+  <div class="card" style="margin-bottom:12px"><b>الفكرة:</b> نبحث عن اللحظة اللي تتفق فيها المدارس الثلاث على نفس السهم:
+    <span class="sch classic">📐 الكلاسيكية</span> (اختراق ثم إعادة اختبار · قاع مزدوج W · علم صاعد)
+    <span class="sch wyckoff">⚖️ وايكوف</span> (سبرنق + اختبار · إشارة قوة ثم آخر نقطة دعم)
+    <span class="sch elliott">〰️ إليوت</span> (نهاية الموجة الثانية · نهاية تصحيح ABC).
+    <div class="note" style="margin-top:6px">كل فرصة لها دخول ووقف وهدفين من منطق المدرسة نفسها. <b>التوافق</b> = كم مدرسة تشوف فرصة بنفس الوقت.
+    ادخل بطلبات Limit (لا تشتري من العرض) والتزم بالوقف. ليس توصية شراء أو بيع.</div>
+    <div id="modelnote" class="note" style="margin-top:6px"></div></div>
+  <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
+  <details id="exclhrt" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="exclhrt-body" style="margin-top:8px"></div></details>
+  <div class="tiles" id="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
+  <div class="toolbar" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+    <select id="sort" class="btn"><option value="status">الترتيب: الأقوى</option><option value="conf">الأكثر توافق</option><option value="q">الأعلى جودة</option></select>
+    <select id="schoolf" class="btn"><option value="">كل المدارس</option><option value="classic">📐 الكلاسيكية</option><option value="wyckoff">⚖️ وايكوف</option><option value="elliott">〰️ إليوت</option></select>
+  </div>
+  <div class="list" id="list"></div>
+  <div class="disc">الكواشف: الكلاسيكية (مقاومة انلمست مرتين+ ← اختراق بفوليوم ← رجوع يثبت فوقها · قاعين ±6% بينهم قمة 12%+ · سارية 30%+ ثم علم ضيق هادي)
+    · وايكوف (نطاق تجميع بعد هبوط ← كسر كاذب تحت الدعم ورجوع ← اختبار بفوليوم أقل · اختراق النطاق بفوليوم 1.8x+ ← رجوع هادي لسقفه)
+    · إليوت (موجة 1 +25%+ من قاع بفوليوم ← تصحيح 38-88% بفوليوم أقل ← الموجة 3 · تصحيح ABC و C ≈ A ← ارتداد).
+    الوقف من منطق النموذج (تحت القاع/السبرنق/مستوى 78.6%)، والهدف الأول أقرب مقاومة. ليس توصية شراء أو بيع.</div>
+</div>
+<div class="overlay" id="ov"></div>
+<script>
+const DATA = /*__DATA__*/null;
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const fM = n => n == null ? "-" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n >= 1e3 ? (n/1e3).toFixed(0)+"K" : String(Math.round(n));
+const pc = (a, b) => (a && b) ? ((b/a - 1) * 100) : null;
+const fpc = v => v == null ? "-" : (v > 0 ? "+" : "") + v.toFixed(0) + "%";
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const SENT = {positive:["✅","إيجابي"], negative:["❌","سلبي"], neutral:["➖","محايد"]};
+function sentBadge(n){ const s = SENT[n.sentiment] || SENT.neutral; return `<span class="sent ${n.sentiment||"neutral"}">${s[0]} ${s[1]}</span>`; }
+function newsHTML(list){
+  if (!(list||[]).length) return `<div class="note">لا توجد أخبار حديثة لهذا السهم</div>`;
+  return list.map(n => `<div class="newsitem"><div class="nt">${sentBadge(n)} ${esc(n.title_ar || n.title)}</div>
+      ${(n.text_ar || n.summary_ar || n.summary) ? `<div class="newsfull">${esc(n.text_ar || n.summary_ar || n.summary)}</div>` : ""}
+      <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span></div></div>`).join("");
+}
+const SCH = {classic:["📐","الكلاسيكية"], wyckoff:["⚖️","وايكوف"], elliott:["〰️","إليوت"]};
+const ST = {strong:["🎯 قوي","strong"], good:["🟡 جيد","good"], watch:["👀 مراقبة","watch"]};
+const stocks = (DATA && DATA.stocks) || [];
+let filt = null;
+$("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx) }catch(e){} render(); };
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · فحص <span class="num">${DATA.scanned}</span> سهم · ${esc(DATA.source||"")}` : "";
+if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
+if (DATA && DATA.model && DATA.model.tier_stats){ const t = DATA.model.tier_stats, h = t["عالية"] || {};
+  $("#modelnote").innerHTML = `🎯 <b>نموذج الثقة</b> (مختبر على ${esc((DATA.model.period||[]).join(" → "))}، خارج العينة): الثقة العالية وصلت الهدف الأول خلال ${DATA.model.horizon||10} جلسات في <b class="num">${Math.round((h.hit||0)*100)}%</b> من الحالات (لو عشوائي بنفس الهدف/الوقف <span class="num">${Math.round((h.expected_random||0)*100)}%</span>).`; }
+function schoolTags(s){ return s.schools.map(k => `<span class="sch ${k}">${SCH[k][0]} ${SCH[k][1]}</span>`).join(""); }
+function chart(s){
+  const c = s.chart, n = c.c.length, W = 800, H = 300, VH = 46, pad = {l:8, r:58, t:10, b:22}, p = s.plan;
+  let lo = Math.min(...c.l.filter(x=>x!=null), p.stop), hi = Math.max(...c.h.filter(x=>x!=null), p.t1); lo *= 0.97; hi *= 1.03;
+  const ph = H - VH - pad.t - pad.b, y = v => pad.t + (hi - v) / (hi - lo) * ph;
+  const cw = (W - pad.l - pad.r) / n, x = i => pad.l + i * cw + cw / 2;
+  const up = cssv("--up"), dn = cssv("--down"), line = cssv("--line"), muted = cssv("--muted");
+  let g = "";
+  for (let k = 0; k <= 4; k++){ const v = lo + (hi-lo)*k/4; g += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${line}"/><text x="${W-pad.r+4}" y="${y(v)+4}" fill="${muted}" font-size="11">${fp(v)}</text>`; }
+  const rg = (s.setups.find(x => x.range) || {}).range;
+  if (rg) g += `<rect x="${pad.l}" width="${W-pad.l-pad.r}" y="${y(rg[1])}" height="${Math.max(2, y(rg[0])-y(rg[1]))}" fill="${cssv("--zone")}" stroke="${cssv("--warn")}" stroke-dasharray="3 3"/>`;
+  const hl = (v, col, label, dash) => v == null || v > hi || v < lo ? "" : `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="5 4"':""}/><text x="${pad.l+4}" y="${y(v)-3}" fill="${col}" font-size="11">${label}</text>`;
+  const mal = (arr, col) => { let d = ""; arr.forEach((v,i) => { if (v != null) d += (d ? "L" : "M") + x(i) + " " + y(v); }); return d ? `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.2" opacity=".8"/>` : ""; };
+  g += mal(c.ma20, cssv("--ma20")) + mal(c.ma50, cssv("--ma50"));
+  g += hl(p.entry, cssv("--accent"), "الدخول", false) + hl(p.stop, cssv("--bad"), "الوقف", true) + hl(p.t1, cssv("--good"), "الهدف 1", true) + hl(p.t2, cssv("--good"), "الهدف 2", true);
+  const vmax = Math.max(...c.v);
+  for (let i = 0; i < n; i++){ const o = c.o[i], h = c.h[i], l = c.l[i], cl = c.c[i]; if (cl == null) continue;
+    const col = cl >= o ? up : dn, bw = Math.max(1, cw * 0.62);
+    g += `<line x1="${x(i)}" x2="${x(i)}" y1="${y(h)}" y2="${y(l)}" stroke="${col}"/><rect x="${x(i)-bw/2}" width="${bw}" y="${y(Math.max(o,cl))}" height="${Math.max(1,Math.abs(y(o)-y(cl)))}" fill="${col}"/>`;
+    const vh = c.v[i] / vmax * (VH - 6); g += `<rect x="${x(i)-bw/2}" width="${bw}" y="${H-pad.b-vh}" height="${vh}" fill="${col}" opacity=".45"/>`; }
+  [[0,"start"],[Math.floor(n/2),"middle"],[n-1,"end"]].forEach(([i,a]) => g += `<text x="${x(i)}" y="${H-6}" fill="${muted}" font-size="11" text-anchor="${a}">${c.d[i]}</text>`);
+  return `<svg style="direction:ltr;width:100%;height:auto" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+}
+function tiles(){
+  const n = k => stocks.filter(s => s.status === k).length;
+  $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
+  document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = filt === el.dataset.k ? null : el.dataset.k; render(); });
+}
+function randLine(s){
+  if (s.rand_p == null) return "";
+  return `<div class="left note">🎲 لو دخلت عشوائي بنفس الهدف والوقف: يوصل الهدف الأول قبل الوقف خلال 10 جلسات في <b class="num">${Math.round(s.rand_p*100)}%</b> من المرات (تاريخياً)</div>`;
+}
+function trustLine(t){
+  if (!t) return "";
+  const col = t.label === "عالية" ? "var(--good)" : t.label === "متوسطة" ? "var(--warn)" : "var(--bad)";
+  return `<div class="left" style="color:${col};font-weight:600">🎯 ثقة الوصول للهدف الأول خلال ${t.horizon||10} جلسات: <span class="num">${Math.round(t.p*100)}%</span> (${esc(t.label)})</div>`;
+}
+function render(){
+  tiles();
+  const sf = $("#schoolf").value, key = $("#sort").value, order = {strong:0, good:1, watch:2};
+  let L = stocks.filter(s => (!filt || s.status === filt) && (!sf || s.schools.includes(sf)));
+  const S = {status:(a,b) => (order[a.status]-order[b.status]) || (b.confluence-a.confluence) || (b.quality-a.quality),
+             trust:(a,b) => ((b.trust||{}).p ?? -1) - ((a.trust||{}).p ?? -1), conf:(a,b) => (b.confluence-a.confluence) || (b.quality-a.quality),
+             q:(a,b) => b.quality-a.quality};
+  L.sort(S[key]);
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">ما فيه أسهم بهذا الفلتر حالياً.</div>`; return; }
+  $("#list").innerHTML = L.map(s => { const [lab,cls] = ST[s.status] || ["-","watch"], p = s.plan, n0 = (s.news||[])[0];
+    return `<div class="card" style="cursor:pointer" data-s="${esc(s.symbol)}">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+        <div><span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct}%</span>
+          <div class="name" style="max-width:none">${esc(s.name)}</div></div>
+        <div style="text-align:left"><span class="badge ${cls}">${lab}</span> <span class="conf">توافق ${s.confluence}/3</span></div>
+      </div>
+      <div style="margin-top:6px">${schoolTags(s)} ${s.setups.map(x => `<span class="tag">${esc(x.name_ar)} · ${x.quality}</span>`).join(" ")}</div>
+      <div class="facts" style="margin-top:8px">
+        <span>الدخول: <b class="num">${fp(p.entry)}</b></span><span>الوقف: <b class="num" style="color:var(--bad)">${fp(p.stop)}</b> (${fpc(pc(p.entry,p.stop))})</span>
+        <span>الهدف 1: <b class="num" style="color:var(--good)">${fp(p.t1)}</b> (${fpc(pc(p.entry,p.t1))})</span>${p.t2 ? `<span>الهدف 2: <b class="num">${fp(p.t2)}</b> (${fpc(pc(p.entry,p.t2))})</span>` : ""}
+        <span>الفلووت: <b class="num">${fM(s.float)}</b></span><span>الشورت: <b class="num">${s.short!=null?fM(s.short):"؟"}</b></span>
+      </div>
+      ${trustLine(s.trust)}
+      ${randLine(s)}
+      ${(s.flags||[]).map(f => `<div class="left" style="color:${/⛔|⚠/.test(f)?"var(--bad)":"var(--muted)"}">${esc(f)}</div>`).join("")}
+      ${n0 ? `<div class="left">${sentBadge(n0)} ${esc(n0.title_ar || n0.title)}</div>` : ""}
+      <div class="note" style="margin-top:4px">اضغط للتفاصيل ▾</div>
+    </div>`; }).join("");
+  document.querySelectorAll("#list .card").forEach(el => el.onclick = () => toggle(el));
+}
+function toggle(el){
+  const s = stocks.find(x => x.symbol === el.dataset.s); const ex = el.querySelector(".more");
+  if (ex){ ex.remove(); return; }
+  const d = document.createElement("div"); d.className = "more"; d.style.marginTop = "10px"; d.onclick = e => e.stopPropagation();
+  const sims = s.trust && s.trust.similar ? `<div class="note" style="margin-top:6px">📊 فرص سابقة بنفس مستوى الثقة (${esc(s.trust.label)}): وصلت الهدف <b class="num">${Math.round(s.trust.similar.hit*100)}%</b> · لما تنجح <b class="num" style="color:var(--good)">+${(s.trust.similar.avg_win*100).toFixed(1)}%</b> · لما ما تنجح <b class="num" style="color:var(--bad)">${(s.trust.similar.avg_miss*100).toFixed(1)}%</b></div>` : "";
+  d.innerHTML = `${chart(s)}
+    <div class="legend"><span><i style="background:var(--accent)"></i>الدخول</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--good)"></i>الأهداف</span><span><i style="background:var(--zone);height:9px"></i>نطاق وايكوف</span><span><i style="background:var(--ma20)"></i>MA20</span><span><i style="background:var(--ma50)"></i>MA50</span></div>
+    ${sims}
+    ${s.setups.map(x => `<div class="setupbox"><div class="t"><span class="sch ${x.school}">${SCH[x.school][0]} ${SCH[x.school][1]}</span> ${esc(x.name_ar)} <span class="note">· جودة ${x.quality}</span></div>
+      <ul class="clean note" style="margin-top:4px">${x.why.map(w => `<li>${esc(w)}</li>`).join("")}</ul>
+      <div class="note">دخول <span class="num">${fp(x.entry)}</span> · وقف <span class="num">${fp(x.stop)}</span> · هدف 1 <span class="num">${fp(x.t1)}</span>${x.t2 ? ` · هدف 2 <span class="num">${fp(x.t2)}</span>` : ""}</div></div>`).join("")}
+    ${s.dilution ? `<div style="margin-top:8px;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: ${(s.dilution.hits||[]).slice(0,4).map(h => esc(h.form+" "+h.date+" — "+h.label)).join(" · ") || "ما لقى الفحص الآلي ملفات طرح — تأكد بنفسك"}</div>` : ""}
+    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}`;
+  el.appendChild(d);
+}
+$("#sort").onchange = render; $("#schoolf").onchange = render;
+(function(){ const ex = (DATA && DATA.excluded_dilution) || []; if (!ex.length) return;
+  const box = $("#excl"); box.style.display = ""; box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم";
+  $("#excl-body").innerHTML = ex.map(x => `<div class="note"><b class="ltr">${esc(x.symbol)}</b> — ${x.events.map(e => esc(e.date+" "+e.what)).join(" · ")}</div>`).join(""); })();
+(function(){ const ex = (DATA && DATA.excluded_hrt) || []; if (!ex.length) return;
+  const box = $("#exclhrt"); box.style.display = ""; box.querySelector("summary").textContent = "⛔ مستبعد لأن صندوق HRT من الملاك: " + ex.length + " سهم";
+  $("#exclhrt-body").innerHTML = ex.map(x => `<span style="display:inline-block;margin:3px 8px 3px 0"><b class="ltr">${esc(x.symbol)}</b></span>`).join("") + '<div class="note">قرار المستخدم: الأسهم اللي يملك فيها HRT Financial LP (Hudson River Trading) ما تترشح — تقرير 13F في SEC.</div>'; })();
+render();
+</script>
+</body>
+</html>
