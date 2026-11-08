@@ -138,7 +138,7 @@ ul.clean{margin:0;padding-right:18px}
       <h1 id="h1">📡 رادار طريقة فيصل</h1>
       <div class="sub" id="meta"></div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
       <a class="btn" id="lnk-other" href="original/" style="text-decoration:none">📜 فيصل الأصلي</a>
       <a class="btn" id="lnk-abd" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
       <a class="btn" id="lnk-ins" href="insiders/" style="text-decoration:none">🟢 المطّلعين</a>
@@ -175,6 +175,7 @@ ul.clean{margin:0;padding-right:18px}
   </div>
   <div class="chips" id="chips"></div>
   <div class="list" id="list"></div>
+  <details id="hidradar" class="card" style="display:none;margin-top:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="hidradar-body" style="margin-top:8px"></div></details>
 
   <div class="disc">
     هذا الرادار أداة تعليمية تطبّق القواعد المكتوبة في دليل طريقة فيصل بشكل آلي (RSI، المتوسطات، الدعم، الفوليوم، السلوك السابق، التقسيم، الشورت...).
@@ -253,12 +254,14 @@ if (DATA && DATA.demo) $("#demo").style.display = "block";
 function tiles(){
   const c = k => stocks.filter(s => s.irtikaz.status === k).length;
   const m = stocks.filter(s => s.momentum.status !== "no").length;
+  const hid = DATA && DATA.hidden_radar;   // فيصل المطوّر: «تحت الرادار» مخفي (قرار المستخدم: نركز على المطابق والقريب)
   const T = [["ready","مطابق للشروط",c("ready")],["near","قريب (باقي شرط أو شرطين)",c("near")],
-             ["radar","تحت الرادار",c("radar")],["mom","زخم اليوم",m]];
+             hid ? ["hidden","تحت الرادار (مخفية)",hid.length] : ["radar","تحت الرادار",c("radar")],["mom","زخم اليوم",m]];
   $("#tiles").innerHTML = T.map(([k,l,n]) =>
     `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n}</b><span>${l}</span></div>`).join("");
   document.querySelectorAll(".tile").forEach(el => el.onclick = () => {
     const k = el.dataset.k;
+    if (k === "hidden"){ const d = $("#hidradar"); d.open = true; d.scrollIntoView({behavior:"smooth", block:"start"}); return; }
     if (k === "mom"){ setTab("momentum"); filt = null; }
     else { if (tab !== "irtikaz") setTab("irtikaz"); filt = filt === k ? null : k; }
     render();
@@ -347,7 +350,7 @@ function render(){
     conf: (a,b) => ((b.confidence||{}).p ?? -1) - ((a.confidence||{}).p ?? -1),
   };
   L.sort(S[key]);
-  if (!L.length){ $("#list").innerHTML = `<div class="empty">لا توجد أسهم بهذا الفلتر حالياً. ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">${DATA && DATA.hidden_radar && !filt && !q && tab === "irtikaz" ? "ما فيه سهم ✅ مطابق أو 🟡 قريب حالياً — اللي تحت الرادار تحت (مخفية)." : "لا توجد أسهم بهذا الفلتر حالياً."} ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
   $("#list").innerHTML = L.map(s => {
     const isI = tab === "irtikaz";
     const score = isI ? s.irtikaz.score : s.momentum.score;
@@ -594,6 +597,19 @@ if (LIVE){
   }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
 })();
 render();
+
+(function(){
+  const hr = DATA && DATA.hidden_radar;
+  if (!hr) return;
+  const box = document.getElementById("hidradar"); box.style.display = "";
+  box.querySelector("summary").textContent = "📡 تحت الرادار: " + hr.length + " سهم — مخفية عشان نركز على المطابق والقريب (اضغط للعرض)";
+  document.getElementById("hidradar-body").innerHTML = (hr.length ? hr.map(function(x){
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)">' + (x.flag ? '<span title="' + esc(x.country_ar||"") + '">' + x.flag + '</span> ' : "") +
+      '<b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">· جاهزية <span class="num">' + x.score + '%</span> · عن الدعم <span class="num">' + fpct(x.dist_support_pct) + '</span> · RSI <span class="num">' + (x.rsi ?? "-") + '</span></span>' +
+      ((x.why||[]).length ? '<div class="note">ليش مو جاهز: ' + x.why.map(esc).join(" · ") + '</div>' : "") + '</div>';
+  }).join("") : '<div class="note">ما فيه.</div>') +
+    '<div class="note" style="margin-top:6px">قرارك: الصفحة تعرض ✅ المطابق و🟡 القريب بس. أي سهم من هذي إذا اكتملت شروطه يطلع فوق تلقائياً بالمسح الجاي.</div>';
+})();
 
 (function(){
   const ex = (DATA && DATA.excluded_hrt) || [];
