@@ -98,7 +98,10 @@ def run_one(args):
                 continue
             h10, x10, r10, _ = outcome(fut, px, s["stop"], s["t1"], 10)
             h20, x20, r20, _ = outcome(fut, px, s["stop"], s["t1"], 20)
+            fh, fl_, fc = fut["High"].to_numpy(float), fut["Low"].to_numpy(float), fut["Close"].to_numpy(float)
             row = {**base, "kind": "setup", "setup": s["setup"], "school": s["school"], "quality": s["quality"],
+                   "mfe10": fh[:10].max() / px - 1, "mfe20": fh.max() / px - 1, "mae10": fl_[:10].min() / px - 1,
+                   "c10": fc[min(9, len(fc) - 1)] / px - 1, "c20": fc[-1] / px - 1,
                    "type": s.get("type"), "stop_pct": st_pct, "t1_pct": t1_pct,
                    "t2_pct": ((s["t2"] / s["entry"] - 1) * 100) if s.get("t2") else None,
                    "hit10": h10, "x10": x10, "res10": r10, "hit20": h20, "x20": x20, "res20": r20}
@@ -258,6 +261,36 @@ def main():
         print(line("تحت متوسط 50", C[C.above_ma50 == 0], H))
         print(line("بدون ملفات تخفيف 90 يوم", C[C.dil90 == 0], H))
         print(line("فيه ملفات تخفيف", C[C.dil90 >= 1], H))
+    # ==== اقتناص الطيارات: هل الأنماط تمسك الأسهم اللي تطير؟ (بدون هدف/وقف) ====
+    PH = np.array(R.ph.tolist()); PC = np.array(R.pc.tolist())
+    R["mfe10"], R["mfe20"] = PH[:, :10].max(1) - 1, PH.max(1) - 1
+    R["c10"], R["c20"] = PC[:, 9] - 1, PC[:, -1] - 1
+    qa = np.quantile(R.atr20, [0.2, 0.4, 0.6, 0.8]); qp = np.quantile(R.price_log, [1 / 3, 2 / 3])
+    R["cell"] = np.searchsorted(qa, R.atr20) * 3 + np.searchsorted(qp, R.price_log)
+    Sx["cell"] = np.searchsorted(qa, Sx.atr20) * 3 + np.searchsorted(qp, Sx.price_log)
+    cellm = R.groupby("cell").agg(r30=("mfe20", lambda x: (x >= 0.3).mean()), r50=("mfe20", lambda x: (x >= 0.5).mean()),
+                                  r15_10=("mfe10", lambda x: (x >= 0.15).mean()), c20=("c20", "mean"), c10=("c10", "mean"))
+
+    def runners(name, g):
+        g = g[g["first"]] if "first" in g else g
+        if len(g) < 40:
+            return f"  {name:<34} n={len(g)} (قليل)"
+        e = cellm.reindex(g.cell)
+        a30, b30 = (g.mfe20 >= 0.3).mean(), e.r30.mean()
+        a50, b50 = (g.mfe20 >= 0.5).mean(), e.r50.mean()
+        a15, b15 = (g.mfe10 >= 0.15).mean(), e.r15_10.mean()
+        per = ((g.mfe20 >= 0.3).astype(float).values - e.r30.values)
+        per = pd.Series(per, index=g.index).groupby(g.t).mean()
+        ci = 1.96 * per.std() / max(1, len(per)) ** 0.5
+        return (f"  {name:<34} n={len(g):<5} طار +30% خلال 20: {pct(a30)} (عشوائي مماثل {pct(b30)} ← {(a30 - b30) * 100:+.1f} ±{ci * 100:.1f}) · "
+                f"+50%: {pct(a50)} ({pct(b50)}) · +15% خلال 10: {pct(a15)} ({pct(b15)}) · عائد 20 جلسة {g.c20.mean() * 100:+.1f}% ({e.c20.mean() * 100:+.1f}%)")
+    print("\n==== اقتناص الطيارات (أقصى صعود بدون هدف/وقف) مقابل أسهم عشوائية بنفس التذبذب والسعر ====")
+    for code in list(SC.SCHOOLS) + ["COMBO"]:
+        print(runners(f"{code} {SC.SETUP_AR.get(code, 'الخطة المجمعة')[:26]}", Sx[Sx.setup == code]))
+    C_ = Sx[Sx.setup == "COMBO"]
+    print(runners("توافق 2+ مدرسة", C_[C_.confluence >= 2]))
+    print(runners("جودة 80+", C_[C_.quality >= 80]))
+    print(runners("سوق صاعد + فوق متوسط 50", C_[(C_.iwm_up == 1) & (C_.above_ma50 == 1)]))
     # الثبات
     mid = Sx.date.sort_values().iloc[len(Sx) // 2]
     print(f"\n==== الثبات: النص الأول (قبل {mid}) مقابل الثاني — 10 جلسات ====")
