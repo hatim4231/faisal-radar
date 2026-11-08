@@ -27,6 +27,38 @@
    "t1": 2.1052,
    "t2": 2.2009,
    "stop": 1.7224
+  },
+  {
+   "symbol": "OMH",
+   "D": "2026-11-06",
+   "close": 7.37,
+   "ah_high": 16.98,
+   "ah_last": 15.4997,
+   "ah_vwap": 14.3376,
+   "jump_pct": 130.4,
+   "hold_pct": 85,
+   "ah_vol": 6665167,
+   "rth_vol": 3973771,
+   "limit": 14.3376,
+   "name": "Ohmyhome Limited",
+   "price": 15.4997,
+   "float": 457595,
+   "short": 55556,
+   "short_src": "Short Interest",
+   "flags": [],
+   "news": [],
+   "country": "Singapore",
+   "flag": "🇸🇬",
+   "country_ar": "سنغافورة",
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_level": "medium",
+   "eligible": true,
+   "t1": 15.7714,
+   "t2": 16.4882,
+   "stop": 12.9038,
+   "pm_min_vol": 466561
   }
  ]
 }
