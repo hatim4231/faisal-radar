@@ -79,6 +79,9 @@ jobs:
       - name: رادار المدارس (تجريبي — بالسجل بدون تيليجرام)
         run: python schools_radar/schools_scanner.py --out site/schools/index.html || echo "رادار المدارس تعطل — نكمل"
 
+      - name: رادار الطيارات (تجريبي — بالسجل بدون تيليجرام)
+        run: python runners_radar/runners_scanner.py --out site/runners/index.html || echo "رادار الطيارات تعطل — نكمل"
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -113,6 +116,9 @@ jobs:
           fi
           if [ -f site/schools/index.html ]; then
             npx --yes staticrypt@3.5.4 site/schools/index.html "${OPTS[@]}" --template-title "🧭 رادار المدارس" -d site/schools
+          fi
+          if [ -f site/runners/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/runners/index.html "${OPTS[@]}" --template-title "🚀 رادار الطيارات" -d site/runners
           fi
 
       - uses: actions/upload-pages-artifact@v3

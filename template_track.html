@@ -159,11 +159,12 @@ ul.clean{margin:0;padding-right:18px}
       <a class="btn" href="../accumulation/" style="text-decoration:none">🔍 التجميع</a>
       <a class="btn" href="../afterhours/" style="text-decoration:none">🌙 الأفتر</a>
       <a class="btn" href="../schools/" style="text-decoration:none">🧭 المدارس</a>
+      <a class="btn" href="../runners/" style="text-decoration:none">🚀 الطيارات</a>
     </div>
   </header>
-  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة (<b>فيصل المطوّر والمدارس: 10 جلسات</b>).
-    <br><span class="note">🔕 = ينحفظ هنا بس وما ينرسل بتيليجرام: توصيات فيصل المطوّر بثقة منخفضة، ورادار 🔍 التجميع، ورادار 🧭 المدارس (تجريبي).</span>
-    <br><span class="note">🎲 المدارس: مع كل توصية نتابع 3 أسهم عشوائية من نفس اليوم بنفس الهدف والوقف ونفس التذبذب — الرادار ينفع بس إذا نجاحه أعلى منها بوضوح.</span>
+  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة (<b>فيصل المطوّر والمدارس: 10 جلسات · الطيارات: 60 جلسة وهدفها +100%</b>).
+    <br><span class="note">🔕 = ينحفظ هنا بس وما ينرسل بتيليجرام: توصيات فيصل المطوّر بثقة منخفضة، ورادار 🔍 التجميع، و🧭 المدارس و🚀 الطيارات (تجريبيين).</span>
+    <br><span class="note">🎲 المدارس والطيارات: مع كل توصية نتابع 3 أسهم عشوائية من نفس اليوم بنفس الهدف والوقف ونفس التذبذب — الرادار ينفع بس إذا نجاحه أعلى منها بوضوح.</span>
     <span class="note">«نجح» = وصل الهدف الأول قبل الوقف. نفس اليوم فيه الوقف والهدف = نحسبه وقف (الأحوط). هذا سجل لقياس الرادار — مو توصية شراء.</span></div>
   <div id="stats" class="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
   <div class="toolbar">
@@ -192,16 +193,17 @@ function statsHTML(){
       <div class="note" style="margin-top:6px">❌ وقف ${s.stop_pct ?? "-"}% · ⏳ مفتوحة ${s.open} · متوسط أقصى ربح ${pc(s.avg_max_gain)}<br>
       المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
       تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}
-      ${k === "schools" ? vsRandHTML() : ""}
+      ${(k === "schools" || k === "runners") ? vsRandHTML(k) : ""}
       ${k === "faisal_dev" ? "<br>🎯 حسب الثقة: " + ["عالية","متوسطة","منخفضة"].map(l => { const c = DATA.stats_status["faisal_dev:conf:"+l] || {}; return l + " " + (c.hit_pct ?? "-") + "% من " + (c.n ?? 0); }).join(" · ") : ""}</div></div>`;
   }).join("");
 }
-function vsRandHTML(){
-  const v = (DATA.vs_random || {}).schools;
+function vsRandHTML(k){
+  const v = (DATA.vs_random || {})[k];
   if (!v) return "";
-  if (!v.n) return `<br>🎲 المقارنة مع العشوائي تبدأ لما تكمل أول توصيات 10 جلسات (عندنا ${v.n_total || 0} توصية).`;
+  const H = v.horizon || 10;
+  if (!v.n) return `<br>🎲 المقارنة مع العشوائي تبدأ لما تكمل أول توصيات ${H} جلسة (عندنا ${v.n_total || 0} توصية).`;
   const d = (v.hit_pct != null && v.twin_pct != null) ? (v.hit_pct - v.twin_pct) : null;
-  return `<br>🎲 <strong style="color:var(--text)">مقارنة صادقة</strong> (${v.n} توصية كملت 10 جلسات): نجحت <strong class="num" style="color:var(--text)">${v.hit_pct ?? "-"}%</strong>`
+  return `<br>🎲 <strong style="color:var(--text)">مقارنة صادقة</strong> (${v.n} توصية كملت ${H} جلسة): نجحت <strong class="num" style="color:var(--text)">${v.hit_pct ?? "-"}%</strong>`
     + ` · العشوائي بنفس اليوم والهدف والوقف <strong class="num" style="color:var(--text)">${v.twin_pct ?? "-"}%</strong> (${v.n_twins} سهم)`
     + (d != null ? ` ← <strong class="num" style="color:${d > 0 ? "var(--good)" : "var(--bad)"}">${d > 0 ? "+" : ""}${d.toFixed(1)} نقطة</strong>` : "")
     + (v.exp_pct != null ? ` · المتوقع تاريخياً ${v.exp_pct}%` : "")
