@@ -593,22 +593,28 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
                             f"معها: {'، '.join(c['pos']) or '-'} · ضدها: {'، '.join(c['neg']) or '-'}")
         except Exception as e:
             log("أداة الثقة تعطلت:", repr(e)[:150])
-    # قرار المستخدم (نوفمبر 2026): صفحة فيصل المطوّر تعرض الجاهز ✅ وقريب الجاهزية 🟡 بس، عشان نركز.
-    # «تحت الرادار» ينشال من القائمة ويبقى ملخص خفيف مخفي (ليش مو جاهز). النسخة الأصلية تعرض الكل زي ما هي.
-    all_rows, hidden = rows, None
+    # صفحة فيصل المطوّر: الحالات اللي تنعرض من config (scan.dev_page_statuses). قرار المستخدم (نوفمبر 2026):
+    # المطابق ✅ ثم القريب 🟡 ثم تحت الرادار 👀 بالترتيب، و«غير مطابق» ما ينعرض. لو «تحت الرادار» مو من الحالات المعروضة
+    # يبقى ملخص خفيف مطوي (ليش مو جاهز). النسخة الأصلية تعرض الكل زي ما هي.
+    from collections import Counter
+    all_rows, hidden, status_first = rows, None, False
     show = cfg["scan"].get("dev_page_statuses")
     if show and getattr(fr, "__name__", "") == "faisal_rules" and not explicit:
         rows = [r for r in all_rows if r["irtikaz"]["status"] in show]
-        hidden = [radar_brief(r) for r in all_rows if r["irtikaz"]["status"] == "radar"]
-        log(f"صفحة فيصل المطوّر: {len(rows)} سهم (✅ + 🟡) · مخفي تحت الرادار {len(hidden)}")
-    from collections import Counter
+        status_first = True
+        if "radar" not in show:
+            hidden = [radar_brief(r) for r in all_rows if r["irtikaz"]["status"] == "radar"]
+        n = Counter(r["irtikaz"]["status"] for r in rows)
+        log(f"صفحة فيصل المطوّر: {len(rows)} سهم (✅ {n['ready']} · 🟡 {n['near']} · 👀 {n['radar']})"
+            + (f" · مخفي تحت الرادار {len(hidden)}" if hidden is not None else ""))
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
         "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil, "excluded_hrt": excluded_hrt,
         "hrt_report": {k: hrt_info.get(k) for k in ("name", "period", "filed", "n")} if hrt_info else None,
-        "hidden_radar": hidden, "status_counts": dict(Counter(r["irtikaz"]["status"] for r in all_rows)),
+        "hidden_radar": hidden, "status_first": status_first,
+        "status_counts": dict(Counter(r["irtikaz"]["status"] for r in all_rows)),
     }
     (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
     write_csv(all_rows)

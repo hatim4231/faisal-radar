@@ -66,8 +66,8 @@
     "deep_scan_min_score": 45,
     "deep_scan_max": 100,
     "report_min_score": 40,
-    "dev_page_statuses": ["ready", "near"],
-    "_dev_page_statuses_help": "قرار المستخدم: صفحة فيصل المطوّر تعرض ✅ مطابق و🟡 قريب بس (تحت الرادار ملخص مخفي) — null = يعرض الكل",
+    "dev_page_statuses": ["ready", "near", "radar"],
+    "_dev_page_statuses_help": "قرار المستخدم: صفحة فيصل المطوّر تعرض ✅ مطابق ثم 🟡 قريب ثم 👀 تحت الرادار (بالترتيب)، بدون «غير مطابق». شيل radar = تنطوي تحت. null = يعرض الكل",
     "data_source": "alpaca",
     "_data_source_help": "alpaca = أسعار Alpaca (كل البورصات، فوليوم البري والأفتر صحيح) وياهو احتياط · yahoo = ياهو فقط"
   },

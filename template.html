@@ -241,6 +241,7 @@ if (DATA && DATA.variant === "original"){
   document.getElementById("h1").textContent = "📡 رادار فيصل — المطوّر";
 }
 const STATUS = {ready:"✅ مطابق", near:"🟡 قريب", radar:"👀 رادار", no:"غير مطابق"};
+const RANK = {ready:0, near:1, radar:2, no:3};
 const MSTATUS = {ready:"🚀 زخم قوي", near:"🟡 زخم محتمل", no:"لا يوجد زخم"};
 let tab = "irtikaz", filt = null, tagF = null;
 
@@ -357,7 +358,8 @@ function render(){
   const key = $("#sort").value;
   const sc = s => tab === "irtikaz" ? s.irtikaz.score : s.momentum.score;
   const S = {
-    score: (a,b) => sc(b) - sc(a),
+    // فيصل المطوّر: المطابق ثم القريب ثم تحت الرادار، وداخل كل حالة الأعلى جاهزية (قرار المستخدم)
+    score: (a,b) => (DATA && DATA.status_first && tab === "irtikaz" ? (RANK[a.irtikaz.status] ?? 9) - (RANK[b.irtikaz.status] ?? 9) : 0) || (sc(b) - sc(a)),
     support: (a,b) => (a.plan.dist_support_pct ?? 1e9) - (b.plan.dist_support_pct ?? 1e9),
     rsi: (a,b) => (a.rsi ?? 1e9) - (b.rsi ?? 1e9),
     rvol: (a,b) => (b.rel_volume ?? 0) - (a.rel_volume ?? 0),
