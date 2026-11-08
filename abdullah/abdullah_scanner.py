@@ -117,7 +117,7 @@ def run(cfg, tickers=None, deep=True) -> dict:
         readings = hist.get(t, [])
         sa = ib.get(t, {}).get("available")
         short_val, short_src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
-        if short_val is not None and short_val > A["max_short_shares"] and not explicit:
+        if short_val is not None and A.get("max_short_shares") and short_val > A["max_short_shares"] and not explicit:
             continue
         a.update({
             "symbol": t, "name": inf.get("shortName") or inf.get("longName") or t,
@@ -125,7 +125,7 @@ def run(cfg, tickers=None, deep=True) -> dict:
             "market_cap": mcap, "float": flt, "shares_out": inf.get("sharesOutstanding"),
             "short_interest": inf.get("sharesShort"),
             "short_available": sa, "short_readings": readings[-8:],
-            "short_used": {"value": short_val, "source": short_src, "max": A["max_short_shares"]},
+            "short_used": {"value": short_val, "source": short_src, "max": A.get("max_short_shares")},
             "flags": [],
         })
         if short_val is None:
@@ -174,7 +174,17 @@ def run(cfg, tickers=None, deep=True) -> dict:
                 h = dl["hits"][0]
                 r["flags"].insert(0, f"{'⛔' if dl['level'] == 'high' else '⚠'} SEC: {h['label']} ({h['form']} · {h['date']})")
     rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
-    payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
+    import flags
+    import holders
+    flags.annotate(rows)
+    excluded_hrt = []
+    if data.load_cfg()["behavior"].get("exclude_hrt"):
+        try:
+            holders.annotate(rows, log)
+            rows, excluded_hrt = holders.exclude(rows, log)
+        except Exception as e:
+            log("فحص HRT تعطل:", repr(e)[:150])
+    payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "excluded_hrt": excluded_hrt,
                "source": "الأسعار: Alpaca · الشركة والأخبار: Yahoo · الشورت المتاح: Interactive Brokers",
                "scanned": len(daily), "with_wave": len(results),
                "moved": counts.get("moved", 0), "invalid": counts.get("invalid", 0), "seconds": round(time.time() - t0),

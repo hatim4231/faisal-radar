@@ -71,9 +71,10 @@ h2{font-size:17px;margin:22px 0 10px}
   </header>
   <div class="muted-box">🔇 رادار تجريبي صامت: ما يرسل تيليجرام. نراقب نتايجه الحقيقية قبل ما نعتمده.</div>
   <div class="card"><b>الفكرة:</b> سهم قفز في الأفتر 15% أو أكثر بفوليوم حقيقي، وحافظ على 70% من قفزته لين آخر الأفتر.
-    <b>الخطة:</b> طلب Limit عند <b>متوسط سعر الأفتر (VWAP)</b> وتنتظر البري ينزل له. الهدف +10% ثم +15%، والوقف −10%. والبيع غالباً بالبري أو أول الافتتاح.
-    <div class="note" style="margin-top:6px">الاختبار التاريخي (سنة كاملة، بيانات Alpaca): بالدخول عند متوسط الأفتر وصل +10% قبل −10% في 62% من الحالات، و71% إذا فوليوم البري قوي.
-    أما اللي يشتري بآخر سعر وهو طاير فوصل الهدف 34% بس. <b>لا تشتري من العرض.</b> ليس توصية شراء.</div></div>
+    <b>الخطة:</b> طلب Limit عند <b>متوسط سعر الأفتر (VWAP)</b> وتنتظر البري ينزل له، <b>بشرط فوليوم البري لين لحظة الشراء ≥ 7% من فوليوم الأفتر</b>.
+    الهدف +10%، وإلا بيع عند الإغلاق. الوقف −10%. <b>لا تبيع عند الافتتاح</b>: الاختبار بيّن إن البري يطلع وبعدين يطيح قبل الافتتاح (متوسط −2.7%).
+    <div class="note" style="margin-top:6px">الاختبار التاريخي (سنة كاملة، بيانات Alpaca): بالدخول عند متوسط الأفتر، متوسط الصفقة +1.4%، ومع شرط فوليوم البري +2.2% (رابحة 60%، وقف 37%).
+    الربح بسيط وفرق العرض والطلب في البري ممكن ياكل جزء منه — استخدم Limit دائماً. اللي يشتري بآخر سعر وهو طاير وصل الهدف 34% بس. <b>لا تشتري من العرض.</b> ليس توصية شراء.</div></div>
 
   <h2>📊 النتايج الحقيقية</h2>
   <div class="tiles" id="tiles"></div>
@@ -113,7 +114,7 @@ function card(f){
   const ok = f.eligible;
   return `<div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-      <div><span class="sym">${esc(f.symbol)}</span> <span class="note">${esc(f.name || "")}</span></div>
+      <div><span class="sym">${f.flag ? `<span title="${esc(f.country_ar||"")}">${f.flag}</span> ` : ""}${esc(f.symbol)}</span> <span class="note">${esc(f.name || "")}</span></div>
       <span class="badge ${ok ? "b-good" : "b-bad"}">${ok ? "مؤهل" : "خارج الشروط"}</span></div>
     <div class="note" style="margin-top:4px">إغلاق <span class="num">${fp(f.close)}</span> · أعلى الأفتر <span class="num">${fp(f.ah_high)}</span> (+${f.jump_pct}%)
       · آخر سعر <span class="num">${fp(f.ah_last)}</span> · حافظ ${f.hold_pct}% · فوليوم الأفتر <span class="num">${fk(f.ah_vol)}</span>
@@ -123,6 +124,7 @@ function card(f){
       <div class="pbox"><span>الهدف 1 (+10%)</span><b class="num" style="color:var(--good)">${fp(f.t1)}</b></div>
       <div class="pbox"><span>الهدف 2 (+15%)</span><b class="num" style="color:var(--good)">${fp(f.t2)}</b></div>
       <div class="pbox"><span>الوقف (−10%)</span><b class="num" style="color:var(--bad)">${fp(f.stop)}</b></div></div>
+    ${f.pm_min_vol ? `<div class="note" style="margin-top:6px">📊 ادخل بس إذا فوليوم البري لين لحظة الشراء ≥ <b class="num">${fk(f.pm_min_vol)}</b> سهم (7% من فوليوم الأفتر). بيع: +10% وإلا عند الإغلاق.</div>` : ""}
     ${(f.flags || []).length ? `<div class="note" style="margin-top:6px;color:var(--bad)">${f.flags.map(esc).join(" · ")}</div>` : ""}
     ${f.dilution_level ? `<div class="note" style="margin-top:4px;color:var(--warn)">🏛 تنبيه تخفيف من SEC (${esc(f.dilution_level)})</div>` : ""}
     ${f.result ? `<div style="margin-top:6px"><span class="badge ${(RES[f.result]||["",""])[1]}">${(RES[f.result]||[f.result])[0]}</span></div>` : ""}
@@ -137,7 +139,7 @@ $("#final").innerHTML = (D.last_final || []).length ? D.last_final.map(card).joi
 
 const H = D.history || [];
 $("#hist").innerHTML = `<tr><th>السهم</th><th>يوم الأفتر</th><th>القفزة</th><th>حافظ</th><th>Limit</th><th>أعلى البري</th><th>النتيجة</th><th>مؤهل</th></tr>` +
-  (H.length ? H.map(s => `<tr><td><b>${esc(s.symbol)}</b></td><td class="num">${esc(s.D)}</td><td class="num">+${s.jump_pct}%</td><td class="num">${s.hold_pct}%</td>
+  (H.length ? H.map(s => `<tr><td>${s.flag||""} <b>${esc(s.symbol)}</b></td><td class="num">${esc(s.D)}</td><td class="num">+${s.jump_pct}%</td><td class="num">${s.hold_pct}%</td>
     <td class="num">${fp(s.limit)}</td><td class="num">${s.pm_high_pct == null ? "—" : (s.pm_high_pct > 0 ? "+" : "") + s.pm_high_pct + "%"}</td>
     <td>${s.result ? `<span class="badge ${(RES[s.result]||["",""])[1]}">${(RES[s.result]||[s.result])[0]}</span>${s.flat_pct != null ? ` <span class="num note">${s.flat_pct}%</span>` : ""}` : `<span class="note">ننتظر</span>`}</td>
     <td>${s.eligible ? "✅" : "—"}</td></tr>`).join("") : `<tr><td colspan="8" class="note">فاضي</td></tr>`);

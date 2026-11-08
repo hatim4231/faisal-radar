@@ -162,23 +162,27 @@ def score(buys: list[dict], price: float, df: pd.DataFrame) -> dict:
     days = (date.today() - datetime.strptime(last[:10], "%Y-%m-%d").date()).days
     above = (price / avg - 1) * 100 if avg else None
 
+    # الأوزان من الاختبار التاريخي (ملفات SEC، نوفمبر 2024 - أبريل 2026، قرار المستخدم):
+    # المنصب أقوى شرط (CEO/CFO/الرئيس)، العدد والمبلغ وقرب السعر من متوسطهم فرقهم بسيط
     pts, why = 0, []
-    c = 40 if n >= 3 else 30 if n == 2 else 15
-    pts += c
-    why.append(f"{n} مطّلع اشترى" + (" (Cluster قوي)" if n >= 2 else ""))
-    r = 20 if top else 12 if director else 8
+    r = 40 if top else 15 if director else 5
     pts += r
     why.append("المدير التنفيذي/المالي/الرئيس اشترى" if top else "عضو مجلس إدارة" if director else "مالك كبير")
-    a = 20 if total >= 250_000 else 15 if total >= 100_000 else 10
+    c = 20 if n >= 3 else 15 if n == 2 else 8
+    pts += c
+    why.append(f"{n} مطّلع اشترى" + (" (Cluster)" if n >= 2 else ""))
+    a = 10 if total >= 100_000 else 6
     pts += a
-    rec = 10 if days <= 7 else 7 if days <= 14 else 4
+    rec = 10 if days <= 7 else 6 if days <= 14 else 3
     pts += rec
-    near = 10 if above is not None and above <= 10 else 5 if above is not None and above <= 25 else 0
+    near = 5 if above is not None and above <= 25 else 0
     pts += near
     # الشارت: فوق قاع 20 يوم وما كسر قاع جديد = أفضل
     low20 = float(df["Low"].tail(20).min())
     stop = round(max(price * 0.85, low20 * 0.97), 4)
-    status = "ready" if pts >= 65 and (above is None or above <= 20) else "near" if pts >= 45 else "radar"
+    status = "ready" if pts >= 65 and top and (above is None or above <= 20) else "near" if pts >= 45 else "radar"
+    if pts >= 65 and not top:
+        why.append("«شراء قوي» يحتاج المدير التنفيذي أو المالي أو الرئيس")
     if above is not None and above > 30:
         status = "radar"
         why.append(f"السعر فوق متوسط شرائهم بـ {above:.0f}% — لا تطارد")
@@ -198,7 +202,7 @@ def run(cfg, tickers=None) -> dict:
         tickers = [t for t in tickers if not (len(t) == 5 and t[-1] in "WRU") and "-" not in t]
     daily = data.download_daily(tickers, cfg)
     U = dict(cfg["universe"])
-    U["min_price"] = max(U["min_price"], 1.0)  # قرار المستخدم: المطّلعين يبقى من 1$ (التوسيع لـ 0.50$ لفيصل وعبدالله فقط)
+    # قرار المستخدم (نوفمبر 2026): كل الرادارات 0.7$ إلى 10$ (كان المطّلعين من 1$)
     pre = {t: d for t, d in daily.items()
            if explicit or (U["min_price"] <= float(d["Close"].iloc[-1]) <= U["max_price"]
                            and float(d["Volume"].tail(30).mean()) >= U["min_avg_volume"] * 0.7)}
@@ -234,7 +238,7 @@ def run(cfg, tickers=None) -> dict:
         ib = data.load_ib_short()
     except Exception:
         ib = {}
-    max_sh = cfg["behavior"].get("max_short_shares", 100000)
+    max_sh = cfg["behavior"].get("max_short_shares")  # None = الشورت مفتوح
     rows = []
     for t, buys in found.items():
         d = pre[t]
@@ -245,7 +249,7 @@ def run(cfg, tickers=None) -> dict:
             continue
         sa = (ib.get(t) or {}).get("available")
         sv, src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
-        if sv is not None and sv > max_sh and not explicit:
+        if sv is not None and max_sh and sv > max_sh and not explicit:
             continue
         if mcap:
             buys = [x for x in buys if x["value"] <= mcap * 0.5]
@@ -260,9 +264,10 @@ def run(cfg, tickers=None) -> dict:
             "change_pct": round((price / prev - 1) * 100, 2), "date": str(d.index[-1])[:10],
             "market_cap": mcap, "float": flt, "short_used": {"value": sv, "source": src}, **s,
             "chart": {"d": [str(i)[:10] for i in tail.index], "c": [round(float(x), 4) for x in tail["Close"]]},
-            "tags": [], "flags": [] if sv is not None else ["الشورت غير معروف"],
+            "tags": [], "flags": [] if (sv is not None or not max_sh) else ["الشورت غير معروف"],
+            "country": inf.get("country"),
         })
-        if sv is None and rows[-1]["status"] in ("ready", "near"):
+        if sv is None and max_sh and rows[-1]["status"] in ("ready", "near"):
             rows[-1]["status"] = "radar"
 
     # الأخبار + التخفيف + استبعاد التخفيف المتكرر
@@ -282,10 +287,21 @@ def run(cfg, tickers=None) -> dict:
     news_tools.save_cache()
     sec_tools.annotate(rows, log)
     rows, excluded = sec_tools.exclude_repeat_diluters(rows, log)
+    import flags
+    import holders
+    flags.annotate(rows)
+    excluded_hrt = []
+    if cfg["behavior"].get("exclude_hrt"):
+        try:
+            holders.annotate(rows, log)
+            rows, excluded_hrt = holders.exclude(rows, log)
+        except Exception as e:
+            log("فحص HRT تعطل:", repr(e)[:150])
     order = {"ready": 0, "near": 1, "radar": 2}
     rows.sort(key=lambda r: (order[r["status"]], -r["score"]))
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "SEC EDGAR (Form 4) + الأسعار: Alpaca + الشركة: Yahoo", "scanned": len(pre), "found": len(found),
+               "excluded_hrt": excluded_hrt,
                "min_total": MIN_TOTAL, "lookback": LOOKBACK, "seconds": round(time.time() - t0),
                "stocks": rows, "excluded_dilution": excluded}
     from collections import Counter

@@ -620,6 +620,12 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
         c.detail = "لا توجد مقاومات واضحة فوق (قمم تاريخية؟)"
     checks.append(c)
 
+    # أوزان الشروط من الإعدادات (اختبار سنة): نفس حساب كل شرط، بس نعيد توزيع النقاط
+    for x in checks:
+        nw = (IR.get("weights") or {}).get(x.key)
+        if nw is not None and x.weight:
+            x.got = x.got * nw / x.weight
+            x.weight = nw
     base = sum(x.got for x in checks)
 
     # ---- تعديلات السلوك (مكافآت / خصومات)
@@ -640,7 +646,7 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
         adj.append(("لا تطارد", -15, f"صعد {up_from_low:.0f}% من قاع آخر 20 يوم — انتظر Retest"))
     if short_avail is not None:
         # طريقة فيصل: الشورت = المتاح للاقتراض (IB)، مو Short Interest الرسمي القديم
-        if short_avail > BH.get("max_short_shares", 100000):
+        if short_avail > (BH.get("short_penalty_shares") or BH.get("max_short_shares") or 100000):
             adj.append(("شورت متاح مرتفع", -8, f"الشورت المتاح {short_avail:,.0f} سهم"))
     elif short_pct_float is not None and short_pct_float >= BH["high_short_pct_float"]:
         adj.append(("شورت مرتفع", -8, f"الشورت {short_pct_float:.1f}% من الفلووت"))
@@ -727,7 +733,7 @@ def analyze(df: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
        15 if fr["max_pct"] >= BH["former_runner_pct"] else 15 * fr["max_pct"] / BH["former_runner_pct"] * 0.5,
        f"أكبر انفجار سابق +{fr['max_pct']:.0f}%")
     if short_avail is not None:
-        short_ok = short_avail <= BH.get("max_short_shares", 100000)
+        short_ok = short_avail <= (BH.get("short_penalty_shares") or BH.get("max_short_shares") or 100000)
         s_txt = f"المتاح {short_avail:,.0f} سهم"
     else:
         short_ok = (short_pct_float is None or short_pct_float < 10)
