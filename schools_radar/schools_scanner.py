@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 """
-🧭 رادار المدارس الثلاث — كلاسيكي + وايكوف + إليوت (الكواشف في schools.py).
+🧭 رادار المدارس — كلاسيكي + وايكوف + إليوت (الكواشف في schools.py). تجريبي وصامت (بدون تيليجرام).
 
 نفس الفلاتر العامة (0.7-10$، الفوليوم، القيمة السوقية، الفلووت، بدون Warrants، امتثال ناسداك تحت 1$،
 استبعاد التخفيف المتكرر، استبعاد الأسهم اللي HRT من ملاكها، علم الدولة، الأخبار بالعربي).
+
+المقارنة الصادقة (درس الاختبار التاريخي: نسبة نجاح النمط تجي غالباً من بعد الهدف/الوقف):
+- rand_p: كم مرة يوصل الهدف الأول قبل الإغلاق تحت الوقف خلال 10 جلسات لو دخلت عشوائي بنفس الهدف والوقف
+  ونفس شريحة التذبذب (جدول schools_baseline.json من الاختبار، 17 ألف صفقة عشوائية).
+- twins: لكل فرصة 🎯/🟡 ثلاث أسهم عشوائية من نفس المسح ونفس شريحة التذبذب ← السجل يتابعها بنفس الهدف والوقف
+  (نفس اليوم ونفس السوق) عشان نقارن نتيجة الرادار الحقيقية بالعشوائي.
 
     python schools_radar/schools_scanner.py --out site/schools/index.html
 """
@@ -37,6 +43,35 @@ log = data.log
 OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
 MODEL_PATH = ROOT / "schools_model.json"
+BASE_PATH = ROOT / "schools_baseline.json"
+N_TWINS = 3
+
+
+def load_baseline() -> dict | None:
+    try:
+        return json.loads(BASE_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def atr20(d) -> float:
+    c, h, l = (d[k].to_numpy(float) for k in ("Close", "High", "Low"))
+    return float(((h - l) / c)[-20:].mean() * 100)
+
+
+def rand_p(B: dict | None, atr: float, entry, stop, t1) -> float | None:
+    """نسبة وصول الهدف الأول قبل الإغلاق تحت الوقف خلال 10 جلسات لدخول عشوائي بنفس الهدف والوقف ونفس شريحة التذبذب."""
+    if not B or not entry or not stop or not t1:
+        return None
+    u, s = (t1 / entry - 1) * 100, (1 - stop / entry) * 100
+    if u <= 0 or s <= 0:
+        return None
+    T = np.asarray(B["hit_permille"][int(np.searchsorted(B["atr20_q"], atr))], float) / 1000
+    iu, is_ = min(max(u - 1, 0.0), T.shape[0] - 1.0001), min(max(s - 1, 0.0), T.shape[1] - 1.0001)
+    a, b = int(iu), int(is_)
+    fa, fb = iu - a, is_ - b
+    v = T[a, b] * (1 - fa) * (1 - fb) + T[a + 1, b] * fa * (1 - fb) + T[a, b + 1] * (1 - fa) * fb + T[a + 1, b + 1] * fa * fb
+    return round(float(v), 3)
 
 
 def _r(x, n=4):
@@ -125,7 +160,8 @@ def run(cfg, tickers=None) -> dict:
         mkt = confidence.market_state(iwm, {t: d["Close"] for t, d in daily.items()})
     except Exception:
         mkt = {}
-    rows = []
+    B = load_baseline()
+    rows, eligible = [], set()   # eligible = نفس فلاتر الرادار قبل النمط (مجال التوأم العشوائي)
     for t, d in pre.items():
         inf = infos.get(t) or {}
         mcap, flt = inf.get("marketCap"), inf.get("floatShares")
@@ -133,6 +169,7 @@ def run(cfg, tickers=None) -> dict:
             flt = None
         if not explicit and ((mcap and mcap > U["max_market_cap"]) or (flt and flt > U["max_float"])):
             continue
+        eligible.add(t)
         try:
             r = SC.detect(d)
         except Exception as e:
@@ -157,6 +194,8 @@ def run(cfg, tickers=None) -> dict:
                          "ma20": [_r(x) for x in ma20], "ma50": [_r(x) for x in ma50]}}
         row["status"] = status_of(r)
         row["trust"] = trust(row, d, mkt)
+        row["atr20"] = round(atr20(d), 2)
+        row["rand_p"] = rand_p(B, row["atr20"], row["plan"]["entry"], row["plan"]["stop"], row["plan"]["t1"])
         # امتثال ناسداك للأسهم تحت 1$ (نفس طبقة عبدالله — نحول المستويات مؤقتاً)
         row["status"] = {"strong": "ready", "good": "near", "watch": "radar"}[row["status"]]
         compliance_rule.apply_abdullah(row, d)
@@ -191,27 +230,57 @@ def run(cfg, tickers=None) -> dict:
             rows, excluded_hrt = holders.exclude(rows, log)
         except Exception as e:
             log("فحص HRT تعطل:", repr(e)[:150])
+    # التوأم العشوائي: لكل فرصة 🎯/🟡 أسهم عشوائية من نفس المسح ونفس شريحة التذبذب (السجل يتابعها بنفس الهدف والوقف)
+    import random
+    qs = (B or {}).get("atr20_q")
+    atrs = {}
+    for t in eligible:
+        try:
+            atrs[t] = atr20(pre[t])
+        except Exception:
+            pass
+    atrs = {t: a for t, a in atrs.items() if math.isfinite(a)}
+    if cfg["behavior"].get("exclude_hrt") and atrs:   # نفس استبعاد HRT للتوأم (التخفيف المتكرر ما ينفحص له — مكلف)
+        try:
+            pool_rows = [{"symbol": t, "name": (infos.get(t) or {}).get("shortName") or (infos.get(t) or {}).get("longName")}
+                         for t in atrs]
+            holders.annotate(pool_rows, lambda *a: None)
+            atrs = {x["symbol"]: atrs[x["symbol"]] for x in pool_rows if not x.get("hrt")}
+        except Exception as e:
+            log("التوأم العشوائي: فحص HRT تعطل:", repr(e)[:120])
+    if not qs and len(atrs) >= 50:
+        qs = [float(x) for x in np.quantile(list(atrs.values()), [0.2, 0.4, 0.6, 0.8])]
+    if qs:
+        bucket = {t: int(np.searchsorted(qs, a)) for t, a in atrs.items()}
+        for r in rows:
+            if r["status"] not in ("strong", "good") or r["symbol"] not in bucket:
+                continue
+            pool = sorted(t for t, q in bucket.items() if q == bucket[r["symbol"]] and t != r["symbol"])
+            pick = random.Random(f"{r['symbol']}:{r['date']}").sample(pool, min(N_TWINS, len(pool)))
+            r["twins"] = [[t, _r(pre[t]["Close"].iloc[-1])] for t in pick]
     from collections import Counter
     cnt = Counter(r["status"] for r in rows)
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "الأسعار: Alpaca + الشركة: Yahoo + SEC", "scanned": len(pre), "seconds": round(time.time() - t0),
                "stocks": rows, "excluded_dilution": excluded, "excluded_hrt": excluded_hrt,
-               "model": None}
+               "model": None,
+               "baseline": {k: B.get(k) for k in ("version", "period", "horizon", "n_random")} if B else None}
     try:
         mm = json.loads(MODEL_PATH.read_text(encoding="utf-8"))
         payload["model"] = {k: mm.get(k) for k in ("version", "tier_stats", "base_rate", "oos_auc", "period", "horizon")}
     except Exception:
         pass
-    log(f"## رادار المدارس الثلاث: قوي {cnt['strong']} · جيد {cnt['good']} · مراقبة {cnt['watch']} · خلص في {payload['seconds']} ثانية")
+    log(f"## رادار المدارس: قوي {cnt['strong']} · جيد {cnt['good']} · مراقبة {cnt['watch']} · خلص في {payload['seconds']} ثانية")
     for r in rows[:15]:
         log(f"  {r['symbol']} {r['price']} {r['status']} · توافق {r['confluence']} ({'+'.join(r['schools'])}) · "
             f"{', '.join(s['setup'] for s in r['setups'])} · جودة {r['quality']}"
+            + (f" · العشوائي بنفس الهدف/الوقف {r['rand_p'] * 100:.0f}%" if r.get("rand_p") is not None else "")
             + (f" · ثقة {r['trust']['p'] * 100:.0f}% ({r['trust']['label']})" if r.get("trust") else ""))
     return payload
 
 
 def main():
-    ap = argparse.ArgumentParser(description="رادار المدارس الثلاث")
+    ap = argparse.ArgumentParser(description="رادار المدارس")
     ap.add_argument("--out", default=str(OUT / "schools.html"))
     ap.add_argument("--tickers")
     a = ap.parse_args()

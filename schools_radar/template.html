@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>رادار المدارس الثلاث</title>
+<title>رادار المدارس</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -141,7 +141,7 @@ ul.clean{margin:0;padding-right:18px}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>🧭 رادار المدارس الثلاث</h1><div class="sub" id="meta"></div></div>
+    <div><h1>🧭 رادار المدارس</h1><div class="sub" id="meta"></div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
       <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
@@ -154,6 +154,10 @@ ul.clean{margin:0;padding-right:18px}
       <button class="btn" id="theme">🌓</button>
     </div>
   </header>
+  <div class="card" style="margin-bottom:12px;border-color:var(--warn)">🔇 <b>رادار تجريبي صامت:</b> ما يرسل تيليجرام. فرص 🎯 قوي و🟡 جيد تنحفظ في <a href="../track/" style="color:var(--accent)">سجل التوصيات</a> (10 جلسات)،
+    ومع كل وحدة 3 أسهم عشوائية من نفس اليوم بنفس الهدف والوقف ونفس التذبذب — عشان نعرف هل النمط فعلاً يفرق.
+    <div class="note" style="margin-top:6px">⚠ في الاختبار التاريخي (877 سهم، سبتمبر 2024 → أكتوبر 2026) <b>ما تفوق على الدخول العشوائي بنفس الهدف والوقف</b>.
+    🎲 تحت كل سهم: كم مرة يوصل الهدف الأول قبل الوقف لو دخلت عشوائي بنفس المسافات — نسبة النجاح العالية غالباً سببها إن الهدف قريب، مو النمط.</div></div>
   <div class="card" style="margin-bottom:12px"><b>الفكرة:</b> نبحث عن اللحظة اللي تتفق فيها المدارس الثلاث على نفس السهم:
     <span class="sch classic">📐 الكلاسيكية</span> (اختراق ثم إعادة اختبار · قاع مزدوج W · علم صاعد)
     <span class="sch wyckoff">⚖️ وايكوف</span> (سبرنق + اختبار · إشارة قوة ثم آخر نقطة دعم)
@@ -165,7 +169,7 @@ ul.clean{margin:0;padding-right:18px}
   <details id="exclhrt" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="exclhrt-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
   <div class="toolbar" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-    <select id="sort" class="btn"><option value="status">الترتيب: الأقوى</option><option value="trust">🎯 الأعلى ثقة</option><option value="conf">الأكثر توافق</option><option value="q">الأعلى جودة</option></select>
+    <select id="sort" class="btn"><option value="status">الترتيب: الأقوى</option><option value="conf">الأكثر توافق</option><option value="q">الأعلى جودة</option></select>
     <select id="schoolf" class="btn"><option value="">كل المدارس</option><option value="classic">📐 الكلاسيكية</option><option value="wyckoff">⚖️ وايكوف</option><option value="elliott">〰️ إليوت</option></select>
   </div>
   <div class="list" id="list"></div>
@@ -231,6 +235,10 @@ function tiles(){
   $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
   document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = filt === el.dataset.k ? null : el.dataset.k; render(); });
 }
+function randLine(s){
+  if (s.rand_p == null) return "";
+  return `<div class="left note">🎲 لو دخلت عشوائي بنفس الهدف والوقف: يوصل الهدف الأول قبل الوقف خلال 10 جلسات في <b class="num">${Math.round(s.rand_p*100)}%</b> من المرات (تاريخياً)</div>`;
+}
 function trustLine(t){
   if (!t) return "";
   const col = t.label === "عالية" ? "var(--good)" : t.label === "متوسطة" ? "var(--warn)" : "var(--bad)";
@@ -259,6 +267,7 @@ function render(){
         <span>الفلووت: <b class="num">${fM(s.float)}</b></span><span>الشورت: <b class="num">${s.short!=null?fM(s.short):"؟"}</b></span>
       </div>
       ${trustLine(s.trust)}
+      ${randLine(s)}
       ${(s.flags||[]).map(f => `<div class="left" style="color:${/⛔|⚠/.test(f)?"var(--bad)":"var(--muted)"}">${esc(f)}</div>`).join("")}
       ${n0 ? `<div class="left">${sentBadge(n0)} ${esc(n0.title_ar || n0.title)}</div>` : ""}
       <div class="note" style="margin-top:4px">اضغط للتفاصيل ▾</div>

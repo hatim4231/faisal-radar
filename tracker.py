@@ -18,7 +18,7 @@ from __future__ import annotations
 import json
 import os
 import sys
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 
 import pandas as pd
@@ -33,10 +33,13 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 MAX_SESSIONS = 20
 # قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
 # إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
-HORIZON = {"faisal_dev": 10}
+HORIZON = {"faisal_dev": 10, "schools": 10}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
-NEW_RULES = {"faisal_dev", "abdullah", "accumulation"}
-MUTED = {"accumulation"}   # قرار المستخدم: رادار التجميع نراقب نتايجه بالسجل بدون رسائل تيليجرام
+# (+ التجميع والمدارس: نفس قواعد اختبارهم التاريخي — الهدف يُفحص أول، والوقف بإغلاق اليوم تحته)
+NEW_RULES = {"faisal_dev", "abdullah", "accumulation", "schools"}
+# قرار المستخدم: رادار التجميع ورادار المدارس نراقب نتايجهم بالسجل بدون رسائل تيليجرام
+MUTED = {"accumulation", "schools"}
+WIN = ("t1", "t2", "t1_then_stop", "t1_expired")
 
 
 def is_muted(t: dict) -> bool:
@@ -54,11 +57,14 @@ RADARS = {
     "abdullah": ("🌊 عبدالله", ROOT / "output" / "sig_abdullah.json"),
     "insiders": ("🟢 المطّلعين", ROOT / "output" / "sig_insiders.json"),
     "accumulation": ("🔍 التجميع", ROOT / "output" / "sig_accumulation.json"),
+    "schools": ("🧭 المدارس", ROOT / "output" / "sig_schools.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
 STATUS_AR_INS = {"ready": "🟢 شراء داخلي قوي", "near": "🟡 شراء داخلي"}
 STATUS_AR_ACC = {"ready": "🔍 تجميع مؤكد", "near": "🟡 تجميع محتمل"}
+STATUS_AR_SCH = {"ready": "🎯 قوي", "near": "🟡 جيد"}
+SCH_AR = {"classic": "📐 الكلاسيكية", "wyckoff": "⚖️ وايكوف", "elliott": "〰️ إليوت"}
 
 
 def log(*a):
@@ -83,6 +89,20 @@ def fp(x):
 def signals(key: str, payload: dict) -> list[dict]:
     out = []
     for s in payload.get("stocks", []):
+        if key == "schools":
+            st = {"strong": "ready", "good": "near"}.get(s.get("status"))
+            p = s.get("plan") or {}
+            if not st or not p.get("stop") or not p.get("t1"):
+                continue
+            out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_SCH[st],
+                        "entry": s["price"], "stop": p["stop"], "t1": p["t1"], "t2": p.get("t2"),
+                        "score": s.get("quality"), "date": s.get("date"), "name": s.get("name"),
+                        "why": " + ".join(SCH_AR.get(x, x) for x in s.get("schools", [])) + " · "
+                               + "، ".join(x.get("name_ar") or x.get("setup", "") for x in s.get("setups", []))
+                               + f" · توافق {s.get('confluence')}/3",
+                        "dilution": (s.get("dilution") or {}).get("level"),
+                        "rand_p": s.get("rand_p"), "twins": s.get("twins")})
+            continue
         if key == "accumulation":
             st = s.get("status")
             if st not in ("ready", "near"):
@@ -316,7 +336,20 @@ def run():
                  "horizon": HORIZON.get(key, MAX_SESSIONS), **s}
             if any(x["id"] == t["id"] for x in trades):
                 continue
+            twins = t.pop("twins", None) or []
             trades.append(t)
+            # التوأم العشوائي (المدارس): نفس اليوم ونفس الهدف والوقف بالنسبة، على أسهم عشوائية بنفس شريحة التذبذب
+            for k, tw in enumerate(twins):
+                try:
+                    sym2, px2 = tw[0], float(tw[1])
+                except Exception:
+                    continue
+                if not px2 or not t.get("stop") or not t.get("t1"):
+                    continue
+                track.setdefault("twins", []).append({
+                    "id": f"{t['id']}:r{k}", "of": t["id"], "radar": key, "radar_name": "🎲 عشوائي مماثل",
+                    "symbol": sym2, "date": t["date"], "entry": px2, "result": "open", "horizon": t["horizon"],
+                    "stop": round(px2 * t["stop"] / t["entry"], 4), "t1": round(px2 * t["t1"] / t["entry"], 4), "t2": None})
             warn = {"high": "\n⛔ عليه خطر تخفيف SEC عالي", "medium": "\n⚠ عليه ملفات طرح محتملة"}.get(s.get("dilution"), "")
             warn = {"ready": "\n🔍 مؤكد بالتجميع (بصمات مضارب يجمع)", "near": "\n🔍 فيه بصمات تجميع محتملة"}.get(s.get("accum"), "") + warn
             if is_muted(t):
@@ -337,11 +370,12 @@ def run():
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"
                 + (f" · الهدف 2 {fp(s['t2'])}" if s.get("t2") else "") + f"\n{s['why']}{warn}")
 
-    # متابعة المفتوحة
+    # متابعة المفتوحة (+ التوأم العشوائي — بدون أي تنبيه)
     open_t = [t for t in trades if t["result"] in ("open", "t1")]
-    if open_t:
-        syms = sorted({t["symbol"] for t in open_t})
-        log(f"متابعة {len(open_t)} توصية مفتوحة ({len(syms)} سهم)")
+    open_tw = [t for t in track.get("twins", []) if t["result"] in ("open", "t1")]
+    if open_t or open_tw:
+        syms = sorted({t["symbol"] for t in open_t + open_tw})
+        log(f"متابعة {len(open_t)} توصية مفتوحة + {len(open_tw)} توأم عشوائي ({len(syms)} سهم)")
         data = daily_prices(syms)
         for t in open_t:
             try:
@@ -351,6 +385,11 @@ def run():
                     new_events += ev + price_alerts(t)
             except Exception as e:
                 log("خطأ متابعة", t["symbol"], repr(e)[:100])
+        for t in open_tw:
+            try:
+                evaluate(t, data[t["symbol"]])
+            except Exception:
+                pass
 
     TRACK.write_text(json.dumps(track, ensure_ascii=False, indent=1), encoding="utf-8")
     log(f"السجل: {len(trades)} توصية · أحداث جديدة {len(new_events)}")
@@ -421,6 +460,24 @@ def stats(trades):
             "open": sum(t["result"] in ("open", "t1") for t in trades)}
 
 
+def vs_random(trades: list[dict], twins: list[dict], key: str = "schools", days: int = 16) -> dict:
+    """المقارنة الصادقة: التوصيات اللي كملت مدتها (10 جلسات ≈ 16 يوم) — نجاحها الحقيقي مقابل التوأم العشوائي
+    (نفس اليوم ونفس الهدف والوقف ونفس التذبذب) ومقابل المتوقع تاريخياً لنفس الهدف والوقف."""
+    cut = (date.today() - timedelta(days=days)).isoformat()
+    m = [t for t in trades if t["radar"] == key and str(t.get("date")) <= cut and t.get("sessions")]
+    ids = {t["id"] for t in m}
+    tw = [x for x in twins if x.get("of") in ids and x.get("sessions")]
+    rp = [t["rand_p"] for t in m if t.get("rand_p") is not None]
+    out = {"n": len(m), "n_twins": len(tw), "n_total": sum(t["radar"] == key for t in trades)}
+    if m:
+        out["hit_pct"] = round(sum(t["result"] in WIN for t in m) / len(m) * 100, 1)
+    if tw:
+        out["twin_pct"] = round(sum(x["result"] in WIN for x in tw) / len(tw) * 100, 1)
+    if rp:
+        out["exp_pct"] = round(sum(rp) / len(rp) * 100, 1)
+    return out
+
+
 def build_page(track):
     trades = track["trades"]
     by = {k: stats([t for t in trades if t["radar"] == k]) for k in RADARS}
@@ -436,6 +493,7 @@ def build_page(track):
         by_status[f"{k}:over1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 0) >= 1])
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "radars": {k: v[0] for k, v in RADARS.items()}, "stats": by, "stats_status": by_status,
+               "muted": sorted(MUTED), "vs_random": {"schools": vs_random(trades, track.get("twins", []))},
                "trades": sorted(trades, key=lambda t: t["opened_at"], reverse=True)}
     html = (ROOT / "template_track.html").read_text(encoding="utf-8")
     out = ROOT / "site" / "track" / "index.html"
