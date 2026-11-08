@@ -91,6 +91,9 @@ jobs:
           git commit -q -m "تحديث سجل التوصيات $(date -u +%F_%H%M)" || echo "لا تغيير"
           git push -q origin track-data
 
+      - name: ملفات مشتركة للموقع (خط أعلام الدول لويندوز)
+        run: mkdir -p site && cp -r assets site/
+
       - name: قفل الموقع بكلمة سر (إذا موجودة في Secrets باسم RADAR_PASSWORD)
         if: env.RADAR_PASSWORD != ''
         run: |

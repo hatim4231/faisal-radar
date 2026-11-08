@@ -31,6 +31,9 @@ GitHub Pages: https://hatim4231.github.io/faisal-radar
   و`abdullah.max_short_shares = null`). الشورت يظهر للمعلومة بس. خصم طريقة فيصل (−8 للشورت المتاح فوق 100 ألف) باقي في التقييم
   (`behavior.short_penalty_shares`). (كان: 100 ألف وأقل، والشورت غير المعروف = رادار فقط.)
 - **علم الدولة** لكل سهم في كل الصفحات والسجل وتيليجرام (`flags.py`، الدولة من ياهو = مقر الشركة).
+  **صورة العلم مو الحرفين** (طلب المستخدم): ويندوز (كروم/إيدج) يعرض الأعلام حروف مثل «US» ← كل صفحة فيها كاشف صغير يحمّل
+  خط أعلام Twemoji (`assets/TwemojiCountryFlags.woff2`، country-flag-emoji-polyfill 0.1.10، CC-BY 4.0) **بس** للأجهزة اللي ما تعرض
+  الأعلام (الجوال والماك ما يحملونه)، واحتياط من jsDelivr. الـ workflow ينسخ `assets/` إلى `site/`. الخط أول واحد في `font-family`.
 - **استبعاد الأسهم اللي صندوق HRT من ملاكها** (قرار المستخدم) في كل الرادارات (`holders.py`، `behavior.exclude_hrt`):
   HRT = Hudson River Trading، تقرير ملكياته لـ SEC باسم **HRT Financial LP** (كان HRT Financial LLC) — CIK 1475597.
   نقرا آخر 13F-HR (الأسهم بدون أوبشن) ونطابق اسم الشركة (SEC/ياهو). صندوق «⛔ مستبعد لأن صندوق HRT من الملاك» بكل صفحة؛

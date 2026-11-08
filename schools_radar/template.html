@@ -29,7 +29,7 @@
   --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--text);font-family:"IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Twemoji Country Flags","IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
 .wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
 .num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
 header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
@@ -137,6 +137,22 @@ ul.clean{margin:0;padding-right:18px}
 .setupbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px}
 .setupbox .t{font-weight:700;font-size:14px}
 </style>
+<script>
+/* أعلام الدول: ويندوز (كروم/إيدج) يعرض العلم حرفين مثل «US» ← خط أعلام Twemoji (CC-BY 4.0، country-flag-emoji-polyfill)
+   يتحمّل بس على الأجهزة اللي ما تعرض الأعلام. الملف في assets/ والاحتياط من jsDelivr. */
+(function(){try{
+  var F='"Twemoji Mozilla","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","EmojiOne Color","Android Emoji",sans-serif';
+  function px(t,s,c){t.clearRect(0,0,100,100);t.fillStyle=c;t.fillText(s,0,0);return t.getImageData(0,0,1,1).data.join(",");}
+  function ok(s){var c=document.createElement("canvas");c.width=c.height=1;var t=c.getContext("2d",{willReadFrequently:true});
+    t.textBaseline="top";t.font="100px "+F;t.scale(.01,.01);var w=px(t,s,"#fff"),b=px(t,s,"#000");return b===w&&b.indexOf("0,0,0,")!==0;}
+  if(window.FORCE_FLAG_FONT||(ok("\uD83D\uDE0A")&&!ok("\uD83C\uDDE8\uD83C\uDDED"))){
+    var p="../",st=document.createElement("style");
+    st.textContent='@font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E0063,U+E0065,U+E0067,U+E006C,U+E006E,U+E0073-E0074,U+E0077,U+E007F;'+
+      'src:url("'+p+'assets/TwemojiCountryFlags.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.10/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}';
+    document.head.appendChild(st);
+  }
+}catch(e){}})();
+</script>
 </head>
 <body>
 <div class="wrap">
