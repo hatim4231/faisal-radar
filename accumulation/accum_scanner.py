@@ -58,7 +58,7 @@ def run(cfg, tickers=None) -> dict:
         hist = json.loads(SHORT_HIST.read_text(encoding="utf-8"))
     except Exception:
         hist = {}
-    max_sh = cfg["behavior"].get("max_short_shares", 100000)
+    max_sh = cfg["behavior"].get("max_short_shares")  # None = الشورت مفتوح
     rows, moved = [], 0
     for t, d in pre.items():
         inf = infos.get(t) or {}
@@ -69,7 +69,7 @@ def run(cfg, tickers=None) -> dict:
             continue
         sa = (ib.get(t) or {}).get("available")
         sv, src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
-        if sv is not None and sv > max_sh and not explicit:
+        if sv is not None and max_sh and sv > max_sh and not explicit:
             continue
         try:
             a = R.analyze(d, inf, cfg, hist.get(t))
@@ -88,7 +88,7 @@ def run(cfg, tickers=None) -> dict:
                   "short_used": {"value": sv, "source": src, "max": max_sh}, "flags": [], "tags": []})
         if a["chinese"]:
             a["tags"].append("🇨🇳 " + a["country"])
-        if sv is None:
+        if sv is None and max_sh:
             a["flags"].append("الشورت غير معروف — ما يترشح لين يتأكد")
             if a["status"] in ("ready", "near"):
                 a["status"] = "radar"
@@ -121,12 +121,23 @@ def run(cfg, tickers=None) -> dict:
             r["flags"].insert(0, f"⚠ ملف إعادة بيع/تسجيل ({h['form']} · {h['date']}) — أصحاب أسهم جاهزين يبيعون، "
                                  f"وكثير من المضخات يسبقها. بع بدري.")
     rows, excluded = sec_tools.exclude_repeat_diluters(rows, log)
+    import flags
+    import holders
+    flags.annotate(rows)
+    excluded_hrt = []
+    if cfg["behavior"].get("exclude_hrt"):
+        try:
+            holders.annotate(rows, log)
+            rows, excluded_hrt = holders.exclude(rows, log)
+        except Exception as e:
+            log("فحص HRT تعطل:", repr(e)[:150])
     order = {"ready": 0, "near": 1, "radar": 2}
     rows.sort(key=lambda r: (order.get(r["status"], 3), -r["score"]))
     from collections import Counter
     c = Counter(r["status"] for r in rows)
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "الأسعار: Alpaca + الشركة: Yahoo + Interactive Brokers + SEC", "scanned": len(pre), "moved": moved,
+               "excluded_hrt": excluded_hrt,
                "seconds": round(time.time() - t0), "stocks": rows, "excluded_dilution": excluded}
     log(f"## رادار التجميع: مؤكد {c['ready']} · محتمل {c['near']} · مراقبة {c['radar']} · خلص في {payload['seconds']} ثانية")
     for r in rows[:15]:

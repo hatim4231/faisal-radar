@@ -149,6 +149,7 @@ ul.clean{margin:0;padding-right:18px}
   <div class="card" style="margin-bottom:12px"><b>الفكرة:</b> مدير الشركة أو عضو مجلس الإدارة أو مالك كبير اشترى أسهم الشركة <b>من السوق بفلوسه</b> (Form 4، عملية P). «المطّلع يبيع لأسباب كثيرة، بس يشتري لسبب واحد».
     <span class="note">الحد الأدنى ٢٥ ألف دولار خلال ٣٠ يوم · الأثر غالباً على أسابيع لشهور، مو أيام · الشركات الأجنبية ما تقدم Form 4 فما تظهر هنا · ليس توصية شراء.</span></div>
   <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
+  <details id="exclhrt" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="exclhrt-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
   <div class="list" id="list"></div>
   <div class="disc">النقاط (من اختبار تاريخي): منصبهم (حتى 40 — المدير التنفيذي/المالي/الرئيس أقوى شرط) · عدد المطّلعين (حتى 20) · المبلغ (حتى 10) · حداثة الشراء (حتى 10) · قرب السعر من متوسط شرائهم (حتى 5).
@@ -202,7 +203,7 @@ function render(){
     const p0 = s.people[0]; const n0 = (s.news||[])[0];
     return `<div class="card" style="cursor:pointer" data-s="${esc(s.symbol)}">
       <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
-        <div><span class="sym ltr">${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct}%</span>
+        <div><span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct}%</span>
           <div class="name" style="max-width:none">${esc(s.name)}</div></div>
         <div>${spark(s.chart)}</div>
         <div style="text-align:left"><span class="badge ${cls}">${lab}</span> <span class="pct num" style="color:${col}">${s.score}</span></div>
@@ -238,6 +239,17 @@ function toggle(el){
   const box = $("#excl"); box.style.display = ""; box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم";
   $("#excl-body").innerHTML = ex.map(x => `<div class="note"><b class="ltr">${esc(x.symbol)}</b> — ${x.events.map(e => esc(e.date+" "+e.what)).join(" · ")}</div>`).join(""); })();
 render();
+
+(function(){
+  const ex = (DATA && DATA.excluded_hrt) || [];
+  if (!ex.length) return;
+  const box = document.getElementById("exclhrt"); if (!box) return; box.style.display = "";
+  const per = ex[0].period || "";
+  box.querySelector("summary").textContent = "⛔ مستبعد لأن صندوق HRT من الملاك: " + ex.length + " سهم (اضغط للتفاصيل)";
+  document.getElementById("exclhrt-body").innerHTML = ex.map(function(x){
+    return '<span style="display:inline-block;margin:3px 8px 3px 0"><b class="ltr">' + esc(x.symbol) + '</b> <span class="note num">' + Number(x.shares||0).toLocaleString("en") + ' سهم</span></span>';
+  }).join("") + '<div class="note" style="margin-top:6px">قرار المستخدم: الأسهم اللي يملك فيها HRT Financial LP (Hudson River Trading) ما تترشح. المصدر: تقرير 13F في SEC لنهاية ' + esc(per) + ' — التقرير يطلع بعد الربع بـ 45 يوم، فالملكية ممكن تكون تغيرت.</div>';
+})();
 </script>
 </body>
 </html>

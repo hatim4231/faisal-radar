@@ -5,11 +5,12 @@
       "NASDAQ"
     ],
     "_exchanges_help": "أضف \"NYSE_AMERICAN\" أو \"NYSE\" لو تبي توسع البحث",
-    "min_price": 0.5,
-    "max_price": 5.0,
+    "min_price": 0.7,
+    "max_price": 10.0,
     "max_market_cap": 300000000,
     "max_float": 50000000,
-    "min_avg_volume": 100000
+    "min_avg_volume": 100000,
+    "_price_help": "قرار المستخدم (نوفمبر 2026): المجال 0.7$ إلى 10$ لكل الرادارات"
   },
   "irtikaz": {
     "rsi_ideal_low": 23,
@@ -51,8 +52,12 @@
     "quiet_daily_range_pct": 10,
     "high_short_pct_float": 20,
     "high_short_value_to_mcap_pct": 5,
-    "max_short_shares": 100000,
-    "_max_short_help": "لا يُرشَّح إلا سهم شورته 100 ألف سهم أو أقل (الشورت المتاح للاقتراض، وإذا ما توفر: Short Interest)"
+    "max_short_shares": null,
+    "_max_short_help": "قرار المستخدم (نوفمبر 2026): الشورت مفتوح — ما فيه استبعاد بالشورت (null). اكتب رقم لو تبي ترجع الشرط",
+    "short_penalty_shares": 100000,
+    "_short_penalty_help": "طريقة فيصل: الشورت المتاح فوق هالرقم = خصم 8 نقاط (تقييم بس، مو استبعاد)",
+    "exclude_hrt": true,
+    "_exclude_hrt_help": "قرار المستخدم: الأسهم اللي HRT Financial LP (Hudson River Trading) من ملاكها ما تترشح (تقرير 13F)"
   },
   "scan": {
     "history_period": "2y",

@@ -154,6 +154,7 @@ ul.clean{margin:0;padding-right:18px}
     <span class="note">الأسهم اللي طلعت أو كسرت الدعم تنشال من القائمة. فرضية تداول نعمل عليها، وليست نظرية مثبتة النجاح. التقسيم العكسي ليس شرطاً، وقفزته الحسابية لا تُحسب تدبيل.</span>
   </div>
   <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
+  <details id="exclhrt" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="exclhrt-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles"></div>
   <div class="toolbar">
     <input type="search" id="q" placeholder="ابحث برمز السهم...">
@@ -248,7 +249,7 @@ function render(){
       ["عن الدعم", fpct(s.dist_support_pct)], ["الإبطال", fp(s.invalidation)], ["الشورت", shortTxt(s)]];
     const n0 = (s.news||[])[0];
     return `<div class="row" data-s="${esc(s.symbol)}">
-      <div><div class="sym ltr">${esc(s.symbol)}</div><div class="name" title="${esc(s.name)}">${esc(s.name)}</div>
+      <div><div class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</div><div class="name" title="${esc(s.name)}">${esc(s.name)}</div>
         <div class="px"><span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span></div></div>
       <div>
         <div class="facts">${facts.map(([k,v]) => `<span>${k}: <b class="${/[؀-ۿ]/.test(v)?"":"num"}">${esc(v)}</b></span>`).join("")}</div>
@@ -300,7 +301,7 @@ function checksHTML(list){
 function openDetail(sym){
   const s = stocks.find(x => x.symbol === sym); if (!s) return; openSym = sym;
   const w = s.wave, it = s.intraday || {};
-  $("#dtitle").innerHTML = `<span class="sym ltr">${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · بيانات ${esc(s.date)}</div>`;
+  $("#dtitle").innerHTML = `<span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span>${s.country_ar ? ` <span class="note">${esc(s.country_ar)}</span>` : ""} <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · بيانات ${esc(s.date)}</div>`;
   const reads = (s.short_readings||[]).slice().reverse();
   const shortTable = reads.length ? `<table style="width:100%;border-collapse:collapse;font-size:13.5px">${reads.map(r => `<tr style="border-bottom:1px solid var(--line)"><td class="num" style="padding:4px 0">${esc(r.date)}</td><td class="num" style="text-align:left">${r.more_than?">":""}${num(r.available)} سهم</td></tr>`).join("")}</table>` : `<div class="note">لا توجد قراءات محفوظة بعد (تتجمع مع كل مسح)</div>`;
   const news = newsHTML(s.news);
@@ -365,6 +366,17 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(
   }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
 })();
 render();
+
+(function(){
+  const ex = (DATA && DATA.excluded_hrt) || [];
+  if (!ex.length) return;
+  const box = document.getElementById("exclhrt"); if (!box) return; box.style.display = "";
+  const per = ex[0].period || "";
+  box.querySelector("summary").textContent = "⛔ مستبعد لأن صندوق HRT من الملاك: " + ex.length + " سهم (اضغط للتفاصيل)";
+  document.getElementById("exclhrt-body").innerHTML = ex.map(function(x){
+    return '<span style="display:inline-block;margin:3px 8px 3px 0"><b class="ltr">' + esc(x.symbol) + '</b> <span class="note num">' + Number(x.shares||0).toLocaleString("en") + ' سهم</span></span>';
+  }).join("") + '<div class="note" style="margin-top:6px">قرار المستخدم: الأسهم اللي يملك فيها HRT Financial LP (Hudson River Trading) ما تترشح. المصدر: تقرير 13F في SEC لنهاية ' + esc(per) + ' — التقرير يطلع بعد الربع بـ 45 يوم، فالملكية ممكن تكون تغيرت.</div>';
+})();
 </script>
 </body>
 </html>

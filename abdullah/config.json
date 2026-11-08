@@ -1,15 +1,15 @@
 {
   "_ملاحظة": "إعدادات رادار عبدالله. الفلاتر العامة نفس رادار فيصل.",
-
   "universe": {
-    "exchanges": ["NASDAQ"],
-    "min_price": 0.5,
-    "max_price": 5.0,
+    "exchanges": [
+      "NASDAQ"
+    ],
+    "min_price": 0.7,
+    "max_price": 10.0,
     "max_market_cap": 300000000,
     "max_float": 50000000,
     "min_avg_volume": 100000
   },
-
   "abdullah": {
     "min_wave_mult": 2.0,
     "_min_wave_help": "التدبيل: القمة ÷ القاع (2 = من دولار إلى دولارين)",
@@ -34,10 +34,9 @@
     "_moved_help": "إذا ارتفع 25% فوق الدعم أو اخترق سقف التماسك بـ 5% = طلع، ينشال من القائمة",
     "vol_dry_ratio": 0.7,
     "min_dollar_volume": 300000,
-    "max_short_shares": 100000,
+    "max_short_shares": null,
     "short_history_keep": 12
   },
-
   "scan": {
     "history_period": "1y",
     "batch_size": 80,

@@ -114,7 +114,7 @@ function card(f){
   const ok = f.eligible;
   return `<div class="card">
     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-      <div><span class="sym">${esc(f.symbol)}</span> <span class="note">${esc(f.name || "")}</span></div>
+      <div><span class="sym">${f.flag ? `<span title="${esc(f.country_ar||"")}">${f.flag}</span> ` : ""}${esc(f.symbol)}</span> <span class="note">${esc(f.name || "")}</span></div>
       <span class="badge ${ok ? "b-good" : "b-bad"}">${ok ? "مؤهل" : "خارج الشروط"}</span></div>
     <div class="note" style="margin-top:4px">إغلاق <span class="num">${fp(f.close)}</span> · أعلى الأفتر <span class="num">${fp(f.ah_high)}</span> (+${f.jump_pct}%)
       · آخر سعر <span class="num">${fp(f.ah_last)}</span> · حافظ ${f.hold_pct}% · فوليوم الأفتر <span class="num">${fk(f.ah_vol)}</span>
@@ -139,7 +139,7 @@ $("#final").innerHTML = (D.last_final || []).length ? D.last_final.map(card).joi
 
 const H = D.history || [];
 $("#hist").innerHTML = `<tr><th>السهم</th><th>يوم الأفتر</th><th>القفزة</th><th>حافظ</th><th>Limit</th><th>أعلى البري</th><th>النتيجة</th><th>مؤهل</th></tr>` +
-  (H.length ? H.map(s => `<tr><td><b>${esc(s.symbol)}</b></td><td class="num">${esc(s.D)}</td><td class="num">+${s.jump_pct}%</td><td class="num">${s.hold_pct}%</td>
+  (H.length ? H.map(s => `<tr><td>${s.flag||""} <b>${esc(s.symbol)}</b></td><td class="num">${esc(s.D)}</td><td class="num">+${s.jump_pct}%</td><td class="num">${s.hold_pct}%</td>
     <td class="num">${fp(s.limit)}</td><td class="num">${s.pm_high_pct == null ? "—" : (s.pm_high_pct > 0 ? "+" : "") + s.pm_high_pct + "%"}</td>
     <td>${s.result ? `<span class="badge ${(RES[s.result]||["",""])[1]}">${(RES[s.result]||[s.result])[0]}</span>${s.flat_pct != null ? ` <span class="num note">${s.flat_pct}%</span>` : ""}` : `<span class="note">ننتظر</span>`}</td>
     <td>${s.eligible ? "✅" : "—"}</td></tr>`).join("") : `<tr><td colspan="8" class="note">فاضي</td></tr>`);

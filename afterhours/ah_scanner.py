@@ -36,6 +36,7 @@ OUT.mkdir(exist_ok=True)
 STORE = ROOT / "trackdata" / "afterhours.json"
 
 MIN_JUMP, MIN_HOLD, MIN_AH_VOL, MIN_RTH_VOL = 0.15, 0.70, 50_000, 100_000
+PRICE = (0.7, 10.0)   # قرار المستخدم (نوفمبر 2026): كل الرادارات 0.7$ إلى 10$ — يتحدث من config.json تحت
 T1, T2, STOP = 0.10, 0.15, 0.10
 PM_VOL_RATIO = 0.07   # فوليوم البري لين التنفيذ ÷ فوليوم الأفتر — فوقه: متوسط الصفقة +2.2% بدل +1.4%
 
@@ -65,7 +66,7 @@ def find_today(sym: str, h: pd.DataFrame, D) -> dict | None:
     close = float(rth["Close"].iloc[-1])
     rth_vol = float(rth["Volume"].sum())
     ah_hi, ah_last, ah_vol = float(ah["High"].max()), float(ah["Close"].iloc[-1]), float(ah["Volume"].sum())
-    if not (0.5 <= close <= 5) or rth_vol < MIN_RTH_VOL or ah_vol < MIN_AH_VOL:
+    if not (PRICE[0] <= close <= PRICE[1]) or rth_vol < MIN_RTH_VOL or ah_vol < MIN_AH_VOL:
         return None
     jump = ah_hi / close - 1
     if jump < MIN_JUMP:
@@ -148,6 +149,8 @@ def last_session_day(start):
 
 
 def run(cfg) -> dict:
+    global PRICE
+    PRICE = (cfg["universe"]["min_price"], cfg["universe"]["max_price"])
     t0 = time.time()
     store = {"signals": []}
     try:
@@ -195,18 +198,30 @@ def run(cfg) -> dict:
     except Exception:
         ib = {}
     infos = data.get_info([f["symbol"] for f in found], cfg) if found else {}
-    max_sh = cfg["behavior"].get("max_short_shares", 100000)
+    max_sh = cfg["behavior"].get("max_short_shares")  # None = الشورت مفتوح
     for f in found:
         inf = infos.get(f["symbol"]) or {}
         sa = (ib.get(f["symbol"]) or {}).get("available")
         sv, src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
         f.update({"name": inf.get("shortName") or inf.get("longName") or f["symbol"], "price": f["ah_last"],
-                  "float": inf.get("floatShares"), "short": sv, "short_src": src, "flags": [], "news": []})
-        if sv is None:
+                  "float": inf.get("floatShares"), "short": sv, "short_src": src, "flags": [], "news": [],
+                  "country": inf.get("country")})
+        if max_sh and sv is None:
             f["flags"].append("الشورت غير معروف")
-        elif sv > max_sh:
+        elif max_sh and sv > max_sh:
             f["flags"].append(f"الشورت {sv:,} فوق {max_sh:,}")
     if found:
+        import flags
+        import holders
+        flags.annotate(found)
+        if cfg["behavior"].get("exclude_hrt"):
+            try:
+                holders.annotate(found, log)
+                for f in found:
+                    if f.get("hrt"):
+                        f["flags"].append(f"⛔ HRT من الملاك ({f['hrt']['period']})")
+            except Exception as e:
+                log("فحص HRT تعطل:", repr(e)[:150])
         sec_tools.annotate(found, log)
         kept, excl = sec_tools.exclude_repeat_diluters(found, log)
         bad = {e["symbol"] for e in excl}

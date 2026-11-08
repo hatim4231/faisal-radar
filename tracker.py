@@ -137,6 +137,12 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "conf": (s.get("confidence") or {}).get("p"), "conf_label": (s.get("confidence") or {}).get("label"),
                         "conf_base": (s.get("confidence") or {}).get("base"),
                         "conf_similar": (s.get("confidence") or {}).get("similar")})
+    # علم الدولة (طلب المستخدم) لكل الرادارات
+    meta = {s.get("symbol"): s for s in payload.get("stocks", payload.get("today", [])) if isinstance(s, dict)}
+    for o in out:
+        m = meta.get(o["symbol"]) or {}
+        if m.get("flag"):
+            o["flag"], o["country_ar"] = m["flag"], m.get("country_ar")
     return out
 
 
@@ -326,7 +332,8 @@ def run():
                     if sim.get("hit") is not None and sim.get("avg_win") is not None and miss is not None else ""
                 warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}{simtxt}" + warn
             new_events.append(
-                f"🔔 توصية جديدة — {name}\n{s['label']} <b>{s['symbol']}</b> ({s.get('name') or ''})\n"
+                f"🔔 توصية جديدة — {name}\n{s['label']} {s.get('flag') or ''} <b>{s['symbol']}</b> ({s.get('name') or ''})"
+                + (f" · {s['country_ar']}" if s.get("country_ar") else "") + "\n"
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"
                 + (f" · الهدف 2 {fp(s['t2'])}" if s.get("t2") else "") + f"\n{s['why']}{warn}")
 

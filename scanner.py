@@ -537,8 +537,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
             r["irtikaz"]["score"] = max(0, r["irtikaz"]["score"] - 5)
 
     # شرط الشورت: لا يرشح إلا سهم شورته 100 ألف أو أقل (config: max_short_shares)
-    max_sh = cfg["behavior"].get("max_short_shares")
-    if max_sh:
+    max_sh = cfg["behavior"].get("max_short_shares")  # None = قرار المستخدم: الشورت مفتوح (للعرض بس)
+    if True:
         for t in list(results):
             r = results[t]
             sa = (r.get("short_available") or {}).get("available")
@@ -547,6 +547,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
             else:
                 val, src = r.get("short_shares"), "Short Interest"
             r["short_used"] = {"value": val, "source": src, "max": max_sh}
+            if not max_sh:
+                continue
             if val is None:
                 # الشورت غير معروف: ما يترشح (حده الأعلى رادار)
                 r["irtikaz"]["adjustments"].append({"name": "الشورت غير معروف", "pts": 0,
@@ -566,6 +568,17 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
     # قرار المستخدم: شركات الطرح/التخفيف المتكرر ما تترشح
     rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
+    # قرار المستخدم: علم الدولة + استبعاد الأسهم اللي صندوق HRT من ملاكها
+    import flags
+    import holders
+    flags.annotate(rows)
+    excluded_hrt, hrt_info = [], {}
+    if cfg["behavior"].get("exclude_hrt"):
+        try:
+            hrt_info = holders.annotate(rows, log)
+            rows, excluded_hrt = holders.exclude(rows, log)
+        except Exception as e:
+            log("فحص HRT تعطل:", repr(e)[:150])
     # 🎯 أداة الثقة: احتمال نجاح التوصية (فيصل المطوّر فقط — النسخة الأصلية ما تتغير)
     if getattr(fr, "__name__", "") == "faisal_rules":
         try:
@@ -584,7 +597,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
-        "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil,
+        "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil, "excluded_hrt": excluded_hrt,
+        "hrt_report": {k: hrt_info.get(k) for k in ("name", "period", "filed", "n")} if hrt_info else None,
     }
     (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
     write_csv(rows)
