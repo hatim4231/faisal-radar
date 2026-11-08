@@ -75,9 +75,11 @@ def main():
            "period": [str(df.date.min()), str(df.date.max())], "n_random": int(len(R)), "n_by_quintile": ns,
            "atr20_q": [round(float(x), 4) for x in qs], "u_pct": UP.tolist(), "s_pct": SP.tolist(),
            "hit_permille": [np.rint(T * 1000).astype(int).tolist() for T in tables]}
-    print("\nSCHOOLS_BASE_BEGIN")
-    print(json.dumps(out, separators=(",", ":")))
-    print("SCHOOLS_BASE_END")
+    js = json.dumps(out, separators=(",", ":"))
+    print("\nSCHOOLS_BASE_BEGIN", len(js))   # أسطر قصيرة: سجل GitHub يقص السطر الطويل
+    for i in range(0, len(js), 900):
+        print("SB|" + js[i:i + 900])
+    print("SCHOOLS_BASE_END", flush=True)
 
 
 if __name__ == "__main__":
