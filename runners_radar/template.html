@@ -202,7 +202,7 @@ ul.clean{margin:0;padding-right:18px}
   <div class="list" id="list"></div>
   <div class="disc">الشروط بالضبط نفس الاختبار التاريخي: القاع = أدنى سعر 120 جلسة · الانهيار = أعلى سعر خلال 250 جلسة قبل القاع ÷ القاع ≥ 3 ·
     القاع الأخير = أدنى سعر آخر 10 جلسات · الدعوم المتصاعدة = أدنى سعر بكل 10 جلسات من آخر 30 جلسة ما ينزل · يوم الطيران = أعلى سعر ≥ إغلاق أمس +50%.
-    السيولة هنا أخف من باقي الرادارات (فوليوم 20 جلسة ≥ 20 ألف وسيولة ≥ 50 ألف$) عشان تدخل أسهم الفلووت الصغير مثل OMH. ليس توصية شراء أو بيع.</div>
+    <b>استثناءات هالرادار (قرارك):</b> <span id="fltnote">السعر مفتوح · الشورت حتى 100 ألف</span> · السيولة أخف من باقي الرادارات (فوليوم 20 جلسة ≥ 20 ألف وسيولة ≥ 50 ألف$) عشان تدخل أسهم الفلووت الصغير مثل OMH. ليس توصية شراء أو بيع.</div>
 </div>
 <script>
 const DATA = /*__DATA__*/null;
@@ -227,6 +227,9 @@ $("#theme").onclick = () => { const cur = document.documentElement.dataset.theme
   const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx) }catch(e){} render(); };
 $("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · فحص <span class="num">${DATA.scanned}</span> سهم · ${esc(DATA.source||"")}` : "";
 if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
+if (DATA){ const pr = DATA.price_range || [null, null], ms = DATA.max_short;
+  $("#fltnote").textContent = (pr[0] == null && pr[1] == null ? "السعر مفتوح" : `السعر ${pr[0] ?? 0}–${pr[1] ?? "∞"}$`) + " · " +
+    (ms ? `الشورت حتى ${Number(ms).toLocaleString("en")}` : "الشورت مفتوح"); }
 if (DATA && DATA.hist){ const H = DATA.hist;
   $("#histnote").innerHTML = `📊 <b>الاختبار التاريخي</b> (يدبّل خلال 60 جلسة مقابل عشوائي بنفس التذبذب والسعر): 🚀 جاهز <b class="num">${H.V5[0]}%</b> (عشوائي <span class="num">${H.V5[1]}%</span>) و<b class="num">${H.V6[0]}%</b> (<span class="num">${H.V6[1]}%</span>)
     · 🟡 قريب <b class="num">${H.V4[0]}%</b> (<span class="num">${H.V4[1]}%</span>). 🎲 تحت كل سهم: كم مرة العشوائي بنفس الهدف والوقف يوصل — لازم السجل يطلع أعلى منه.`; }

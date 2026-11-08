@@ -2,9 +2,10 @@
 """
 🚀 رادار الطيارات — من أمثلة المستخدم (OMH و QMMM). تجريبي وصامت (بالسجل بدون تيليجرام). الكاشف في runners.py.
 
-الفلاتر: نفس قرارات المستخدم (0.7-10$، القيمة السوقية/الفلووت، الشورت 50 ألف وأقل، بدون Warrants، امتثال ناسداك،
-استبعاد التخفيف المتكرر، استبعاد HRT، علم الدولة، الأخبار بالعربي) — **بس السيولة أخف** عشان تدخل أسهم مثل OMH
-(فوليومه ~67 ألف وكان ينشال بحد الـ 100 ألف): متوسط فوليوم 20 جلسة ≥ 20 ألف وسيولة يومية ≥ 50 ألف$ (نفس الاختبار).
+الفلاتر: قرارات المستخدم (القيمة السوقية/الفلووت، بدون Warrants، امتثال ناسداك، استبعاد التخفيف المتكرر، استبعاد HRT،
+علم الدولة، الأخبار بالعربي) **مع استثناءات لهالرادار بس** (config.json → runners، قرار المستخدم):
+  السعر مفتوح (باقي الرادارات 0.7-10$) · الشورت حتى 100 ألف (باقي الرادارات 50 ألف — OMH كان شورته ~55 ألف)
+  · السيولة أخف: متوسط فوليوم 20 جلسة ≥ 20 ألف وسيولة يومية ≥ 50 ألف$ (OMH فوليومه ~67 ألف وكان ينشال بحد الـ 100 ألف).
 
 المقارنة الصادقة: rand_p = كم مرة دخول عشوائي بنفس الهدف (+100%) والوقف ونفس التذبذب يوصل الهدف خلال 60 جلسة
 (runners_baseline.json)، + التوأم العشوائي (3 أسهم من نفس المسح ونفس التذبذب) يتابعه السجل.
@@ -45,7 +46,7 @@ OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
 BASE_PATH = ROOT / "runners_baseline.json"
 N_TWINS = 3
-MIN_VOL20, MIN_DV20 = 20_000, 50_000
+
 # نتايج الاختبار التاريخي (diag/backtest_runners2.py، 6,395 سهم مع المشطوبة، 3 سنين): يدبّل خلال 60 جلسة
 # مقابل عشوائي بنفس التذبذب والسعر — V5 21.5% (15.3%) · V6 21.7% (17.5%) · V4 20.0% (16.7%)
 HIST = {"V5": [21.5, 15.3], "V6": [21.7, 17.5], "V4": [20.0, 16.7]}
@@ -80,9 +81,14 @@ def rand_p(B: dict | None, atr: float, stop_pct: float | None, target: float = 2
 def run(cfg, tickers=None) -> dict:
     t0 = time.time()
     explicit = tickers is not None
+    RC = cfg.get("runners") or {}
+    MIN_VOL20, MIN_DV20 = RC.get("min_vol20", 20_000), RC.get("min_dv20", 50_000)
+    pmin, pmax = RC.get("min_price"), RC.get("max_price")          # None = السعر مفتوح (قرار المستخدم)
     if tickers is None:
         cfg_u = copy.deepcopy(cfg)
         cfg_u["universe"]["min_avg_volume"] = 2 * MIN_VOL20 * 0.75   # فلتر ياهو: متوسط 3 شهور > 15 ألف
+        cfg_u["universe"]["min_price"] = pmin if pmin is not None else 0.0001
+        cfg_u["universe"]["max_price"] = pmax if pmax is not None else 1_000_000
         tickers = data.get_universe(cfg_u)
     tickers = [t.strip().upper() for t in tickers if t.strip()]
     if not explicit:
@@ -94,15 +100,17 @@ def run(cfg, tickers=None) -> dict:
         v20 = float(d["Volume"].tail(20).mean())
         return v20 >= MIN_VOL20 and float((d["Close"].tail(20) * d["Volume"].tail(20)).mean()) >= MIN_DV20
 
-    pre = {t: d for t, d in daily.items()
-           if explicit or (U["min_price"] <= float(d["Close"].iloc[-1]) <= U["max_price"] and liquid(d))}
+    def price_ok(px):
+        return (pmin is None or px >= pmin) and (pmax is None or px <= pmax)
+
+    pre = {t: d for t, d in daily.items() if explicit or (price_ok(float(d["Close"].iloc[-1])) and liquid(d))}
     infos = data.get_info(list(pre), cfg)
     try:
         ib = data.load_ib_short()
     except Exception:
         ib = {}
     B = load_baseline()
-    max_sh = cfg["behavior"].get("max_short_shares")  # قرار المستخدم: فوق 50 ألف ما يترشح (None = مفتوح)
+    max_sh = RC.get("max_short_shares", cfg["behavior"].get("max_short_shares"))  # لهالرادار: 100 ألف (None = مفتوح)
     rows, eligible = [], set()
     for t, d in pre.items():
         inf = infos.get(t) or {}
@@ -206,7 +214,7 @@ def run(cfg, tickers=None) -> dict:
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "الأسعار: Alpaca + الشركة: Yahoo + SEC", "scanned": len(pre), "seconds": round(time.time() - t0),
                "stocks": rows, "excluded_dilution": excluded, "excluded_hrt": excluded_hrt, "hist": HIST,
-               "liquidity": {"vol20": MIN_VOL20, "dv20": MIN_DV20},
+               "liquidity": {"vol20": MIN_VOL20, "dv20": MIN_DV20}, "max_short": max_sh, "price_range": [pmin, pmax],
                "baseline": {k: B.get(k) for k in ("version", "horizon", "n")} if B else None}
     log(f"## رادار الطيارات: جاهز {cnt['ready']} · قريب {cnt['near']} · مراقبة {cnt['watch']} · خلص في {payload['seconds']} ثانية")
     for r in rows[:15]:
