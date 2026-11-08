@@ -2,7 +2,7 @@
 """
 🧭 رادار المدارس — كلاسيكي + وايكوف + إليوت (الكواشف في schools.py). تجريبي وصامت (بدون تيليجرام).
 
-نفس الفلاتر العامة (0.7-10$، الفوليوم، القيمة السوقية، الفلووت، بدون Warrants، امتثال ناسداك تحت 1$،
+نفس الفلاتر العامة (0.7-10$، الفوليوم، القيمة السوقية، الفلووت، الشورت 50 ألف وأقل، بدون Warrants، امتثال ناسداك تحت 1$،
 استبعاد التخفيف المتكرر، استبعاد الأسهم اللي HRT من ملاكها، علم الدولة، الأخبار بالعربي).
 
 المقارنة الصادقة (درس الاختبار التاريخي: نسبة نجاح النمط تجي غالباً من بعد الهدف/الوقف):
@@ -161,6 +161,7 @@ def run(cfg, tickers=None) -> dict:
     except Exception:
         mkt = {}
     B = load_baseline()
+    max_sh = cfg["behavior"].get("max_short_shares")  # قرار المستخدم: فوق 50 ألف ما يترشح (None = مفتوح)
     rows, eligible = [], set()   # eligible = نفس فلاتر الرادار قبل النمط (مجال التوأم العشوائي)
     for t, d in pre.items():
         inf = infos.get(t) or {}
@@ -169,7 +170,12 @@ def run(cfg, tickers=None) -> dict:
             flt = None
         if not explicit and ((mcap and mcap > U["max_market_cap"]) or (flt and flt > U["max_float"])):
             continue
-        eligible.add(t)
+        sa = (ib.get(t) or {}).get("available")
+        sv = sa if sa is not None else inf.get("sharesShort")   # المتاح للاقتراض (IB)، وإلا Short Interest
+        if not explicit and max_sh and sv is not None and sv > max_sh:
+            continue
+        if not max_sh or sv is not None:
+            eligible.add(t)   # التوأم بس من الأسهم اللي ممكن تترشح (الشورت معروف وتحت الحد)
         try:
             r = SC.detect(d)
         except Exception as e:
@@ -180,11 +186,10 @@ def run(cfg, tickers=None) -> dict:
         c = d["Close"]
         tail = d.tail(120)
         ma20, ma50 = c.rolling(20).mean().tail(120), c.rolling(50).mean().tail(120)
-        sa = (ib.get(t) or {}).get("available")
         row = {"symbol": t, "name": inf.get("shortName") or inf.get("longName") or t,
                "sector": inf.get("sector") or inf.get("industry"), "country": inf.get("country"),
                "price": _r(c.iloc[-1]), "change_pct": _r((c.iloc[-1] / c.iloc[-2] - 1) * 100, 2),
-               "market_cap": mcap, "float": flt, "short": sa if sa is not None else inf.get("sharesShort"),
+               "market_cap": mcap, "float": flt, "short": sv,
                "setups": r["setups"], "schools": r["schools"], "confluence": r["confluence"], "types": r["types"],
                "plan": {k: _r(v) for k, v in r["plan"].items()}, "best": r["best"], "quality": r["best"]["quality"],
                "context": r["context"], "date": str(d.index[-1])[:10], "flags": [], "tags": [],
@@ -200,6 +205,9 @@ def run(cfg, tickers=None) -> dict:
         row["status"] = {"strong": "ready", "good": "near", "watch": "radar"}[row["status"]]
         compliance_rule.apply_abdullah(row, d)
         row["status"] = {"ready": "strong", "near": "good"}.get(row["status"], "watch")
+        if max_sh and sv is None and not explicit:
+            row["flags"].append("الشورت غير معروف — ما يترشح لين يتأكد")
+            row["status"] = "watch"
         rows.append(row)
     log(f"[المدارس] {len(rows)} سهم فيه فرصة من {len(pre)}")
     # الأخبار + SEC + التخفيف المتكرر + HRT + الأعلام

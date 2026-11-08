@@ -536,8 +536,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
                                                 "detail": "كسر أدنى قاع آخر 5 جلسات على فريم 4 ساعات"})
             r["irtikaz"]["score"] = max(0, r["irtikaz"]["score"] - 5)
 
-    # شرط الشورت: لا يرشح إلا سهم شورته 100 ألف أو أقل (config: max_short_shares)
-    max_sh = cfg["behavior"].get("max_short_shares")  # None = قرار المستخدم: الشورت مفتوح (للعرض بس)
+    # شرط الشورت (قرار المستخدم، نوفمبر 2026): فوق 50 ألف ما يترشح (config: behavior.max_short_shares، None = مفتوح)
+    max_sh = cfg["behavior"].get("max_short_shares")
     if True:
         for t in list(results):
             r = results[t]
@@ -625,6 +625,8 @@ def radar_brief(r: dict) -> dict:
         why.append("قاع جديد — ينتظر تماسك الدعم الثاني")
     if I.get("status_before_compliance"):
         why.append("امتثال ناسداك (تحت 1$)")
+    if any(x.get("name") == "الشورت غير معروف" for x in I.get("adjustments") or []):
+        why.append("الشورت غير معروف — ما يترشح لين يتأكد")
     miss = [c.get("remaining") for c in sorted(I.get("checks") or [], key=lambda c: -(c.get("weight") or 0))
             if not c.get("ok") and c.get("remaining")]
     return {"symbol": r["symbol"], "flag": r.get("flag"), "country_ar": r.get("country_ar"), "price": r.get("price"),
