@@ -87,7 +87,7 @@ def evaluate(sig: dict) -> None:
     D = pd.Timestamp(sig["D"]).date()
     s = pd.Timestamp(sig["D"]).tz_localize(NY) + pd.Timedelta(days=1)
     b = A.bars([sig["symbol"]], "5Min", s.tz_convert("UTC").to_pydatetime(),
-               min(now_ny(), s + pd.Timedelta(days=5)).tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
+               min(now_ny() - pd.Timedelta(minutes=16), s + pd.Timedelta(days=5)).tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
     if b is None or b.empty:
         return
     b = b[b.index.date > D]
