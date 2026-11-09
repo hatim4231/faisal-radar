@@ -26,7 +26,11 @@
    "eligible": false,
    "t1": 2.1052,
    "t2": 2.2009,
-   "stop": 1.7224
+   "stop": 1.7224,
+   "N": "2026-11-09",
+   "pm_high_pct": 248.8,
+   "close_next_pct": 320.5,
+   "result": "nofill"
   },
   {
    "symbol": "OMH",
@@ -58,7 +62,13 @@
    "t1": 15.7714,
    "t2": 16.4882,
    "stop": 12.9038,
-   "pm_min_vol": 466561
+   "pm_min_vol": 466561,
+   "N": "2026-11-09",
+   "pm_high_pct": 57.4,
+   "close_next_pct": 54.7,
+   "r10": "hit",
+   "r15": "hit",
+   "result": "t2"
   }
  ]
 }
