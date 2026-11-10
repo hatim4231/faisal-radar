@@ -6734,6 +6734,7 @@
     "2026-11-09",
     "2026-11-09",
     "2026-11-09",
+    "2026-11-09",
     "2026-11-09"
    ]
   },
@@ -7485,6 +7486,59 @@
    "sessions": 0,
    "last": 1.51,
    "last_date": "2026-11-09"
+  },
+  {
+   "id": "accumulation:UPLD:2026-11-09",
+   "radar": "accumulation",
+   "radar_name": "🔍 التجميع",
+   "sub1": false,
+   "opened_at": "2026-11-10 13:04",
+   "result": "open",
+   "horizon": 20,
+   "symbol": "UPLD",
+   "status": "near",
+   "label": "🟡 تجميع محتمل",
+   "entry": 3.815,
+   "stop": 2.5875,
+   "t1": 4.258,
+   "t2": 6.1,
+   "score": 69.0,
+   "date": "2026-11-09",
+   "name": "Upland Software, Inc.",
+   "why": "قاعدة 14 جلسة بين 3.20 و 4.26",
+   "dilution": "none",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "sessions": 0,
+   "last": 3.815,
+   "last_date": "2026-11-09"
+  },
+  {
+   "id": "schools:UPLD:2026-11-09",
+   "radar": "schools",
+   "radar_name": "🧭 المدارس",
+   "sub1": false,
+   "opened_at": "2026-11-10 13:04",
+   "result": "open",
+   "horizon": 10,
+   "symbol": "UPLD",
+   "status": "ready",
+   "label": "🎯 قوي",
+   "entry": 3.815,
+   "stop": 2.7887,
+   "t1": 4.74,
+   "t2": 6.71,
+   "score": 72,
+   "date": "2026-11-09",
+   "name": "Upland Software, Inc.",
+   "why": "📐 الكلاسيكية + ⚖️ وايكوف · قاع مزدوج W، سبرنق + اختبار (وايكوف) · توافق 2/3",
+   "dilution": "none",
+   "rand_p": 0.321,
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "sessions": 0,
+   "last": 3.815,
+   "last_date": "2026-11-09"
   }
  ],
  "stop_rule_version": 2,
@@ -7509,6 +7563,7 @@
    "max_dd_pct": -12.4,
    "ret_pct": -2.6,
    "sweeps": [
+    "2026-11-09",
     "2026-11-09",
     "2026-11-09",
     "2026-11-09",
@@ -8830,6 +8885,7 @@
     "2026-11-09",
     "2026-11-09",
     "2026-11-09",
+    "2026-11-09",
     "2026-11-09"
    ]
   },
@@ -8853,6 +8909,7 @@
    "max_dd_pct": -8.3,
    "ret_pct": 1.0,
    "sweeps": [
+    "2026-11-09",
     "2026-11-09",
     "2026-11-09",
     "2026-11-09",
@@ -9736,6 +9793,7 @@
    "max_dd_pct": -17.0,
    "ret_pct": -6.4,
    "sweeps": [
+    "2026-11-09",
     "2026-11-09",
     "2026-11-09",
     "2026-11-09",
@@ -10954,6 +11012,7 @@
     "2026-11-09",
     "2026-11-09",
     "2026-11-09",
+    "2026-11-09",
     "2026-11-09"
    ]
   },
@@ -11259,6 +11318,7 @@
    "max_dd_pct": -8.3,
    "ret_pct": -1.7,
    "sweeps": [
+    "2026-11-09",
     "2026-11-09",
     "2026-11-09",
     "2026-11-09",
@@ -12335,6 +12395,57 @@
    "t2": null,
    "sessions": 0,
    "last": 1.55,
+   "last_date": "2026-11-09"
+  },
+  {
+   "id": "schools:UPLD:2026-11-09:r0",
+   "of": "schools:UPLD:2026-11-09",
+   "radar": "schools",
+   "radar_name": "🎲 عشوائي مماثل",
+   "symbol": "CABR",
+   "date": "2026-11-09",
+   "entry": 1.01,
+   "result": "open",
+   "horizon": 10,
+   "stop": 0.7383,
+   "t1": 1.2549,
+   "t2": null,
+   "sessions": 0,
+   "last": 1.01,
+   "last_date": "2026-11-09"
+  },
+  {
+   "id": "schools:UPLD:2026-11-09:r1",
+   "of": "schools:UPLD:2026-11-09",
+   "radar": "schools",
+   "radar_name": "🎲 عشوائي مماثل",
+   "symbol": "CDT",
+   "date": "2026-11-09",
+   "entry": 0.8401,
+   "result": "open",
+   "horizon": 10,
+   "stop": 0.6141,
+   "t1": 1.0438,
+   "t2": null,
+   "sessions": 0,
+   "last": 0.8401,
+   "last_date": "2026-11-09"
+  },
+  {
+   "id": "schools:UPLD:2026-11-09:r2",
+   "of": "schools:UPLD:2026-11-09",
+   "radar": "schools",
+   "radar_name": "🎲 عشوائي مماثل",
+   "symbol": "ELPW",
+   "date": "2026-11-09",
+   "entry": 1.18,
+   "result": "open",
+   "horizon": 10,
+   "stop": 0.8626,
+   "t1": 1.4661,
+   "t2": null,
+   "sessions": 0,
+   "last": 1.18,
    "last_date": "2026-11-09"
   }
  ]
