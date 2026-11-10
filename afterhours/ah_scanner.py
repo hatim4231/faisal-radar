@@ -201,8 +201,7 @@ def run(cfg) -> dict:
     max_sh = cfg["behavior"].get("max_short_shares")  # 50 ألف (None = مفتوح)
     for f in found:
         inf = infos.get(f["symbol"]) or {}
-        sa = (ib.get(f["symbol"]) or {}).get("available")
-        sv, src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
+        sv, src = data.short_of(f["symbol"], ib, inf)   # مو بقائمة IB = 0 متاح (تعريف فيصل)
         f.update({"name": inf.get("shortName") or inf.get("longName") or f["symbol"], "price": f["ah_last"],
                   "float": inf.get("floatShares"), "short": sv, "short_src": src, "flags": [], "news": [],
                   "country": inf.get("country")})

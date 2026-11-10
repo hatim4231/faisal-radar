@@ -119,8 +119,7 @@ def run(cfg, tickers=None) -> dict:
             flt = None
         if not explicit and ((mcap and mcap > U["max_market_cap"]) or (flt and flt > U["max_float"])):
             continue
-        sa = (ib.get(t) or {}).get("available")
-        sv = sa if sa is not None else inf.get("sharesShort")   # المتاح للاقتراض (IB)، وإلا Short Interest
+        sv, short_src = data.short_of(t, ib, inf)   # المتاح للاقتراض (IB)؛ مو بالقائمة = 0؛ IB تعطل = Short Interest
         if not explicit and max_sh and sv is not None and sv > max_sh:
             continue
         if not max_sh or sv is not None:
@@ -138,7 +137,7 @@ def run(cfg, tickers=None) -> dict:
         row = {"symbol": t, "name": inf.get("shortName") or inf.get("longName") or t,
                "sector": inf.get("sector") or inf.get("industry"), "country": inf.get("country"),
                "price": _r(c.iloc[-1]), "change_pct": _r((c.iloc[-1] / c.iloc[-2] - 1) * 100, 2),
-               "market_cap": mcap, "float": flt, "short": sv, "short_src": "IB" if sa is not None else "Short Interest",
+               "market_cap": mcap, "float": flt, "short": sv, "short_src": short_src,
                "vol20": int(d["Volume"].tail(20).mean()), "date": str(d.index[-1])[:10], "flags": [], "tags": [],
                **r,
                "chart": {"d": [str(i)[:10] for i in tail.index], "o": [_r(x) for x in tail["Open"]],

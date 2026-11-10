@@ -116,7 +116,7 @@ def run(cfg, tickers=None, deep=True) -> dict:
         # الشورت: المتاح للاقتراض (عدة قراءات بتواريخها)، وإلا Short Interest
         readings = hist.get(t, [])
         sa = ib.get(t, {}).get("available")
-        short_val, short_src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
+        short_val, short_src = data.short_of(t, ib, inf)   # مو بقائمة IB = 0 متاح (تعريف فيصل)
         if short_val is not None and A.get("max_short_shares") and short_val > A["max_short_shares"] and not explicit:
             continue
         a.update({

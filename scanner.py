@@ -339,6 +339,28 @@ def load_ib_short() -> dict[str, dict]:
     return out
 
 
+IB_MIN_ROWS = 1000   # أقل من كذا = ملف IB ما نزل كامل (عطل)
+
+
+def ib_ok(ib: dict | None) -> bool:
+    return bool(ib) and len(ib) >= IB_MIN_ROWS
+
+
+def short_of(sym: str, ib: dict | None, info: dict | None) -> tuple[int | None, str]:
+    """الشورت بتعريف فيصل = المتاح للاقتراض عند IB (تصحيح نوفمبر 2026 بعد OMH، بموافقة المستخدم):
+    - السهم موجود بقائمة IB ← رقمه.
+    - مو موجود بالقائمة (والقائمة نزلت كاملة) ← ما فيه أسهم متاحة للشورت عند IB = 0.
+      (كان الكود ياخذ بداله Short Interest من ياهو — رقم قديم ومختلف — وشال OMH بـ 55,556 وهو غالباً 0 متاح)
+    - القائمة ما نزلت (عطل) ← Short Interest من ياهو كاحتياط."""
+    if ib_ok(ib):
+        x = ib.get(sym)
+        if x is None:
+            return 0, "غير متاح للشورت عند IB"
+        if x.get("available") is not None:
+            return x["available"], "المتاح للاقتراض (IB)"
+    return (info or {}).get("sharesShort"), "Short Interest (ياهو — احتياط)"
+
+
 def short_available(t: str) -> dict | None:
     """الشورت المتاح للاقتراض (اللي يقصده فيصل بـ "شورت 10 آلاف") من iBorrowDesk."""
     import requests
@@ -502,8 +524,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     for t, d in pre.items():
         try:
             inf_t = dict(infos.get(t) or {})
-            if t in ib_short and ib_short[t].get("available") is not None:
-                inf_t["shortAvailable"] = ib_short[t]["available"]
+            if ib_ok(ib_short) and (t not in ib_short or ib_short[t].get("available") is not None):
+                inf_t["shortAvailable"] = short_of(t, ib_short, inf_t)[0]   # مو بقائمة IB = 0 متاح
             a = fr.analyze(d, inf_t, cfg)
         except Exception:
             log(f"  خطأ في تحليل {t}:", traceback.format_exc(limit=1).splitlines()[-1])
@@ -523,6 +545,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         a["exchange"] = inf.get("exchange")
         if t in ib_short:
             a["short_available"] = ib_short[t]
+        a["_short"] = short_of(t, ib_short, inf)
         results[t] = a
 
     if deep and results:
@@ -541,11 +564,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     if True:
         for t in list(results):
             r = results[t]
-            sa = (r.get("short_available") or {}).get("available")
-            if sa is not None:
-                val, src = sa, "المتاح للاقتراض"
-            else:
-                val, src = r.get("short_shares"), "Short Interest"
+            val, src = r.pop("_short", (None, "غير معروف"))
             r["short_used"] = {"value": val, "source": src, "max": max_sh}
             if not max_sh:
                 continue
