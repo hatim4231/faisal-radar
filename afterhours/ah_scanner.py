@@ -86,8 +86,10 @@ def evaluate(sig: dict) -> None:
     """النتيجة يوم التداول التالي (بعد ما يخلص)."""
     D = pd.Timestamp(sig["D"]).date()
     s = pd.Timestamp(sig["D"]).tz_localize(NY) + pd.Timedelta(days=1)
-    b = A.bars([sig["symbol"]], "5Min", s.tz_convert("UTC").to_pydatetime(),
-               min(now_ny() - pd.Timedelta(minutes=16), s + pd.Timedelta(days=5)).tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
+    e = min(now_ny() - pd.Timedelta(minutes=16), s + pd.Timedelta(days=5))
+    if e <= s:
+        return  # اليوم التالي ما بدا (كان يطلب فترة بالمستقبل ← Alpaca يرد 403)
+    b = A.bars([sig["symbol"]], "5Min", s.tz_convert("UTC").to_pydatetime(), e.tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
     if b is None or b.empty:
         return
     b = b[b.index.date > D]
