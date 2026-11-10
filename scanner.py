@@ -807,6 +807,7 @@ def main():
     ap.add_argument("--demo", action="store_true", help="تقرير تجريبي ببيانات وهمية")
     ap.add_argument("--config", help="مسار ملف إعدادات بديل")
     ap.add_argument("--out", help="مسار ملف التقرير (يستخدم في GitHub Pages)")
+    ap.add_argument("--out-new", help="الشكل الجديد التجريبي: نفس البيانات بصفحة ثانية (template_new.html)")
     args = ap.parse_args()
 
     cfg = load_cfg(Path(args.config) if args.config else None)
@@ -839,6 +840,16 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     report.write(payload, out)
     log(f"التقرير: {out}")
+    # الشكل الجديد (تجريبي — قرار المستخدم 2026-11-10: «حطه برابط تجريبي ... لاتغير الحاليه الا لما نتعود على الجديد»)
+    # نفس البيانات بالضبط بصفحة /new/، والصفحة الحالية ما تتغير. أي عطل هنا ما يأثر على الصفحة الحالية.
+    if args.out_new:
+        try:
+            on = Path(args.out_new)
+            on.parent.mkdir(parents=True, exist_ok=True)
+            report.write(payload, on, template=ROOT / "template_new.html")
+            log(f"الشكل الجديد (تجريبي): {on}")
+        except Exception as e:
+            log("الشكل الجديد تعطل (الصفحة الحالية سليمة):", repr(e)[:150])
     log(f"ملف Excel/CSV: {OUT / 'latest.csv'}")
     if not args.no_open:
         webbrowser.open(out.as_uri())

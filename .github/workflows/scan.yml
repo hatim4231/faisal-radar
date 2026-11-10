@@ -54,7 +54,7 @@ jobs:
 
       - name: المسح
         run: |
-          python scanner.py --no-open --out site/index.html
+          python scanner.py --no-open --out site/index.html --out-new site/new/index.html
           cp output/latest.json output/sig_faisal_dev.json
 
       - name: نسخ ملف Excel (فقط إذا الموقع بدون كلمة سر)
@@ -121,6 +121,9 @@ jobs:
           fi
           if [ -f site/runners/index.html ]; then
             npx --yes staticrypt@3.5.4 site/runners/index.html "${OPTS[@]}" --template-title "🚀 رادار الطيارات" -d site/runners
+          fi
+          if [ -f site/new/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/new/index.html "${OPTS[@]}" --template-title "✨ رادار فيصل — الشكل الجديد" -d site/new
           fi
 
       - uses: actions/upload-pages-artifact@v3
