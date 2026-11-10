@@ -103,7 +103,13 @@
    "t1": 2.2418,
    "t2": 2.3437,
    "stop": 1.8342,
-   "pm_min_vol": 13498
+   "pm_min_vol": 13498,
+   "N": "2026-11-10",
+   "pm_high_pct": 12.3,
+   "close_next_pct": -13.2,
+   "r10": "hit",
+   "r15": "hit",
+   "result": "t2"
   },
   {
    "symbol": "CISS",
@@ -145,7 +151,13 @@
    "t1": 2.8442,
    "t2": 2.9734,
    "stop": 2.327,
-   "pm_min_vol": 170304
+   "pm_min_vol": 170304,
+   "N": "2026-11-10",
+   "pm_high_pct": 37.9,
+   "close_next_pct": -28.4,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   },
   {
    "symbol": "KLTR",
@@ -177,7 +189,11 @@
    "t1": 1.6799,
    "t2": 1.7563,
    "stop": 1.3745,
-   "pm_min_vol": 5867
+   "pm_min_vol": 5867,
+   "N": "2026-11-10",
+   "pm_high_pct": 8.1,
+   "close_next_pct": -12.5,
+   "result": "nofill"
   }
  ],
  "fire_sent": []
