@@ -69,6 +69,115 @@
    "r10": "hit",
    "r15": "hit",
    "result": "t2"
+  },
+  {
+   "symbol": "AMIX",
+   "D": "2026-11-09",
+   "close": 1.685,
+   "ah_high": 2.25,
+   "ah_last": 2.12,
+   "ah_vwap": 2.038,
+   "jump_pct": 33.5,
+   "hold_pct": 77,
+   "ah_vol": 192835,
+   "rth_vol": 144520,
+   "limit": 2.038,
+   "name": "Autonomix Medical, Inc.",
+   "price": 2.12,
+   "float": 918257,
+   "short": 100000,
+   "short_src": "المتاح للاقتراض",
+   "flags": [
+    "الشورت 100,000 فوق 50,000",
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_level": "medium",
+   "eligible": false,
+   "t1": 2.2418,
+   "t2": 2.3437,
+   "stop": 1.8342,
+   "pm_min_vol": 13498
+  },
+  {
+   "symbol": "CISS",
+   "D": "2026-11-09",
+   "close": 1.75,
+   "ah_high": 3.01,
+   "ah_last": 2.85,
+   "ah_vwap": 2.5856,
+   "jump_pct": 72.0,
+   "hold_pct": 87,
+   "ah_vol": 2432922,
+   "rth_vol": 131076,
+   "limit": 2.5856,
+   "name": "C3is Inc.",
+   "price": 2.85,
+   "float": 11792,
+   "short": 58325,
+   "short_src": "Short Interest",
+   "flags": [
+    "الشورت 58,325 فوق 50,000",
+    "⛔ HRT من الملاك (2026-06-30)",
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "Greece",
+   "flag": "🇬🇷",
+   "country_ar": "اليونان",
+   "hrt": {
+    "shares": 24459,
+    "name13f": "C3IS INC",
+    "period": "2026-06-30",
+    "filed": "2026-08-14"
+   },
+   "tags": [
+    "⛔ تخفيف SEC"
+   ],
+   "dilution_level": "high",
+   "eligible": false,
+   "t1": 2.8442,
+   "t2": 2.9734,
+   "stop": 2.327,
+   "pm_min_vol": 170304
+  },
+  {
+   "symbol": "KLTR",
+   "D": "2026-11-09",
+   "close": 1.44,
+   "ah_high": 1.6682,
+   "ah_last": 1.6,
+   "ah_vwap": 1.5272,
+   "jump_pct": 15.8,
+   "hold_pct": 70,
+   "ah_vol": 83820,
+   "rth_vol": 305831,
+   "limit": 1.5272,
+   "name": "Kaltura, Inc.",
+   "price": 1.6,
+   "float": 90696279,
+   "short": 550000,
+   "short_src": "المتاح للاقتراض",
+   "flags": [
+    "الشورت 550,000 فوق 50,000"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 1.6799,
+   "t2": 1.7563,
+   "stop": 1.3745,
+   "pm_min_vol": 5867
   }
  ]
 }
