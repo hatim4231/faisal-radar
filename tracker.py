@@ -47,6 +47,18 @@ def is_muted(t: dict) -> bool:
     return t.get("radar") in MUTED or (t.get("radar") == "faisal_dev" and t.get("conf_label") == "منخفضة")
 
 
+def open_trades(radar: str) -> dict[str, dict]:
+    """التوصيات المفتوحة لرادار (آخر وحدة لكل سهم) — عشان الصفحة توضح خطة الصفقة المفتوحة جنب التقييم الحالي."""
+    keep = ("date", "opened_at", "label", "entry", "stop", "t1", "t2", "result", "last", "last_date", "ret_pct",
+            "max_gain_pct", "max_dd_pct", "sessions", "horizon", "conf", "conf_label")
+    out = {}
+    for t in load(TRACK, {"trades": []}).get("trades", []):
+        if t.get("radar") == radar and t.get("result") in ("open", "t1"):
+            if t["symbol"] not in out or t.get("opened_at", "") > out[t["symbol"]].get("opened_at", ""):
+                out[t["symbol"]] = {k: t.get(k) for k in keep}
+    return out
+
+
 def horizon(t: dict) -> int:
     return int(t.get("horizon") or HORIZON.get(t.get("radar"), MAX_SESSIONS))
 COOLDOWN_DAYS = 7          # ~5 جلسات قبل ما نفتح توصية جديدة لنفس السهم من نفس الرادار

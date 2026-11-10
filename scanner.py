@@ -626,6 +626,18 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         n = Counter(r["irtikaz"]["status"] for r in rows)
         log(f"صفحة فيصل المطوّر: {len(rows)} سهم (✅ {n['ready']} · 🟡 {n['near']} · 👀 {n['radar']})"
             + (f" · مخفي تحت الرادار {len(hidden)}" if hidden is not None else ""))
+    # التوصية المفتوحة (من السجل) لكل سهم: الصفحة تفصل بين «خطة صفقتك» و«التقييم الحالي لشراء جديد»
+    # (طلب المستخدم بعد FBGL: التقييم نزل بعد ما اشترى — لأن السعر ابتعد عن الدعم، مو لأن الصفقة خربت)
+    try:
+        import tracker
+        ot = tracker.open_trades("faisal_dev" if getattr(fr, "__name__", "") == "faisal_rules" else "faisal_orig")
+        for r in rows:
+            if r["symbol"] in ot:
+                r["open_trade"] = ot[r["symbol"]]
+        if ot:
+            log(f"توصيات مفتوحة بالسجل: {len(ot)} · منها بالصفحة {sum(r['symbol'] in ot for r in rows)}")
+    except Exception as e:
+        log("التوصيات المفتوحة ما انقرت:", repr(e)[:120])
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",

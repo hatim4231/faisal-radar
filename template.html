@@ -330,6 +330,25 @@ function confLine(c){
     + (c.base != null ? ` <span class="note">· متوسط التوصيات <span class="num">${Math.round(c.base*100)}%</span></span>` : "")
     + (c.neg && c.neg.length ? ` <span class="note">· ضدها: ${c.neg.map(esc).join("، ")}</span>` : "") + `</div>`;
 }
+function openTradeLine(s){
+  const o = s.open_trade;
+  if (!o) return "";
+  const r = o.ret_pct;
+  return `<div class="left" style="font-weight:600">📌 توصية مفتوحة من <span class="num">${esc(o.date)}</span>: دخول <span class="num">${fp(o.entry)}</span>
+    · الآن <span class="num ${r>=0?"up":"down"}">${r==null?"-":(r>0?"+":"")+r+"%"}</span> · الوقف <span class="num" style="color:var(--bad)">${fp(o.stop)}</span>
+    · الهدف <span class="num" style="color:var(--good)">${fp(o.t1)}</span> <span class="note">— التقييم فوق لشراء جديد بالسعر الحالي</span></div>`;
+}
+function openTradeCard(s){
+  const o = s.open_trade;
+  if (!o) return "";
+  return `<div class="card" style="border-color:var(--accent)"><h3>📌 عندك توصية مفتوحة على هالسهم</h3>
+    <div class="note" style="line-height:1.9">انحفظت <span class="num">${esc(o.date)}</span> كـ ${esc(o.label||"")}: دخول <b class="num">${fp(o.entry)}</b>
+      · الوقف (إغلاق تحت) <b class="num" style="color:var(--bad)">${fp(o.stop)}</b> · الهدف 1 <b class="num" style="color:var(--good)">${fp(o.t1)}</b>
+      ${o.t2 ? `· الهدف 2 <b class="num">${fp(o.t2)}</b>` : ""} · الآن <b class="num">${fp(o.last)}</b> (${o.ret_pct>0?"+":""}${o.ret_pct ?? "-"}%) · أقصى ربح ${o.max_gain_pct ?? "-"}%
+      · جلسات <span class="num">${o.sessions ?? 0}</span> من ${o.horizon || 20}${o.result === "t1" ? " · ✅ وصل الهدف الأول" : ""}<br>
+      <b>مهم:</b> الحالة والجاهزية والثقة اللي بالصفحة تقيس <b>شراء جديد بالسعر الحالي</b> — لما السعر يبتعد عن الدعم أو يصير الهدف أبعد،
+      تنزل طبيعي حتى لو صفقتك رابحة. <b>صفقتك تمشي على خطتها:</b> الوقف بإغلاق تحت <span class="num">${fp(o.stop)}</span>، والهدف <span class="num">${fp(o.t1)}</span>.</div></div>`;
+}
 function confCard(c){
   if (!c) return "";
   return `<div class="card"><h3>🎯 أداة الثقة — احتمال نجاح التوصية</h3>
@@ -396,6 +415,7 @@ function render(){
         ${rem.length ? `<div class="left"><span class="k">باقي:</span> ${rem.map(esc).join(" · ")}</div>` :
           (isI && st==="ready" ? `<div class="left" style="color:var(--good)">اكتملت الشروط الأساسية — راقب الثبات وضع طلبات Limit داخل منطقة الطلب</div>` : "")}
         ${warn}
+        ${openTradeLine(s)}
         ${isI && s.confidence ? confLine(s.confidence) : ""}
         ${s.dilution && s.dilution.level!=="none" && s.dilution.level!=="low" ? `<div class="left" style="color:${s.dilution.level==="high"?"var(--bad)":"var(--warn)"}">🏛 SEC: ${esc(s.dilution.hits[0].label)} (<span class="num">${esc(s.dilution.hits[0].form)} · ${esc(s.dilution.hits[0].date)}</span>)</div>` : ""}
         ${s.accum ? `<div class="left" style="color:var(--good)">${esc(s.accum.label)} (${Math.round(s.accum.score)}) — قاعدة ${s.accum.base_len} جلسة · ${esc(s.accum.signs.slice(0,3).join("، "))}</div>` : ""}
@@ -497,6 +517,7 @@ function openDetail(sym){
       <div class="legend"><span><i style="background:var(--ma20)"></i>MA20</span><span><i style="background:var(--ma50)"></i>MA50</span><span><i style="background:var(--good)"></i>الدعم</span><span><i style="background:var(--zone);height:9px"></i>منطقة الطلب</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--accent)"></i>الأهداف الأربعة</span></div>
     </div>
 
+    ${openTradeCard(s)}
     ${confCard(s.confidence)}
     <div class="card"><h3>📋 خطة فيصل المقترحة (Limit داخل منطقة الطلب — لا تشتري من العرض)</h3>
       <div class="plan">
