@@ -33,12 +33,12 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 MAX_SESSIONS = 20
 # قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
 # إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
-HORIZON = {"faisal_dev": 10, "schools": 10}
+HORIZON = {"faisal_dev": 10, "schools": 10, "runners": 60}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
 # (+ التجميع والمدارس: نفس قواعد اختبارهم التاريخي — الهدف يُفحص أول، والوقف بإغلاق اليوم تحته)
-NEW_RULES = {"faisal_dev", "abdullah", "accumulation", "schools"}
-# قرار المستخدم: رادار التجميع ورادار المدارس نراقب نتايجهم بالسجل بدون رسائل تيليجرام
-MUTED = {"accumulation", "schools"}
+NEW_RULES = {"faisal_dev", "abdullah", "accumulation", "schools", "runners"}
+# قرار المستخدم: رادار التجميع والمدارس والطيارات نراقب نتايجهم بالسجل بدون رسائل تيليجرام
+MUTED = {"accumulation", "schools", "runners"}
 WIN = ("t1", "t2", "t1_then_stop", "t1_expired")
 
 
@@ -58,12 +58,14 @@ RADARS = {
     "insiders": ("🟢 المطّلعين", ROOT / "output" / "sig_insiders.json"),
     "accumulation": ("🔍 التجميع", ROOT / "output" / "sig_accumulation.json"),
     "schools": ("🧭 المدارس", ROOT / "output" / "sig_schools.json"),
+    "runners": ("🚀 الطيارات", ROOT / "output" / "sig_runners.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
 STATUS_AR_INS = {"ready": "🟢 شراء داخلي قوي", "near": "🟡 شراء داخلي"}
 STATUS_AR_ACC = {"ready": "🔍 تجميع مؤكد", "near": "🟡 تجميع محتمل"}
 STATUS_AR_SCH = {"ready": "🎯 قوي", "near": "🟡 جيد"}
+STATUS_AR_RUN = {"ready": "🚀 جاهز", "near": "🟡 قريب"}
 SCH_AR = {"classic": "📐 الكلاسيكية", "wyckoff": "⚖️ وايكوف", "elliott": "〰️ إليوت"}
 
 
@@ -89,6 +91,19 @@ def fp(x):
 def signals(key: str, payload: dict) -> list[dict]:
     out = []
     for s in payload.get("stocks", []):
+        if key == "runners":
+            st = s.get("status") if s.get("status") in ("ready", "near") else None
+            p = s.get("plan") or {}
+            if not st or not p.get("stop") or not p.get("t1"):
+                continue
+            out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_RUN[st],
+                        "entry": s["price"], "stop": p["stop"], "t1": p["t1"], "t2": p.get("t2"),
+                        "zone": p.get("zone"), "score": s.get("n_jumps"), "date": s.get("date"), "name": s.get("name"),
+                        "why": f"انهار {s.get('crash_pct')}% · قاع {fp(s.get('bottom'))} قبل {s.get('age')} جلسة · قاع أعلى +{s.get('hl_pct')}% · "
+                               f"RSI {s.get('rsi_bottom')}→{s.get('rsi_last_low')} · طار {s.get('n_jumps')} مرة · {s.get('level_ar', '')}",
+                        "dilution": (s.get("dilution") or {}).get("level"),
+                        "rand_p": s.get("rand_p"), "twins": s.get("twins")})
+            continue
         if key == "schools":
             st = {"strong": "ready", "good": "near"}.get(s.get("status"))
             p = s.get("plan") or {}
@@ -460,15 +475,17 @@ def stats(trades):
             "open": sum(t["result"] in ("open", "t1") for t in trades)}
 
 
-def vs_random(trades: list[dict], twins: list[dict], key: str = "schools", days: int = 16) -> dict:
-    """المقارنة الصادقة: التوصيات اللي كملت مدتها (10 جلسات ≈ 16 يوم) — نجاحها الحقيقي مقابل التوأم العشوائي
+def vs_random(trades: list[dict], twins: list[dict], key: str = "schools", days: int | None = None) -> dict:
+    """المقارنة الصادقة: التوصيات اللي كملت مدتها (المدة بالجلسات × 7/5 + يومين) — نجاحها الحقيقي مقابل التوأم العشوائي
     (نفس اليوم ونفس الهدف والوقف ونفس التذبذب) ومقابل المتوقع تاريخياً لنفس الهدف والوقف."""
+    H = HORIZON.get(key, MAX_SESSIONS)
+    days = days or (H * 7 + 4) // 5 + 2
     cut = (date.today() - timedelta(days=days)).isoformat()
     m = [t for t in trades if t["radar"] == key and str(t.get("date")) <= cut and t.get("sessions")]
     ids = {t["id"] for t in m}
     tw = [x for x in twins if x.get("of") in ids and x.get("sessions")]
     rp = [t["rand_p"] for t in m if t.get("rand_p") is not None]
-    out = {"n": len(m), "n_twins": len(tw), "n_total": sum(t["radar"] == key for t in trades)}
+    out = {"n": len(m), "n_twins": len(tw), "n_total": sum(t["radar"] == key for t in trades), "horizon": H}
     if m:
         out["hit_pct"] = round(sum(t["result"] in WIN for t in m) / len(m) * 100, 1)
     if tw:
@@ -493,7 +510,8 @@ def build_page(track):
         by_status[f"{k}:over1"] = stats([t for t in trades if t["radar"] == k and t.get("entry", 0) >= 1])
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "radars": {k: v[0] for k, v in RADARS.items()}, "stats": by, "stats_status": by_status,
-               "muted": sorted(MUTED), "vs_random": {"schools": vs_random(trades, track.get("twins", []))},
+               "muted": sorted(MUTED),
+               "vs_random": {k: vs_random(trades, track.get("twins", []), k) for k in ("schools", "runners")},
                "trades": sorted(trades, key=lambda t: t["opened_at"], reverse=True)}
     html = (ROOT / "template_track.html").read_text(encoding="utf-8")
     out = ROOT / "site" / "track" / "index.html"
