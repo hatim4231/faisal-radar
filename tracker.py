@@ -33,12 +33,14 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 MAX_SESSIONS = 20
 # قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
 # إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
-HORIZON = {"faisal_dev": 10, "schools": 10, "runners": 60}
+HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
 # (+ التجميع والمدارس: نفس قواعد اختبارهم التاريخي — الهدف يُفحص أول، والوقف بإغلاق اليوم تحته)
-NEW_RULES = {"faisal_dev", "abdullah", "accumulation", "schools", "runners"}
+NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners"}
 # قرار المستخدم: رادار التجميع والمدارس والطيارات نراقب نتايجهم بالسجل بدون رسائل تيليجرام
-MUTED = {"accumulation", "schools", "runners"}
+# + «⚠ طرح متكرر» (الخيار 2، 2026-11-10 بعد RUBI): شركات الطرح المتكرر تنعرض بقسم مخاطرة عالية بصفحة فيصل المطوّر
+#   وتنحفظ هنا صامتة بنفس قواعد فيصل المطوّر — عشان نعرف بالأرقام هل قاعدة «ما تترشح» صح
+MUTED = {"accumulation", "schools", "runners", "faisal_dil"}
 WIN = ("t1", "t2", "t1_then_stop", "t1_expired")
 
 
@@ -65,6 +67,7 @@ COOLDOWN_DAYS = 7          # ~5 جلسات قبل ما نفتح توصية جد�
 STOP_RULE_VERSION = 2
 RADARS = {
     "faisal_dev": ("📡 فيصل المطوّر", ROOT / "output" / "sig_faisal_dev.json"),
+    "faisal_dil": ("⚠ فيصل — طرح متكرر", ROOT / "output" / "sig_faisal_dev.json"),  # payload["diluters"]
     "faisal_orig": ("📜 فيصل الأصلي", ROOT / "output" / "sig_faisal_orig.json"),
     "abdullah": ("🌊 عبدالله", ROOT / "output" / "sig_abdullah.json"),
     "insiders": ("🟢 المطّلعين", ROOT / "output" / "sig_insiders.json"),
@@ -102,7 +105,8 @@ def fp(x):
 
 def signals(key: str, payload: dict) -> list[dict]:
     out = []
-    for s in payload.get("stocks", []):
+    stocks = (payload.get("diluters") or []) if key == "faisal_dil" else payload.get("stocks", [])
+    for s in stocks:
         if key == "runners":
             st = s.get("status") if s.get("status") in ("ready", "near") else None
             p = s.get("plan") or {}
@@ -184,8 +188,11 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "conf": (s.get("confidence") or {}).get("p"), "conf_label": (s.get("confidence") or {}).get("label"),
                         "conf_base": (s.get("confidence") or {}).get("base"),
                         "conf_similar": (s.get("confidence") or {}).get("similar")})
+            if key == "faisal_dil":
+                ev = s.get("dilution_events") or []
+                out[-1]["why"] += f" · ⚠ طرح متكرر: {len(ev)} أحداث خلال 90 يوم (آخرها {ev[-1]['date'] if ev else '-'})"
     # علم الدولة (طلب المستخدم) لكل الرادارات
-    meta = {s.get("symbol"): s for s in payload.get("stocks", payload.get("today", [])) if isinstance(s, dict)}
+    meta = {s.get("symbol"): s for s in (stocks or payload.get("today", [])) if isinstance(s, dict)}
     for o in out:
         m = meta.get(o["symbol"]) or {}
         if m.get("flag"):

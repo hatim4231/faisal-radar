@@ -192,6 +192,7 @@ ul.clean{margin:0;padding-right:18px}
   </div>
   <div class="chips" id="chips"></div>
   <div class="list" id="list"></div>
+  <div id="dilsec" class="list" style="display:none;margin-top:16px"></div>
   <details id="hidradar" class="card" style="display:none;margin-top:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="hidradar-body" style="margin-top:8px"></div></details>
 
   <div class="disc">
@@ -274,13 +275,16 @@ function tiles(){
   const c = k => stocks.filter(s => s.irtikaz.status === k).length;
   const m = stocks.filter(s => s.momentum.status !== "no").length;
   const hid = DATA && DATA.hidden_radar;   // فيصل المطوّر: «تحت الرادار» مخفي (قرار المستخدم: نركز على المطابق والقريب)
+  const dil = (DATA && DATA.diluters) || [];
   const T = [["ready","مطابق للشروط",c("ready")],["near","قريب (باقي شرط أو شرطين)",c("near")],
-             hid ? ["hidden","تحت الرادار (مخفية)",hid.length] : ["radar","تحت الرادار",c("radar")],["mom","زخم اليوم",m]];
+             hid ? ["hidden","تحت الرادار (مخفية)",hid.length] : ["radar","تحت الرادار",c("radar")],["mom","زخم اليوم",m]]
+            .concat(dil.length ? [["dil","⚠ طرح متكرر (مخاطرة عالية)",dil.length]] : []);
   $("#tiles").innerHTML = T.map(([k,l,n]) =>
     `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n}</b><span>${l}</span></div>`).join("");
   document.querySelectorAll(".tile").forEach(el => el.onclick = () => {
     const k = el.dataset.k;
     if (k === "hidden"){ const d = $("#hidradar"); d.open = true; d.scrollIntoView({behavior:"smooth", block:"start"}); return; }
+    if (k === "dil"){ if (tab !== "irtikaz"){ setTab("irtikaz"); render(); } $("#dilsec").scrollIntoView({behavior:"smooth", block:"start"}); return; }
     if (k === "mom"){ setTab("momentum"); filt = null; }
     else { if (tab !== "irtikaz") setTab("irtikaz"); filt = filt === k ? null : k; }
     render();
@@ -369,29 +373,7 @@ function confCard(c){
       احتمال مو ضمان — التزم بالوقف دائماً.</div></div>`;
 }
 
-function render(){
-  tiles(); chips();
-  const q = $("#q").value.trim().toUpperCase();
-  let L = stocks.filter(s => !q || s.symbol.includes(q) || (s.name||"").toUpperCase().includes(q));
-  if (tab === "momentum") L = L.filter(s => s.momentum.status !== "no" || q);
-  if (filt) L = L.filter(s => s.irtikaz.status === filt);
-  if (tagF) L = L.filter(s => s.tags.includes(tagF));
-  const key = $("#sort").value;
-  const sc = s => tab === "irtikaz" ? s.irtikaz.score : s.momentum.score;
-  const S = {
-    // فيصل المطوّر: المطابق ثم القريب ثم تحت الرادار، وداخل كل حالة الأعلى جاهزية (قرار المستخدم)
-    score: (a,b) => (DATA && DATA.status_first && tab === "irtikaz" ? (RANK[a.irtikaz.status] ?? 9) - (RANK[b.irtikaz.status] ?? 9) : 0) || (sc(b) - sc(a)),
-    support: (a,b) => (a.plan.dist_support_pct ?? 1e9) - (b.plan.dist_support_pct ?? 1e9),
-    rsi: (a,b) => (a.rsi ?? 1e9) - (b.rsi ?? 1e9),
-    rvol: (a,b) => (b.rel_volume ?? 0) - (a.rel_volume ?? 0),
-    float: (a,b) => (a.float ?? 1e12) - (b.float ?? 1e12),
-    upside: (a,b) => (b.plan.upside_pct ?? -1e9) - (a.plan.upside_pct ?? -1e9),
-    conf: (a,b) => ((b.confidence||{}).p ?? -1) - ((a.confidence||{}).p ?? -1),
-  };
-  L.sort(S[key]);
-  if (!L.length){ $("#list").innerHTML = `<div class="empty">${DATA && DATA.hidden_radar && !filt && !q && tab === "irtikaz" ? "ما فيه سهم ✅ مطابق أو 🟡 قريب حالياً — اللي تحت الرادار تحت (مخفية)." : "لا توجد أسهم بهذا الفلتر حالياً."} ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
-  $("#list").innerHTML = L.map(s => {
-    const isI = tab === "irtikaz";
+function rowHTML(s, isI, extra){
     const score = isI ? s.irtikaz.score : s.momentum.score;
     const st = isI ? s.irtikaz.status : s.momentum.status;
     const rem = remainingList(s).slice(0,2);
@@ -423,6 +405,7 @@ function render(){
         ${s.new_low ? `<div class="left" style="color:${s.new_low.pending?"var(--bad)":"var(--good)"}">${s.new_low.pending?"⚠":"✓"} ${esc(s.new_low.why)}</div>` : ""}
         ${s.split_zone ? `<div class="left" style="color:${s.split_zone.status==="in"?"var(--good)":s.split_zone.status==="below"?"var(--bad)":"var(--muted)"}">✂️ منطقة التقسيم <span class="num">${fp(s.split_zone.sweep)} – ${fp(s.split_zone.half)}</span> · ${esc(s.split_zone.label)}${(s.split_zone.status==="above" || s.split_zone.status==="na") ? " · " + esc(s.split_zone.note) : ""}</div>` : ""}
         ${(s.news||[]).length ? `<div class="left">${sentBadge(s.news[0])} <span class="note">${esc(dateTxt(s.news[0].time))}</span> ${esc(s.news[0].title_ar || s.news[0].title)}</div>` : ""}
+        ${extra || ""}
         <div class="tags">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
       </div>
       <div class="score">
@@ -431,8 +414,43 @@ function render(){
         <div class="note">${isI ? "جاهزية سهم الارتكاز" : "قوة الزخم"}</div>
       </div>
     </div>`;
-  }).join("");
+}
+
+function render(){
+  tiles(); chips();
+  const q = $("#q").value.trim().toUpperCase();
+  let L = stocks.filter(s => !q || s.symbol.includes(q) || (s.name||"").toUpperCase().includes(q));
+  if (tab === "momentum") L = L.filter(s => s.momentum.status !== "no" || q);
+  if (filt) L = L.filter(s => s.irtikaz.status === filt);
+  if (tagF) L = L.filter(s => s.tags.includes(tagF));
+  const key = $("#sort").value;
+  const sc = s => tab === "irtikaz" ? s.irtikaz.score : s.momentum.score;
+  const S = {
+    // فيصل المطوّر: المطابق ثم القريب ثم تحت الرادار، وداخل كل حالة الأعلى جاهزية (قرار المستخدم)
+    score: (a,b) => (DATA && DATA.status_first && tab === "irtikaz" ? (RANK[a.irtikaz.status] ?? 9) - (RANK[b.irtikaz.status] ?? 9) : 0) || (sc(b) - sc(a)),
+    support: (a,b) => (a.plan.dist_support_pct ?? 1e9) - (b.plan.dist_support_pct ?? 1e9),
+    rsi: (a,b) => (a.rsi ?? 1e9) - (b.rsi ?? 1e9),
+    rvol: (a,b) => (b.rel_volume ?? 0) - (a.rel_volume ?? 0),
+    float: (a,b) => (a.float ?? 1e12) - (b.float ?? 1e12),
+    upside: (a,b) => (b.plan.upside_pct ?? -1e9) - (a.plan.upside_pct ?? -1e9),
+    conf: (a,b) => ((b.confidence||{}).p ?? -1) - ((a.confidence||{}).p ?? -1),
+  };
+  L.sort(S[key]);
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">${DATA && DATA.hidden_radar && !filt && !q && tab === "irtikaz" ? "ما فيه سهم ✅ مطابق أو 🟡 قريب حالياً — اللي تحت الرادار تحت (مخفية)." : "لا توجد أسهم بهذا الفلتر حالياً."} ${tab==="momentum"?"أسهم الزخم تظهر وقت السوق/البري ماركت.":""}</div>`; return; }
+  $("#list").innerHTML = L.map(s => rowHTML(s, tab === "irtikaz")).join("");
+  renderDil();
   document.querySelectorAll(".row").forEach(el => el.onclick = () => openDetail(el.dataset.s));
+}
+// الخيار 2 (قرار المستخدم بعد RUBI): الطرح المتكرر ما ينشال بصمت — قسم لحاله بتقييمه الكامل، بدون تيليجرام
+function renderDil(){
+  const D = (DATA && DATA.diluters) || [];
+  const box = $("#dilsec");
+  if (!D.length || tab !== "irtikaz"){ box.style.display = "none"; box.innerHTML = ""; return; }
+  box.style.display = "";
+  box.innerHTML = `<div class="card" style="border-color:var(--bad);margin-bottom:8px"><b>⚠ طرح متكرر — مخاطرة عالية (${D.length})</b>
+    <div class="note" style="margin-top:4px">قاعدتك: شركات الطرح المتكرر (حدثين+ خلال 90 يوم) ما تترشح — بس ما تنشال بصمت: هذي تقييماتها كاملة للمعلومة.
+    <b>بدون تيليجرام</b>، وتنحفظ بالسجل صامتة عشان نعرف هل القاعدة صح. أغلبها يكمل نزول، وبعضها فلووت صغير يطير بدقايق (مثل RUBI) — وقف صارم وحجم صغير.</div></div>`
+    + D.map(s => rowHTML(s, true, `<div class="left" style="color:var(--bad)">⚠ طرح متكرر: ${(s.dilution_events||[]).map(e => `<span class="num">${esc(e.date)}</span> ${esc(e.what)}`).join(" · ")}</div>`)).join("");
 }
 
 // ------- chart (SVG candlesticks + levels)
@@ -496,7 +514,7 @@ function checksHTML(list){
 
 let openSym = null;
 function openDetail(sym){
-  const s = stocks.find(x => x.symbol === sym); if (!s) return;
+  const s = stocks.find(x => x.symbol === sym) || ((DATA && DATA.diluters) || []).find(x => x.symbol === sym); if (!s) return;
   openSym = sym;
   const p = s.plan, I = s.irtikaz, M = s.momentum;
   $("#dtitle").innerHTML = `<span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span>${s.country_ar ? ` <span class="note">${esc(s.country_ar)}</span>` : ""} <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${fpct(s.change_pct)}</span><div class="name" style="max-width:none">${esc(s.name)} · ${esc(s.sector||"")} · ${esc(s.country||"")} · بيانات ${esc(s.date)}</div>`;
@@ -633,7 +651,8 @@ if (LIVE){
   const box = document.getElementById("excl"); box.style.display = "";
   box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم (اضغط للتفاصيل)";
   document.getElementById("excl-body").innerHTML = ex.map(function(x){
-    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">' + esc(x.name||"") + '</span><ul class="clean note">' +
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">' + esc(x.name||"") + '</span>'
+      + (x.status ? ' <span class="tag">' + esc(STATUS[x.status] || x.status) + (x.score != null ? ' · ' + esc(Math.round(x.score)) + '%' : '') + '</span>' : '') + '<ul class="clean note">' +
       x.events.map(function(e){ return '<li><span class="num">' + esc(e.date) + '</span> — ' + esc(e.what) + '</li>'; }).join("") + '</ul></div>';
   }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
 })();

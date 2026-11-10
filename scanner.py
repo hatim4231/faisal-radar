@@ -585,24 +585,29 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     rows.sort(key=lambda r: -r["irtikaz"]["score"])
     if deep:
         sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
-    # قرار المستخدم: شركات الطرح/التخفيف المتكرر ما تترشح
-    rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
+    # قرار المستخدم: شركات الطرح/التخفيف المتكرر ما تترشح — الخيار 2 (2026-11-10 بعد RUBI): ما تنشال بصمت،
+    # تطلع بقسم «⚠ طرح متكرر — مخاطرة عالية» بتقييمها الكامل (بدون تيليجرام، وبالسجل صامتة عشان نحكم على القاعدة)
+    dil_rows: list[dict] = []
+    rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log, full=dil_rows)
     # قرار المستخدم: علم الدولة + استبعاد الأسهم اللي صندوق HRT من ملاكها
     import flags
     import holders
     flags.annotate(rows)
+    flags.annotate(dil_rows)
     excluded_hrt, hrt_info = [], {}
     if cfg["behavior"].get("exclude_hrt"):
         try:
-            hrt_info = holders.annotate(rows, log)
+            hrt_info = holders.annotate(rows + dil_rows, log)
             rows, excluded_hrt = holders.exclude(rows, log)
+            dil_rows, ex2 = holders.exclude(dil_rows, lambda *a: None)
+            excluded_hrt += ex2
         except Exception as e:
             log("فحص HRT تعطل:", repr(e)[:150])
     # 🎯 أداة الثقة: احتمال نجاح التوصية (فيصل المطوّر فقط — النسخة الأصلية ما تتغير)
     if getattr(fr, "__name__", "") == "faisal_rules":
         try:
             import confidence
-            n_conf = confidence.apply(rows, daily, log)
+            n_conf = confidence.apply(rows + dil_rows, daily, log)
             if n_conf:
                 log(f"أداة الثقة: انحسبت لـ {n_conf} سهم")
                 for r in rows:
@@ -626,12 +631,21 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         n = Counter(r["irtikaz"]["status"] for r in rows)
         log(f"صفحة فيصل المطوّر: {len(rows)} سهم (✅ {n['ready']} · 🟡 {n['near']} · 👀 {n['radar']})"
             + (f" · مخفي تحت الرادار {len(hidden)}" if hidden is not None else ""))
+        dil_rows = [r for r in dil_rows if r["irtikaz"]["status"] in show]
+    else:
+        dil_rows = [r for r in dil_rows if r["irtikaz"]["status"] in ("ready", "near", "radar")]
+    rank = {"ready": 0, "near": 1, "radar": 2, "no": 3}
+    dil_rows.sort(key=lambda r: (rank.get(r["irtikaz"]["status"], 9), -r["irtikaz"]["score"]))
+    if dil_rows:
+        nd = Counter(r["irtikaz"]["status"] for r in dil_rows)
+        log(f"⚠ طرح متكرر (قسم مخاطرة عالية): {len(dil_rows)} سهم (✅ {nd['ready']} · 🟡 {nd['near']} · 👀 {nd['radar']}) — "
+            + ", ".join(f"{r['symbol']}({r['irtikaz']['status']} {r['irtikaz']['score']:.0f}%)" for r in dil_rows[:12]))
     # التوصية المفتوحة (من السجل) لكل سهم: الصفحة تفصل بين «خطة صفقتك» و«التقييم الحالي لشراء جديد»
     # (طلب المستخدم بعد FBGL: التقييم نزل بعد ما اشترى — لأن السعر ابتعد عن الدعم، مو لأن الصفقة خربت)
     try:
         import tracker
         ot = tracker.open_trades("faisal_dev" if getattr(fr, "__name__", "") == "faisal_rules" else "faisal_orig")
-        for r in rows:
+        for r in rows + dil_rows:
             if r["symbol"] in ot:
                 r["open_trade"] = ot[r["symbol"]]
         if ot:
@@ -644,7 +658,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
         "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil, "excluded_hrt": excluded_hrt,
         "hrt_report": {k: hrt_info.get(k) for k in ("name", "period", "filed", "n")} if hrt_info else None,
-        "hidden_radar": hidden, "status_first": status_first,
+        "hidden_radar": hidden, "status_first": status_first, "diluters": dil_rows,
         "status_counts": dict(Counter(r["irtikaz"]["status"] for r in all_rows)),
     }
     (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
