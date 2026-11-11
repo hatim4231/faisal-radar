@@ -380,7 +380,19 @@ def main():
     w = fit_logit(Z, df.E10.astype(float).values, lam=5.0)
     for f_, c_ in sorted(zip(FEATS, w[1:]), key=lambda x: -abs(x[1])):
         print(f"  {f_:>11}: {c_:+.3f}")
+    # حدود الحالات من توزيع الاحتمال خارج العينة: 🧨 أعلى 1% · 🟠 أعلى 5% — ونتايجها الفعلية (للعرض بالصفحة)
+    q99, q95 = float(T.p.quantile(0.99)), float(T.p.quantile(0.95))
+    tiers = {}
+    for k_, g in (("ready", T[T.p >= q99]), ("near", T[(T.p >= q95) & (T.p < q99)])):
+        tiers[k_] = {"e10": float(g.E10.mean()), "e20": float(g.E20.mean()), "exp_e10": matched_expect(g, T, "E10"),
+                     "mx20_50": float((g.mx20 >= 0.5).mean()), "mx20_100": float((g.mx20 >= 1).mean()),
+                     "dd20_30": float((g.dd20 <= -0.3).mean()), "r20_med": float(g.r20.median()), "n": int(len(g)),
+                     **{c_: float(g[c_].mean()) for c_ in ("tr50", "v_c10", "v_c5", "v_lot", "v_s15", "v_s25", "v_s15b")},
+                     **{f"{c_}_rand": matched_expect(g.dropna(subset=[c_]), T.dropna(subset=[c_]), c_)
+                        for c_ in ("tr50", "v_c10", "v_c5", "v_lot", "v_s15", "v_s25", "v_s15b")}}
+    print("\nحدود الحالات:", {"ready_p": round(q99, 4), "near_p": round(q95, 4)}, json.dumps(tiers, ensure_ascii=False)[:1500])
     model = {"version": "hr1-" + datetime.now(timezone.utc).strftime("%Y%m%d"), "feats": FEATS, "w": [float(x) for x in w],
+             "thresholds": {"ready": q99, "near": q95}, "tiers": tiers,
              "mean": [float(x) for x in mu], "std": [float(x) for x in sd], "calib": calib,
              "base_e10": float(df.E10.mean()), "base_e20": float(df.E20.mean()), "n_rows": int(len(df)), "n_eps": int(len(ev)),
              "period": [int(df.D.min()), int(df.D.max())]}
