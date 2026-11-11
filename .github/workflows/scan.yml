@@ -84,6 +84,9 @@ jobs:
       - name: رادار الطيارات (تجريبي — بالسجل بدون تيليجرام)
         run: python runners_radar/runners_scanner.py --out site/runners/index.html || echo "رادار الطيارات تعطل — نكمل"
 
+      - name: رادار عالي مخاطرة (تجريبي — بالسجل بدون تيليجرام، بدون فلاتر)
+        run: python highrisk_radar/highrisk_scanner.py --out site/highrisk/index.html || echo "رادار عالي مخاطرة تعطل — نكمل"
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -121,6 +124,9 @@ jobs:
           fi
           if [ -f site/runners/index.html ]; then
             npx --yes staticrypt@3.5.4 site/runners/index.html "${OPTS[@]}" --template-title "🚀 رادار الطيارات" -d site/runners
+          fi
+          if [ -f site/highrisk/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/highrisk/index.html "${OPTS[@]}" --template-title "🧨 رادار عالي مخاطرة" -d site/highrisk
           fi
 
       - uses: actions/upload-pages-artifact@v3

@@ -160,11 +160,13 @@ ul.clean{margin:0;padding-right:18px}
       <a class="btn" href="../afterhours/" style="text-decoration:none">🌙 الأفتر</a>
       <a class="btn" href="../schools/" style="text-decoration:none">🧭 المدارس</a>
       <a class="btn" href="../runners/" style="text-decoration:none">🚀 الطيارات</a>
+      <a class="btn" href="../highrisk/" style="text-decoration:none">🧨 عالي مخاطرة</a>
     </div>
   </header>
-  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة (<b>فيصل المطوّر و⚠ الطرح المتكرر والمدارس: 10 جلسات · الطيارات: 60 جلسة وهدفها +100%</b>).
-    <br><span class="note">🔕 = ينحفظ هنا بس وما ينرسل بتيليجرام: توصيات فيصل المطوّر بثقة منخفضة، ورادار 🔍 التجميع، و🧭 المدارس و🚀 الطيارات (تجريبيين)، و⚠ فيصل — طرح متكرر (قسم المخاطرة العالية: نتابعه عشان نعرف هل قاعدة «الطرح المتكرر ما يترشح» صح).</span>
-    <br><span class="note">🎲 المدارس والطيارات: مع كل توصية نتابع 3 أسهم عشوائية من نفس اليوم بنفس الهدف والوقف ونفس التذبذب — الرادار ينفع بس إذا نجاحه أعلى منها بوضوح.</span>
+  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة (<b>فيصل المطوّر و⚠ الطرح المتكرر والمدارس: 10 جلسات · الطيارات: 60 جلسة وهدفها +100% · 🧨 عالي مخاطرة: شراء معلّق +15% باليوم التالي ثم 3 جلسات، الهدف +30% والوقف إغلاق −15%</b>).
+    <br><span class="note">🔕 = ينحفظ هنا بس وما ينرسل بتيليجرام: توصيات فيصل المطوّر بثقة منخفضة، ورادار 🔍 التجميع، و🧭 المدارس و🚀 الطيارات (تجريبيين)، و🧨 عالي مخاطرة، و⚠ فيصل — طرح متكرر (قسم المخاطرة العالية: نتابعه عشان نعرف هل قاعدة «الطرح المتكرر ما يترشح» صح).</span>
+    <br><span class="note">⏸ 🧨 عالي مخاطرة: «ما تفعّل» = السهم ما وصل سعر الشراء باليوم التالي، فما انشرى وما ينحسب.</span>
+    <br><span class="note">🎲 المدارس والطيارات وعالي مخاطرة: مع كل توصية نتابع 3 أسهم عشوائية من نفس اليوم بنفس الهدف والوقف ونفس التذبذب — الرادار ينفع بس إذا نجاحه أعلى منها بوضوح.</span>
     <span class="note">«نجح» = وصل الهدف الأول قبل الوقف. نفس اليوم فيه الوقف والهدف = نحسبه وقف (الأحوط). هذا سجل لقياس الرادار — مو توصية شراء.</span></div>
   <div id="stats" class="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
   <div class="toolbar">
@@ -182,7 +184,7 @@ const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;
 const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
 const pc = p => p == null ? "-" : (p > 0 ? "+" : "") + p + "%";
 const RES = {open:["⏳ مفتوحة","var(--muted)"], t1:["✅ وصل الهدف 1 (مفتوحة)","var(--good)"], t2:["🏆 الهدف 2","var(--good)"],
-  t1_then_stop:["✅ الهدف 1 ثم وقف","var(--good)"], t1_expired:["✅ الهدف 1 (انتهت)","var(--good)"], stop:["❌ وقف","var(--bad)"], expired:["⌛ انتهت بدون هدف","var(--warn)"]};
+  t1_then_stop:["✅ الهدف 1 ثم وقف","var(--good)"], t1_expired:["✅ الهدف 1 (انتهت)","var(--good)"], stop:["❌ وقف","var(--bad)"], expired:["⌛ انتهت بدون هدف","var(--warn)"], no_fill:["⏸ ما تفعّل الشراء","var(--muted)"]};
 let tab = "all";
 $("#meta").textContent = DATA ? "آخر تحديث: " + DATA.generated_at + " · عدد التوصيات: " + DATA.trades.length : "";
 function statsHTML(){
@@ -193,7 +195,7 @@ function statsHTML(){
       <div class="note" style="margin-top:6px">❌ وقف ${s.stop_pct ?? "-"}% · ⏳ مفتوحة ${s.open} · متوسط أقصى ربح ${pc(s.avg_max_gain)}<br>
       المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
       تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}
-      ${(k === "schools" || k === "runners") ? vsRandHTML(k) : ""}
+      ${(k === "schools" || k === "runners" || k === "highrisk") ? vsRandHTML(k) : ""}
       ${k === "faisal_dil" ? dilCmpHTML() : ""}
       ${k === "faisal_dev" ? "<br>🎯 حسب الثقة: " + ["عالية","متوسطة","منخفضة"].map(l => { const c = DATA.stats_status["faisal_dev:conf:"+l] || {}; return l + " " + (c.hit_pct ?? "-") + "% من " + (c.n ?? 0); }).join(" · ") : ""}</div></div>`;
   }).join("");
@@ -233,7 +235,7 @@ function render(){
   const th = s => `<th style="text-align:right;padding:8px;border-bottom:1px solid var(--line);color:var(--muted);font-weight:600;white-space:nowrap">${s}</th>`;
   const td = (s, st="") => `<td style="padding:8px;border-bottom:1px solid var(--line);white-space:nowrap;${st}">${s}</td>`;
   $("#tbl").innerHTML = `<tr>${["التاريخ","الرادار","السهم","الحالة","الدخول","الوقف","الهدف 1","النتيجة","أقصى ربح","أقصى نزول","الآن","جلسات"].map(th).join("")}</tr>` +
-    (L.length ? L.map(t => { const r = RES[t.result] || [t.result,""];
+    (L.length ? L.map(t => { const r = (t.pending && t.result === "open") ? ["⏸ ينتظر التفعيل", "var(--muted)"] : (RES[t.result] || [t.result,""]);
       return `<tr>${td(`<span class="num">${esc(t.date)}</span>`)}${td(esc(t.radar_name) + ((DATA.muted || []).includes(t.radar) ? " 🔕" : ""))}${td(`${t.flag ? `<span title="${esc(t.country_ar||"")}">${t.flag}</span> ` : ""}<b class="ltr">${esc(t.symbol)}</b>`)}${td(esc(t.label) + (t.accum ? ' <span class="tag g">🔍</span>' : "") + (t.rand_p != null ? ` <span class="note" dir="ltr" title="لو دخول عشوائي بنفس الهدف والوقف (تاريخياً)">🎲 ${Math.round(t.rand_p*100)}%</span>` : "") + (t.conf != null ? ` <span class="note" title="ثقة النجاح وقت التوصية">🎯${Math.round(t.conf*100)}%${t.conf_label === "منخفضة" ? " 🔕" : ""}</span>` : ""))}
         ${td(`<span class="num">${fp(t.entry)}</span>`)}${td(`<span class="num" style="color:var(--bad)">${fp(t.stop)}</span>`)}${td(`<span class="num" style="color:var(--good)">${fp(t.t1)}</span>`)}
         ${td(r[0], "color:"+r[1]+";font-weight:600")}${td(`<span class="num ${(t.max_gain_pct||0)>0?"up":""}">${pc(t.max_gain_pct)}</span>`)}${td(`<span class="num ${(t.max_dd_pct||0)<0?"down":""}">${pc(t.max_dd_pct)}</span>`)}
