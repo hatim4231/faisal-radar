@@ -7,8 +7,8 @@ from pathlib import Path
 TEMPLATE = Path(__file__).resolve().parent / "template.html"
 
 
-def write(payload: dict, out: Path, live: bool = False, template: Path | None = None):
-    html = Path(template or TEMPLATE).read_text(encoding="utf-8")
+def write(payload: dict, out: Path, live: bool = False):
+    html = TEMPLATE.read_text(encoding="utf-8")
     data = json.dumps(payload, ensure_ascii=False, default=str).replace("</", "<\\/")
     html = html.replace("/*__DATA__*/null", data).replace("/*__LIVE__*/false", "true" if live else "false")
     Path(out).write_text(html, encoding="utf-8")
