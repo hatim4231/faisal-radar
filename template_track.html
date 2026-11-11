@@ -45,7 +45,7 @@ h1{font-size:22px;margin:0;font-weight:700}
 .tile span{color:var(--muted);font-size:13px}
 .tile.on{outline:2px solid var(--accent)}
 .toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
-.tabs{display:flex;background:var(--panel2);border-radius:10px;padding:3px}
+.tabs{display:flex;flex-wrap:wrap;max-width:100%;background:var(--panel2);border-radius:10px;padding:3px}
 .tabs button{border:0;background:transparent;color:var(--muted);font:inherit;padding:6px 14px;border-radius:8px;cursor:pointer}
 .tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow);font-weight:600}
 input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
@@ -162,8 +162,8 @@ ul.clean{margin:0;padding-right:18px}
       <a class="btn" href="../runners/" style="text-decoration:none">🚀 الطيارات</a>
     </div>
   </header>
-  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة (<b>فيصل المطوّر والمدارس: 10 جلسات · الطيارات: 60 جلسة وهدفها +100%</b>).
-    <br><span class="note">🔕 = ينحفظ هنا بس وما ينرسل بتيليجرام: توصيات فيصل المطوّر بثقة منخفضة، ورادار 🔍 التجميع، و🧭 المدارس و🚀 الطيارات (تجريبيين).</span>
+  <div class="card" style="margin-bottom:12px"><b>كيف ينحسب:</b> أول ما يصير السهم ✅/🟡 في أي رادار ينحفظ بسعره ووقفه وهدفه الأول، ونتابعه يوم بيوم لمدة 20 جلسة (<b>فيصل المطوّر و⚠ الطرح المتكرر والمدارس: 10 جلسات · الطيارات: 60 جلسة وهدفها +100%</b>).
+    <br><span class="note">🔕 = ينحفظ هنا بس وما ينرسل بتيليجرام: توصيات فيصل المطوّر بثقة منخفضة، ورادار 🔍 التجميع، و🧭 المدارس و🚀 الطيارات (تجريبيين)، و⚠ فيصل — طرح متكرر (قسم المخاطرة العالية: نتابعه عشان نعرف هل قاعدة «الطرح المتكرر ما يترشح» صح).</span>
     <br><span class="note">🎲 المدارس والطيارات: مع كل توصية نتابع 3 أسهم عشوائية من نفس اليوم بنفس الهدف والوقف ونفس التذبذب — الرادار ينفع بس إذا نجاحه أعلى منها بوضوح.</span>
     <span class="note">«نجح» = وصل الهدف الأول قبل الوقف. نفس اليوم فيه الوقف والهدف = نحسبه وقف (الأحوط). هذا سجل لقياس الرادار — مو توصية شراء.</span></div>
   <div id="stats" class="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
@@ -194,8 +194,18 @@ function statsHTML(){
       المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
       تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}
       ${(k === "schools" || k === "runners") ? vsRandHTML(k) : ""}
+      ${k === "faisal_dil" ? dilCmpHTML() : ""}
       ${k === "faisal_dev" ? "<br>🎯 حسب الثقة: " + ["عالية","متوسطة","منخفضة"].map(l => { const c = DATA.stats_status["faisal_dev:conf:"+l] || {}; return l + " " + (c.hit_pct ?? "-") + "% من " + (c.n ?? 0); }).join(" · ") : ""}</div></div>`;
   }).join("");
+}
+function dilCmpHTML(){
+  // الخيار 2 (بعد RUBI): هل شركات الطرح المتكرر فعلاً أسوأ من توصيات فيصل المطوّر العادية؟
+  const a = DATA.stats.faisal_dil || {}, b = DATA.stats.faisal_dev || {};
+  if (!a.n) return `<br>⚖️ المقارنة مع 📡 فيصل المطوّر تبدأ لما تنحسم أول توصيات (عندنا ${a.n_total || 0}).`;
+  const d = (a.hit_pct != null && b.hit_pct != null) ? (a.hit_pct - b.hit_pct) : null;
+  return `<br>⚖️ مقابل 📡 فيصل المطوّر العادي <strong class="num" style="color:var(--text)">${b.hit_pct ?? "-"}%</strong> (${b.n || 0})`
+    + (d != null ? ` ← <strong class="num" style="color:${d > 0 ? "var(--good)" : "var(--bad)"}">${d > 0 ? "+" : ""}${d.toFixed(1)} نقطة</strong>` : "")
+    + `<br>إذا الطرح المتكرر أقل بوضوح = القاعدة صح. إذا مثله أو أعلى = نراجعها.` + (a.n < 30 ? ` العدد قليل — نحتاج 30+ قبل الحكم.` : "");
 }
 function vsRandHTML(k){
   const v = (DATA.vs_random || {})[k];

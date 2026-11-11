@@ -39,6 +39,11 @@ MIN_JUMP, MIN_HOLD, MIN_AH_VOL, MIN_RTH_VOL = 0.15, 0.70, 50_000, 100_000
 PRICE = (0.7, 10.0)   # قرار المستخدم (نوفمبر 2026): كل الرادارات 0.7$ إلى 10$ — يتحدث من config.json تحت
 T1, T2, STOP = 0.10, 0.15, 0.10
 PM_VOL_RATIO = 0.07   # فوليوم البري لين التنفيذ ÷ فوليوم الأفتر — فوقه: متوسط الصفقة +2.2% بدل +1.4%
+# 🔥 الموجة الثانية (قرار المستخدم بعد OMH، 2026-11-10 — diag/backtest_second_leg.py):
+# قفزة أفتر محافظة خلال 1-3 جلسات بعد انفجار (أعلى سعر ≥ ضعف إغلاق اليوم اللي قبله) وما رجع لقاعدته (إغلاق ≥ 1.5× ما قبل الانفجار).
+# تاريخياً (40 حالة): 60% كسرت قمة الانفجار خلال 10 جلسات (مقابل 26%) · 15% طلعت +50% باليوم التالي (مقابل 7%).
+FIRE_EXPLOSION, FIRE_DAYS, FIRE_ABOVE_BASE = 2.0, 3, 1.5
+FIRE_T1, FIRE_MIN_T2, FIRE_FALLBACK_T2, FIRE_HORIZON = 0.15, 0.20, 0.30, 10
 
 
 def now_ny() -> pd.Timestamp:
@@ -86,8 +91,10 @@ def evaluate(sig: dict) -> None:
     """النتيجة يوم التداول التالي (بعد ما يخلص)."""
     D = pd.Timestamp(sig["D"]).date()
     s = pd.Timestamp(sig["D"]).tz_localize(NY) + pd.Timedelta(days=1)
-    b = A.bars([sig["symbol"]], "5Min", s.tz_convert("UTC").to_pydatetime(),
-               min(now_ny() - pd.Timedelta(minutes=16), s + pd.Timedelta(days=5)).tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
+    e = min(now_ny() - pd.Timedelta(minutes=16), s + pd.Timedelta(days=5))
+    if e <= s:
+        return  # اليوم التالي ما بدا (كان يطلب فترة بالمستقبل ← Alpaca يرد 403)
+    b = A.bars([sig["symbol"]], "5Min", s.tz_convert("UTC").to_pydatetime(), e.tz_convert("UTC").to_pydatetime()).get(sig["symbol"])
     if b is None or b.empty:
         return
     b = b[b.index.date > D]
@@ -119,6 +126,92 @@ def evaluate(sig: dict) -> None:
     sig["result"] = "t2" if r2 == "hit" else "t1" if r1 == "hit" else "stop" if r1 == "fail" else "flat"
     if sig["result"] == "flat" and not rth.empty:
         sig["flat_pct"] = round((float(rth["Close"].iloc[-1]) / lim - 1) * 100, 1)
+
+
+def mark_second_leg(found: list[dict]) -> None:
+    """🔥 يوسم القفزات اللي جت خلال 1-3 جلسات بعد انفجار وما رجعت لقاعدتها، ويحط خطتها (نص عند +15% والباقي عند قمة الانفجار)."""
+    if not found:
+        return
+    try:
+        daily = A.daily(sorted({f["symbol"] for f in found}), days=400)
+    except Exception as e:
+        log("  [الأفتر] 🔥 الشارت اليومي:", repr(e)[:100])
+        return
+    for f in found:
+        d = daily.get(f["symbol"])
+        if d is None:
+            continue
+        d = d[d.index.date <= pd.Timestamp(f["D"]).date()]
+        if len(d) < 25:
+            continue
+        c, h = d["Close"].to_numpy(float), d["High"].to_numpy(float)
+        t = len(c) - 1
+        E = next((t - k for k in range(1, FIRE_DAYS + 1) if t - k >= 1 and h[t - k] >= FIRE_EXPLOSION * c[t - k - 1]), None)
+        if E is None:
+            continue
+        pre, hiE = float(c[E - 1]), float(h[E])
+        n_exp = int(sum(h[i] >= FIRE_EXPLOSION * c[i - 1] for i in range(max(1, t - 250), t + 1)))
+        f["second_leg"] = {"E": str(d.index[E].date()), "k": t - E, "jump_E": round((hiE / pre - 1) * 100), "hiE": round(hiE, 4),
+                           "pre": round(pre, 4), "above_base": round(float(c[t]) / pre, 2), "n_exp": n_exp}
+        if c[t] >= FIRE_ABOVE_BASE * pre:
+            lim = f["limit"]
+            t2 = hiE if hiE >= lim * (1 + FIRE_MIN_T2) else lim * (1 + FIRE_FALLBACK_T2)
+            f["fire"] = True
+            f["fire_plan"] = {"t1": round(lim * (1 + FIRE_T1), 4), "t2": round(t2, 4), "stop": round(lim * (1 - STOP), 4),
+                              "t2_is_high": bool(hiE >= lim * (1 + FIRE_MIN_T2))}
+
+
+def evaluate_fire(sig: dict) -> None:
+    """🔥 خلال 10 جلسات بعد يوم الأفتر: وصل قمة الانفجار؟ (الوقف قبل الهدف بنفس اليوم = وقف، الأحوط)."""
+    if not sig.get("fire") or sig.get("fire_result"):
+        return
+    d = A.daily([sig["symbol"]], days=40).get(sig["symbol"])
+    if d is None:
+        return
+    after = d[d.index.date > pd.Timestamp(sig["D"]).date()].iloc[:FIRE_HORIZON]
+    if after.empty:
+        return
+    p = sig["fire_plan"]
+    sig["fire_max_pct"] = round((float(after["High"].max()) / sig["limit"] - 1) * 100, 1)
+    res = None
+    for ix, r in after.iterrows():
+        if r["Low"] <= p["stop"]:
+            res = "stop"
+            break
+        if r["High"] >= p["t2"]:
+            res = "t2"
+            break
+        if r["High"] >= p["t1"] and res is None:
+            res = "t1"
+    if res in ("stop", "t2") or len(after) >= FIRE_HORIZON:
+        sig["fire_result"] = res or "flat"
+
+
+def notify_fire(found: list[dict], store: dict, final: bool) -> None:
+    """تيليجرام لـ 🔥 المؤهلة بس (قرار المستخدم: باقي الأفتر صامت) — مرة وحدة لكل سهم ويوم."""
+    sent = set(store.setdefault("fire_sent", []))
+    msgs = []
+    import tracker
+    fp = tracker.fp
+    for f in found:
+        key = f"{f['symbol']}:{f['D']}"
+        if not (f.get("fire") and f.get("eligible")) or key in sent:
+            continue
+        sl, p = f["second_leg"], f["fire_plan"]
+        msgs.append(
+            f"🔥 موجة ثانية — رادار الأفتر{'' if final else ' (مبدئي: الأفتر ما خلص)'}\n"
+            f"{f.get('flag') or ''} <b>{f['symbol']}</b> ({f.get('name') or ''})\n"
+            f"انفجر يوم {sl['E']} (+{sl['jump_E']}%) وقمته {fp(sl['hiE'])} · اليوم قفز بالأفتر +{f['jump_pct']}% وحافظ {f['hold_pct']}% "
+            f"(فوليوم {f['ah_vol']:,})\n"
+            f"الخطة: Limit عند {fp(f['limit'])} بالبري · نص الكمية عند {fp(p['t1'])} (+15%) · الباقي عند "
+            f"{'قمة الانفجار ' if p.get('t2_is_high') else ''}{fp(p['t2'])} · الوقف {fp(p['stop'])} (−10%)\n"
+            f"تاريخياً (40 حالة بس): 60% كسرت قمة الانفجار خلال 10 جلسات · 15% طلعت +50% باليوم التالي. "
+            f"القفزات تذوب بسرعة — بيع وقت القفزة والتزم بالوقف.")
+        sent.add(key)
+    store["fire_sent"] = sorted(sent)
+    if msgs:
+        tracker.telegram(msgs)
+        log(f"[الأفتر] 🔥 انرسل {len(msgs)} تنبيه موجة ثانية")
 
 
 def stats(sigs: list[dict]) -> dict:
@@ -170,6 +263,11 @@ def run(cfg) -> dict:
                 evaluate(s)
             except Exception as e:
                 log("  [الأفتر] تقييم", s["symbol"], repr(e)[:80])
+        if s.get("fire") and not s.get("fire_result"):
+            try:
+                evaluate_fire(s)
+            except Exception as e:
+                log("  [الأفتر] تقييم 🔥", s["symbol"], repr(e)[:80])
 
     # 2) إشارات آخر أفتر
     tickers = [t for t in data.get_universe(cfg) if not (len(t) == 5 and t[-1] in "WRU") and "-" not in t]
@@ -201,8 +299,7 @@ def run(cfg) -> dict:
     max_sh = cfg["behavior"].get("max_short_shares")  # 50 ألف (None = مفتوح)
     for f in found:
         inf = infos.get(f["symbol"]) or {}
-        sa = (ib.get(f["symbol"]) or {}).get("available")
-        sv, src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
+        sv, src = data.short_of(f["symbol"], ib, inf)   # مو بقائمة IB = 0 متاح (تعريف فيصل)
         f.update({"name": inf.get("shortName") or inf.get("longName") or f["symbol"], "price": f["ah_last"],
                   "float": inf.get("floatShares"), "short": sv, "short_src": src, "flags": [], "news": [],
                   "country": inf.get("country")})
@@ -238,6 +335,13 @@ def run(cfg) -> dict:
             # شرط فوليوم البري (اختبار سنة): ادخل بس إذا فوليوم البري لين لحظة الشراء ≥ 7% من فوليوم الأفتر
             f["pm_min_vol"] = int(f["ah_vol"] * PM_VOL_RATIO)
 
+    # 🔥 الموجة الثانية: وسم + خطة + تيليجرام (المؤهلة بس، مرة وحدة)
+    try:
+        mark_second_leg(found)
+        notify_fire(found, store, done)
+    except Exception as e:
+        log("  [الأفتر] 🔥 تعطل:", repr(e)[:150])
+
     # 4) نسجل بس لما الأفتر يخلص (ما نكرر نفس السهم لنفس اليوم)
     if done and found:
         have = {(s["symbol"], s["D"]) for s in sigs}
@@ -247,13 +351,13 @@ def run(cfg) -> dict:
     if STORE.parent.exists():
         STORE.write_text(json.dumps(store, ensure_ascii=False, indent=1, default=str), encoding="utf-8")
 
-    found.sort(key=lambda f: (not f["eligible"], -f["hold_pct"], -f["jump_pct"]))
+    found.sort(key=lambda f: (not f["eligible"], not f.get("fire"), -f["hold_pct"], -f["jump_pct"]))
     sigs.sort(key=lambda s: s["D"], reverse=True)
     st = stats(sigs)
     log(f"[الأفتر] النتايج (المؤهلة): {st['eligible']} · الكل: {st['all']} · {round(time.time() - t0)}ث")
     last_final = max((s["D"] for s in sigs), default=None)
     final_list = sorted([s for s in sigs if s["D"] == last_final],
-                        key=lambda f: (not f.get("eligible"), -f["hold_pct"], -f["jump_pct"]))
+                        key=lambda f: (not f.get("eligible"), not f.get("fire"), -f["hold_pct"], -f["jump_pct"]))
     return {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "day": str(D) if D else None,
             "final": done, "today": found if (found and not done) else [],
             "last_final_day": last_final, "last_final": final_list, "history": sigs[:300], "stats": st,

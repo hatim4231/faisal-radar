@@ -67,8 +67,7 @@ def run(cfg, tickers=None) -> dict:
             flt = None
         if not explicit and ((mcap and mcap > U["max_market_cap"]) or (flt and flt > U["max_float"])):
             continue
-        sa = (ib.get(t) or {}).get("available")
-        sv, src = (sa, "المتاح للاقتراض") if sa is not None else (inf.get("sharesShort"), "Short Interest")
+        sv, src = data.short_of(t, ib, inf)   # مو بقائمة IB = 0 متاح (تعريف فيصل)
         if sv is not None and max_sh and sv > max_sh and not explicit:
             continue
         try:

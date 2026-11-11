@@ -273,7 +273,8 @@ function toggle(el){
 }
 (function(){ const ex = (DATA && DATA.excluded_dilution) || []; if (!ex.length) return;
   const box = $("#excl"); box.style.display = ""; box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم";
-  $("#excl-body").innerHTML = ex.map(x => `<div class="note"><b class="ltr">${esc(x.symbol)}</b> — ${x.events.map(e => esc(e.date+" "+e.what)).join(" · ")}</div>`).join(""); })();
+  $("#excl-body").innerHTML = ex.map(x => `<div class="note"><b class="ltr">${esc(x.symbol)}</b>${x.status ? ` <span class="tag">${esc(ST[x.status] ? ST[x.status][0] : x.status)}${x.score != null ? " · " + esc(x.score) : ""}</span>` : ""} — ${x.events.map(e => esc(e.date+" "+e.what)).join(" · ")}</div>`).join("")
+    + '<div class="note" style="margin-top:6px">قرار المستخدم: الطرح المتكرر (حدثين+ خلال 90 يوم) ما يترشح — بس تقييمه ظاهر هنا للمعلومة (مثل RUBI طار رغم الطرح). مخاطرة عالية.</div>'; })();
 render();
 
 (function(){

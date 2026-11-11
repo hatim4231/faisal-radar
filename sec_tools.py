@@ -235,13 +235,28 @@ def dilution_events(r: dict) -> list[dict]:
     return events
 
 
-def exclude_repeat_diluters(rows: list[dict], log=print) -> tuple[list[dict], list[dict]]:
+def _status_score(r: dict) -> tuple:
+    """حالة السهم ونقاطه بأي رادار (فيصل: irtikaz، الباقي: status/score/quality)."""
+    I = r.get("irtikaz")
+    if isinstance(I, dict):
+        return I.get("status"), I.get("score")
+    return r.get("status"), r.get("score", r.get("quality"))
+
+
+def exclude_repeat_diluters(rows: list[dict], log=print, full: list | None = None) -> tuple[list[dict], list[dict]]:
+    """قرار المستخدم: الطرح المتكرر ما يترشح. الخيار 2 (2026-11-10 بعد RUBI): ما ينشال بصمت — الملخص فيه حالته ونقاطه
+    عشان الصفحة تعرضه بقسم «⚠ طرح متكرر — مخاطرة عالية». لو مررت قائمة `full` تنضاف لها الأسطر الكاملة (للبطاقات)."""
     keep, out = [], []
     for r in rows:
         ev = dilution_events(r)
         if len(ev) >= REPEAT_MIN_EVENTS:
-            out.append({"symbol": r["symbol"], "name": r.get("name"), "price": r.get("price"),
-                        "events": [{"date": e["date"], "what": " + ".join(e["what"][:3])} for e in ev]})
+            st, sc = _status_score(r)
+            r["dilution_events"] = [{"date": e["date"], "what": " + ".join(e["what"][:3])} for e in ev]
+            out.append({"symbol": r["symbol"], "name": r.get("name"), "price": r.get("price"), "status": st,
+                        "score": round(float(sc), 1) if isinstance(sc, (int, float)) else sc,
+                        "events": r["dilution_events"]})
+            if full is not None:
+                full.append(r)
         else:
             keep.append(r)
     if out:

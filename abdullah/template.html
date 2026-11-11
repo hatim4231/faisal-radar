@@ -379,7 +379,8 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closeDetail(
   const box = document.getElementById("excl"); box.style.display = "";
   box.querySelector("summary").textContent = "⛔ مستبعد لطرح/تخفيف متكرر: " + ex.length + " سهم (اضغط للتفاصيل)";
   document.getElementById("excl-body").innerHTML = ex.map(function(x){
-    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">' + esc(x.name||"") + '</span><ul class="clean note">' +
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--line)"><b class="ltr">' + esc(x.symbol) + '</b> <span class="num">$' + fp(x.price) + '</span> <span class="note">' + esc(x.name||"") + '</span>'
+      + (x.status ? ' <span class="tag">' + esc(ST[x.status] || x.status) + (x.score != null ? ' · ' + esc(x.score) : '') + '</span>' : '') + '<ul class="clean note">' +
       x.events.map(function(e){ return '<li><span class="num">' + esc(e.date) + '</span> — ' + esc(e.what) + '</li>'; }).join("") + '</ul></div>';
   }).join("") + '<div class="note">القاعدة: حدثين طرح/تخفيف منفصلين أو أكثر خلال 90 يوم (ملفات SEC أو أخبار) = ما يترشح.</div>';
 })();

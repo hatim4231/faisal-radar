@@ -339,6 +339,28 @@ def load_ib_short() -> dict[str, dict]:
     return out
 
 
+IB_MIN_ROWS = 1000   # أقل من كذا = ملف IB ما نزل كامل (عطل)
+
+
+def ib_ok(ib: dict | None) -> bool:
+    return bool(ib) and len(ib) >= IB_MIN_ROWS
+
+
+def short_of(sym: str, ib: dict | None, info: dict | None) -> tuple[int | None, str]:
+    """الشورت بتعريف فيصل = المتاح للاقتراض عند IB (تصحيح نوفمبر 2026 بعد OMH، بموافقة المستخدم):
+    - السهم موجود بقائمة IB ← رقمه.
+    - مو موجود بالقائمة (والقائمة نزلت كاملة) ← ما فيه أسهم متاحة للشورت عند IB = 0.
+      (كان الكود ياخذ بداله Short Interest من ياهو — رقم قديم ومختلف — وشال OMH بـ 55,556 وهو غالباً 0 متاح)
+    - القائمة ما نزلت (عطل) ← Short Interest من ياهو كاحتياط."""
+    if ib_ok(ib):
+        x = ib.get(sym)
+        if x is None:
+            return 0, "غير متاح للشورت عند IB"
+        if x.get("available") is not None:
+            return x["available"], "المتاح للاقتراض (IB)"
+    return (info or {}).get("sharesShort"), "Short Interest (ياهو — احتياط)"
+
+
 def short_available(t: str) -> dict | None:
     """الشورت المتاح للاقتراض (اللي يقصده فيصل بـ "شورت 10 آلاف") من iBorrowDesk."""
     import requests
@@ -502,8 +524,8 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     for t, d in pre.items():
         try:
             inf_t = dict(infos.get(t) or {})
-            if t in ib_short and ib_short[t].get("available") is not None:
-                inf_t["shortAvailable"] = ib_short[t]["available"]
+            if ib_ok(ib_short) and (t not in ib_short or ib_short[t].get("available") is not None):
+                inf_t["shortAvailable"] = short_of(t, ib_short, inf_t)[0]   # مو بقائمة IB = 0 متاح
             a = fr.analyze(d, inf_t, cfg)
         except Exception:
             log(f"  خطأ في تحليل {t}:", traceback.format_exc(limit=1).splitlines()[-1])
@@ -523,6 +545,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         a["exchange"] = inf.get("exchange")
         if t in ib_short:
             a["short_available"] = ib_short[t]
+        a["_short"] = short_of(t, ib_short, inf)
         results[t] = a
 
     if deep and results:
@@ -541,11 +564,7 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     if True:
         for t in list(results):
             r = results[t]
-            sa = (r.get("short_available") or {}).get("available")
-            if sa is not None:
-                val, src = sa, "المتاح للاقتراض"
-            else:
-                val, src = r.get("short_shares"), "Short Interest"
+            val, src = r.pop("_short", (None, "غير معروف"))
             r["short_used"] = {"value": val, "source": src, "max": max_sh}
             if not max_sh:
                 continue
@@ -566,24 +585,29 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
     rows.sort(key=lambda r: -r["irtikaz"]["score"])
     if deep:
         sec_tools.annotate(rows, log)  # خطر التخفيف من ملفات SEC
-    # قرار المستخدم: شركات الطرح/التخفيف المتكرر ما تترشح
-    rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log)
+    # قرار المستخدم: شركات الطرح/التخفيف المتكرر ما تترشح — الخيار 2 (2026-11-10 بعد RUBI): ما تنشال بصمت،
+    # تطلع بقسم «⚠ طرح متكرر — مخاطرة عالية» بتقييمها الكامل (بدون تيليجرام، وبالسجل صامتة عشان نحكم على القاعدة)
+    dil_rows: list[dict] = []
+    rows, excluded_dil = sec_tools.exclude_repeat_diluters(rows, log, full=dil_rows)
     # قرار المستخدم: علم الدولة + استبعاد الأسهم اللي صندوق HRT من ملاكها
     import flags
     import holders
     flags.annotate(rows)
+    flags.annotate(dil_rows)
     excluded_hrt, hrt_info = [], {}
     if cfg["behavior"].get("exclude_hrt"):
         try:
-            hrt_info = holders.annotate(rows, log)
+            hrt_info = holders.annotate(rows + dil_rows, log)
             rows, excluded_hrt = holders.exclude(rows, log)
+            dil_rows, ex2 = holders.exclude(dil_rows, lambda *a: None)
+            excluded_hrt += ex2
         except Exception as e:
             log("فحص HRT تعطل:", repr(e)[:150])
     # 🎯 أداة الثقة: احتمال نجاح التوصية (فيصل المطوّر فقط — النسخة الأصلية ما تتغير)
     if getattr(fr, "__name__", "") == "faisal_rules":
         try:
             import confidence
-            n_conf = confidence.apply(rows, daily, log)
+            n_conf = confidence.apply(rows + dil_rows, daily, log)
             if n_conf:
                 log(f"أداة الثقة: انحسبت لـ {n_conf} سهم")
                 for r in rows:
@@ -607,13 +631,34 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         n = Counter(r["irtikaz"]["status"] for r in rows)
         log(f"صفحة فيصل المطوّر: {len(rows)} سهم (✅ {n['ready']} · 🟡 {n['near']} · 👀 {n['radar']})"
             + (f" · مخفي تحت الرادار {len(hidden)}" if hidden is not None else ""))
+        dil_rows = [r for r in dil_rows if r["irtikaz"]["status"] in show]
+    else:
+        dil_rows = [r for r in dil_rows if r["irtikaz"]["status"] in ("ready", "near", "radar")]
+    rank = {"ready": 0, "near": 1, "radar": 2, "no": 3}
+    dil_rows.sort(key=lambda r: (rank.get(r["irtikaz"]["status"], 9), -r["irtikaz"]["score"]))
+    if dil_rows:
+        nd = Counter(r["irtikaz"]["status"] for r in dil_rows)
+        log(f"⚠ طرح متكرر (قسم مخاطرة عالية): {len(dil_rows)} سهم (✅ {nd['ready']} · 🟡 {nd['near']} · 👀 {nd['radar']}) — "
+            + ", ".join(f"{r['symbol']}({r['irtikaz']['status']} {r['irtikaz']['score']:.0f}%)" for r in dil_rows[:12]))
+    # التوصية المفتوحة (من السجل) لكل سهم: الصفحة تفصل بين «خطة صفقتك» و«التقييم الحالي لشراء جديد»
+    # (طلب المستخدم بعد FBGL: التقييم نزل بعد ما اشترى — لأن السعر ابتعد عن الدعم، مو لأن الصفقة خربت)
+    try:
+        import tracker
+        ot = tracker.open_trades("faisal_dev" if getattr(fr, "__name__", "") == "faisal_rules" else "faisal_orig")
+        for r in rows + dil_rows:
+            if r["symbol"] in ot:
+                r["open_trade"] = ot[r["symbol"]]
+        if ot:
+            log(f"توصيات مفتوحة بالسجل: {len(ot)} · منها بالصفحة {sum(r['symbol'] in ot for r in rows)}")
+    except Exception as e:
+        log("التوصيات المفتوحة ما انقرت:", repr(e)[:120])
     payload = {
         "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
         "source": "الأسعار: Alpaca · معلومات الشركة والأخبار: Yahoo — تأخير ~15 دقيقة",
         "scanned": len(daily), "passed_filter": len(results), "seconds": round(time.time() - t0),
         "config": cfg, "stocks": rows, "excluded_dilution": excluded_dil, "excluded_hrt": excluded_hrt,
         "hrt_report": {k: hrt_info.get(k) for k in ("name", "period", "filed", "n")} if hrt_info else None,
-        "hidden_radar": hidden, "status_first": status_first,
+        "hidden_radar": hidden, "status_first": status_first, "diluters": dil_rows,
         "status_counts": dict(Counter(r["irtikaz"]["status"] for r in all_rows)),
     }
     (OUT / "latest.json").write_text(json.dumps(payload, ensure_ascii=False, default=str), encoding="utf-8")
