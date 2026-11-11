@@ -57,7 +57,8 @@ def feat(job):
             ep[t] = True
         last = t
     cs = np.cumsum(ep)
-    n_ep252 = cs - np.r_[np.zeros(252), cs[:-252]]
+    lagd = lambda a, k: (a - np.r_[np.zeros(k), a[:-k]]) if len(a) > k else a.astype(float)
+    n_ep252 = lagd(cs, 252)
     lastep = np.maximum.accumulate(np.where(ep, idx, -1))
     has = lastep >= 0
     days_ep = np.where(has, idx - lastep, 9999)
@@ -73,7 +74,7 @@ def feat(job):
             if 0 <= p < n:
                 rs[p] = True
     rcs = np.cumsum(rs)
-    n_rs = rcs - np.r_[np.zeros(504), rcs[:-504]]
+    n_rs = lagd(rcs, 504)
     lastrs = np.maximum.accumulate(np.where(rs, idx, -1))
     days_rs = np.where(lastrs >= 0, idx - lastrs, 9999)
     # ميزات السعر والفوليوم
