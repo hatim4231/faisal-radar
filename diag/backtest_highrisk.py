@@ -1,0 +1,315 @@
+"""
+🧨 «عالي مخاطرة» — الأسهم اللي تنفجر بشكل متكرر (طلب المستخدم 2026-11-11) — تشخيص فقط، ما يغير شي.
+
+الانفجار = أعلى سعر باليوم ≥ ضعف إغلاق اليوم اللي قبله (مثل OMH/QMMM/RUBI). «حلقة» = أول انفجار بعد 20 جلسة بدونه.
+المجال: كل أسهم Alpaca (NASDAQ/NYSE/AMEX) مع المشطوبة، يومي ~3 سنين، **بدون فلاتر** (بس سهم له تداول: سيولة 20 يوم ≥ 5 آلاف$).
+س1  التكرار: احتمال انفجار خلال 10/20 جلسة حسب عدد الانفجارات بآخر سنة — ومقابل نفس شريحة التذبذب (عشان ما ننخدع).
+س2  بصمة المضارب قبل الانطلاقة: الميزات قبل الانفجار بـ 1/5/10 جلسات مقابل الأيام الهادية لنفس السهم.
+س3  نموذج «احتمال انفجار خلال 10 جلسات» walk-forward (مرحلتين خارج العينة): AUC + الرفع فوق الأساس.
+س4  خطة بسيطة (دخول إغلاق، بيع Limit عند +50% أو +100%، وقف إغلاق −30%، أقصى 20 جلسة) للإشارات العالية
+    مقابل دخول عشوائي بنفس شريحة التذبذب والسعر.
+المخرجات: جداول + نموذج JSON بين HR_MODEL_BEGIN/END (أسطر HM| مقطعة) + diag_out/highrisk_*.csv.gz
+"""
+import json
+import os
+import sys
+import time
+from concurrent.futures import ProcessPoolExecutor
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "diag"))
+import numpy as np
+import pandas as pd
+import alpaca_data as A
+from backtest_runners2 import universe, rsi_np
+from backtest_confidence import fit_logit, prep, auc
+
+DAYS = 1180
+H = 20  # أقصى مدة
+FEATS = ["l_price", "l_dv20", "n_ep252", "n_ep_all", "l_days_ep", "recent_ep", "last_mag", "base_ratio", "from_peak",
+         "vol5_60", "vol1_20", "atr5_60", "atr20p", "rng20", "pos60", "dd252", "ret5", "ret20", "rsi", "closepos10",
+         "upv10", "obv20", "hl_up", "gap20", "rs_recent", "n_rs", "l_days_rs"]
+
+
+def roll(a, w, fn, minp=None):
+    s = pd.Series(a)
+    r = s.rolling(w, min_periods=minp or w)
+    return getattr(r, fn)().to_numpy(float)
+
+
+def feat(job):
+    sym, d, spl = job
+    if d is None or len(d) < 300:
+        return None, []
+    o, h, l, c, v = (d[k].to_numpy(float) for k in ("Open", "High", "Low", "Close", "Volume"))
+    n = len(c)
+    idx = np.arange(n)
+    pc = np.r_[np.nan, c[:-1]]
+    jump = h / pc
+    ex = np.nan_to_num(jump, nan=0.0) >= 2.0
+    ep = np.zeros(n, bool)
+    last = -999
+    for t in np.flatnonzero(ex):
+        if t - last > 20:
+            ep[t] = True
+        last = t
+    cs = np.cumsum(ep)
+    n_ep252 = cs - np.r_[np.zeros(252), cs[:-252]]
+    lastep = np.maximum.accumulate(np.where(ep, idx, -1))
+    has = lastep >= 0
+    days_ep = np.where(has, idx - lastep, 9999)
+    li = np.maximum(lastep, 0)
+    last_mag = np.where(has, jump[li], 0.0)
+    base_before = np.where(has & (li >= 1), c[np.maximum(li - 1, 0)], np.nan)
+    peak = np.where(has, h[li], np.nan)
+    # التقسيمات العكسية
+    rs = np.zeros(n, bool)
+    for dt, ratio in spl or []:
+        if ratio < 1:
+            p = d.index.searchsorted(pd.Timestamp(dt).tz_localize(None) if pd.Timestamp(dt).tzinfo else pd.Timestamp(dt))
+            if 0 <= p < n:
+                rs[p] = True
+    rcs = np.cumsum(rs)
+    n_rs = rcs - np.r_[np.zeros(504), rcs[:-504]]
+    lastrs = np.maximum.accumulate(np.where(rs, idx, -1))
+    days_rs = np.where(lastrs >= 0, idx - lastrs, 9999)
+    # ميزات السعر والفوليوم
+    tr = np.where(np.isfinite(pc), np.maximum(h, pc) - np.minimum(l, pc), h - l)
+    dv20 = roll(c * v, 20, "median")
+    vol5_60 = roll(v, 5, "mean") / np.maximum(roll(v, 60, "mean"), 1)
+    vol1_20 = v / np.maximum(roll(v, 20, "median"), 1)
+    atr20 = roll(tr, 20, "mean")
+    atr5_60 = roll(tr, 5, "mean") / np.maximum(roll(tr, 60, "mean"), 1e-9)
+    hi20, lo20 = roll(h, 20, "max"), roll(l, 20, "min")
+    hi60, lo60 = roll(h, 60, "max"), roll(l, 60, "min")
+    hi252 = roll(h, 252, "max", 120)
+    c5 = np.r_[np.full(5, np.nan), c[:-5]]
+    c20 = np.r_[np.full(20, np.nan), c[:-20]]
+    rsi = rsi_np(c)
+    rngd = np.where(h > l, (c - l) / np.maximum(h - l, 1e-12), 0.5)
+    up, dn = c > pc, c < pc
+    upv10 = roll(np.where(up, v, 0.0), 10, "sum") / (roll(np.where(dn, v, 0.0), 10, "sum") + 1)
+    obv = np.cumsum(np.where(up, v, np.where(dn, -v, 0.0)))
+    obv20 = (obv - np.r_[np.full(20, np.nan), obv[:-20]]) / np.maximum(roll(v, 60, "mean") * 20, 1)
+    m5 = roll(l, 5, "min")
+    sh = lambda a, k: np.r_[np.full(k, np.nan), a[:-k]]
+    hl_up = (m5 > sh(m5, 5)).astype(float) + (sh(m5, 5) > sh(m5, 10)).astype(float) + (sh(m5, 10) > sh(m5, 15)).astype(float)
+    gap20 = roll((o >= 1.1 * pc).astype(float), 20, "sum")
+    # النتايج (من إغلاق اليوم)
+    fsh = lambda a, k: np.r_[a[k:], np.full(k, np.nan)]
+    exf = ex.astype(float)
+    E5 = fsh(roll(exf, 5, "max"), 5)
+    E10 = fsh(roll(exf, 10, "max"), 10)
+    E20 = fsh(roll(exf, 20, "max"), 20)
+    mx10 = fsh(roll(h, 10, "max"), 10) / c - 1
+    mx20 = fsh(roll(h, 20, "max"), 20) / c - 1
+    dd20 = fsh(roll(l, 20, "min"), 20) / c - 1
+    r20 = fsh(c, 20) / c - 1
+    # خطة: Limit بيع عند +50% / +100%، وقف إغلاق −30%، أقصى 20 جلسة (الهدف يُفحص أول)
+    res = {}
+    for T in (0.5, 1.0):
+        out = np.full(n, np.nan)
+        done = np.zeros(n, bool)
+        for k in range(1, H + 1):
+            hk, ck = fsh(h, k), fsh(c, k)
+            hit = ~done & (hk >= c * (1 + T))
+            out[hit] = T
+            done |= hit
+            stop = ~done & (ck <= c * 0.7)
+            out[stop] = ck[stop] / c[stop] - 1
+            done |= stop
+            if k == H:
+                rest = ~done & np.isfinite(ck)
+                out[rest] = ck[rest] / c[rest] - 1
+        res[T] = out
+    F = pd.DataFrame({
+        "t": sym, "D": d.index.strftime("%Y%m%d").astype(int).to_numpy(np.int32), "close": c, "dv20": dv20,
+        "l_price": np.log(np.maximum(c, 0.01)), "l_dv20": np.log10(np.maximum(dv20, 1)),
+        "n_ep252": n_ep252, "n_ep_all": cs, "l_days_ep": np.log1p(np.minimum(days_ep, 1000)),
+        "recent_ep": (days_ep <= 60).astype(float), "last_mag": np.minimum(last_mag, 20),
+        "base_ratio": np.where(np.isfinite(base_before), np.minimum(c / np.maximum(base_before, 1e-9), 10), 1.0),
+        "from_peak": np.where(np.isfinite(peak), c / peak - 1, 0.0),
+        "vol5_60": np.minimum(vol5_60, 20), "vol1_20": np.minimum(vol1_20, 50), "atr5_60": np.minimum(atr5_60, 10),
+        "atr20p": atr20 / c, "rng20": np.minimum(hi20 / np.maximum(lo20, 1e-9) - 1, 10),
+        "pos60": np.clip((c - lo60) / np.maximum(hi60 - lo60, 1e-12), 0, 1), "dd252": c / hi252 - 1,
+        "ret5": np.clip(c / c5 - 1, -1, 5), "ret20": np.clip(c / c20 - 1, -1, 10), "rsi": rsi,
+        "closepos10": roll(rngd, 10, "mean"), "upv10": np.minimum(upv10, 20), "obv20": np.clip(obv20, -5, 5),
+        "hl_up": hl_up, "gap20": gap20, "rs_recent": (days_rs <= 60).astype(float), "n_rs": n_rs,
+        "l_days_rs": np.log1p(np.minimum(days_rs, 1000)),
+        "E5": E5, "E10": E10, "E20": E20, "mx10": mx10, "mx20": mx20, "dd20": dd20, "r20": r20,
+        "tr50": res[0.5], "tr100": res[1.0], "ex_today": exf,
+    })
+    keep = (idx >= 260) & (idx <= n - H - 1) & (idx % 2 == 0) & (c >= 0.05) & (np.nan_to_num(dv20) >= 5_000) & ~ex
+    rows = F[keep].copy()
+    for col in rows.columns:
+        if rows[col].dtype == np.float64:
+            rows[col] = rows[col].astype(np.float32)
+    # الحلقات: الميزات قبل الانفجار بـ 1/5/10 جلسات مقابل الأيام الهادية لنفس السهم
+    quiet = np.ones(n, bool)
+    for t in np.flatnonzero(ex):
+        quiet[max(0, t - 25):t + 26] = False
+    quiet &= (idx >= 260)
+    eps = []
+    cols = ["vol5_60", "vol1_20", "atr5_60", "rng20", "pos60", "dd252", "ret5", "ret20", "rsi", "closepos10", "upv10",
+            "obv20", "hl_up", "gap20", "base_ratio", "from_peak", "l_days_rs", "n_ep252"]
+    qmed = F.loc[quiet, cols].median() if quiet.sum() >= 30 else None
+    for E in np.flatnonzero(ep):
+        if E < 260 or qmed is None:
+            continue
+        rec = {"t": sym, "E": str(d.index[E].date()), "pre": c[E - 1], "jump": jump[E], "dv_pre": dv20[E - 1],
+               "n_prior": int(n_ep252[E - 1]), "days_rs": int(days_rs[E - 1]),
+               "c_E": c[E] / c[E - 1] - 1, "c5": (c[E + 5] / c[E - 1] - 1) if E + 5 < n else np.nan,
+               "c20": (c[E + 20] / c[E - 1] - 1) if E + 20 < n else np.nan,
+               "pk5": (h[E:E + 6].max() / c[E - 1] - 1)}
+        for lag in (1, 5, 10):
+            if E - lag >= 0:
+                for col in cols:
+                    rec[f"{col}@{lag}"] = float(F[col].iat[E - lag])
+        for col in cols:
+            rec[f"{col}@q"] = float(qmed[col])
+        eps.append(rec)
+    return rows, eps
+
+
+def matched_expect(df_sig, df_all, col, strata=("vq", "pq")):
+    """المتوقع لو دخول عشوائي بنفس الشرائح (التذبذب × السعر)."""
+    base = df_all.groupby(list(strata))[col].mean()
+    w = df_sig.groupby(list(strata)).size()
+    w = w[w.index.isin(base.index)]
+    return float((base.loc[w.index] * w).sum() / max(w.sum(), 1))
+
+
+def pr(x):
+    return "-" if x is None or (isinstance(x, float) and not np.isfinite(x)) else f"{x * 100:.1f}%"
+
+
+def main():
+    t0 = time.time()
+    syms = universe()
+    start = datetime.now(timezone.utc) - timedelta(days=DAYS)
+    parts, eps = [], []
+    with ProcessPoolExecutor(os.cpu_count()) as ex:
+        for i in range(0, len(syms), 100):
+            batch = syms[i:i + 100]
+            try:
+                raw = A.bars(batch, "1Day", start)
+            except Exception as e:
+                print("bars err", repr(e)[:100], flush=True)
+                continue
+            try:
+                spl = A.splits(batch, start)
+            except Exception:
+                spl = {}
+            jobs = []
+            for s, dd in raw.items():
+                dd = dd[["Open", "High", "Low", "Close", "Volume"]].copy()
+                dd.index = pd.to_datetime(dd.index).tz_localize(None).normalize()
+                jobs.append((s, dd[~dd.index.duplicated(keep="last")], spl.get(s, [])))
+            for rows, e in ex.map(feat, jobs, chunksize=4):
+                if rows is not None and len(rows):
+                    parts.append(rows)
+                eps += e
+            if (i // 100) % 10 == 0:
+                print(f"  {i + 100}/{len(syms)} · صفوف {sum(len(p) for p in parts):,} · حلقات {len(eps)} · {round(time.time() - t0)}ث", flush=True)
+    df = pd.concat(parts, ignore_index=True)
+    del parts
+    for f_ in FEATS:  # تنظيف: لا نهايات ولا فراغات
+        x = df[f_].replace([np.inf, -np.inf], np.nan)
+        df[f_] = x.fillna(x.median()).astype(np.float32)
+    ev = pd.DataFrame(eps)
+    os.makedirs("diag_out", exist_ok=True)
+    ev.to_csv("diag_out/highrisk_episodes.csv.gz", index=False, compression="gzip")
+    print(f"\nالصفوف: {len(df):,} سهم-يوم · أسهم {df.t.nunique():,} · من {df.D.min()} لين {df.D.max()} · حلقات انفجار {len(ev):,}", flush=True)
+    # شرائح للمقارنة العادلة
+    df["vq"] = pd.qcut(df["atr20p"].rank(method="first"), 5, labels=False)
+    df["pq"] = pd.cut(df["close"], [0, 1, 3, 10, 1e9], labels=False)
+    df["epb"] = pd.cut(df["n_ep252"], [-1, 0, 1, 2, 3, 5, 1e9], labels=["0", "1", "2", "3", "4-5", "6+"])
+
+    print("\n==== س1: التكرار — احتمال انفجار (×2 بيوم) خلال 10 / 20 جلسة حسب انفجارات آخر سنة ====")
+    print(f"الأساس: 10 جلسات {pr(df.E10.mean())} · 20 جلسة {pr(df.E20.mean())}")
+    for b, g in df.groupby("epb", observed=True):
+        print(f"  انفجارات آخر سنة {b:>4}: n={len(g):>9,} · خلال 10 {pr(g.E10.mean())} · خلال 20 {pr(g.E20.mean())} "
+              f"· أعلى ربح 20 (وسيط) {pr(g.mx20.median())} · متوقع بنفس التذبذب والسعر {pr(matched_expect(g, df, 'E10'))}")
+    print("\nنفس الشي داخل كل شريحة تذبذب (خلال 10 جلسات) — الصفوف: شريحة التذبذب 0 (هادي) → 4 (متذبذب):")
+    tab = df.pivot_table(index="vq", columns="epb", values="E10", aggfunc="mean", observed=True)
+    print((tab * 100).round(1).to_string())
+    ser = df[df.n_ep252 >= 1]
+    ser = ser.assign(dsb=pd.cut(np.expm1(ser.l_days_ep), [0, 10, 20, 40, 60, 120, 250, 1e9]))
+    print("\nداخل الأسهم اللي انفجرت بآخر سنة: حسب الجلسات من آخر انفجار:")
+    for b, g in ser.groupby("dsb", observed=True):
+        print(f"  {str(b):>14}: n={len(g):>8,} · خلال 10 {pr(g.E10.mean())} · متوقع بنفس التذبذب {pr(matched_expect(g, df, 'E10'))}")
+
+    print("\n==== س2: بصمة المضارب — الميزات قبل الانفجار مقابل الأيام الهادية لنفس السهم (وسيط) ====")
+    cols = ["vol5_60", "vol1_20", "atr5_60", "rng20", "pos60", "dd252", "ret5", "ret20", "rsi", "closepos10", "upv10",
+            "obv20", "hl_up", "gap20", "base_ratio", "from_peak"]
+    for grp, g in (("كل الحلقات", ev), ("المتكرر (انفجر قبل خلال سنة)", ev[ev.n_prior >= 1]), ("أول مرة", ev[ev.n_prior == 0])):
+        print(f"\n-- {grp} (n={len(g)}) · وسيط: قبل 10 جلسات | قبل 5 | قبل يوم | أيامه الهادية")
+        for col in cols:
+            vals = [g[f"{col}@{lag}"].median() for lag in (10, 5, 1)] + [g[f"{col}@q"].median()]
+            print(f"   {col:>11}: " + " | ".join(f"{x:.3f}" for x in vals))
+    print("\nبعد الانفجار (من إغلاق ما قبله): نفس اليوم وسيط " + pr(ev.c_E.median()) + " · بعد 5 جلسات " + pr(ev.c5.median())
+          + " · بعد 20 " + pr(ev.c20.median()) + " · أعلى 5 جلسات وسيط " + pr(ev.pk5.median()))
+    print("التقسيم العكسي قبل الانفجار: خلال 30 جلسة " + pr((ev.days_rs <= 30).mean()) + " · خلال 60 " + pr((ev.days_rs <= 60).mean())
+          + f" (الأيام العادية: خلال 60 {pr((np.expm1(df.l_days_rs) <= 60).mean())})")
+    print("سعر ما قبل الانفجار: " + " · ".join(f"{a}-{b}$ {pr(((ev.pre >= a) & (ev.pre < b)).mean())}" for a, b in ((0, 1), (1, 3), (3, 10), (10, 1e9))))
+
+    print("\n==== س3: النموذج (احتمال انفجار خلال 10 جلسات) — walk-forward ====")
+    folds = [(20250501, 20251101), (20251101, 20261101)]
+    test_all = []
+    for a, b in folds:
+        cut = int((pd.Timestamp(str(a)) - pd.Timedelta(days=30)).strftime("%Y%m%d"))
+        tr = df[df.D < cut]
+        te = df[(df.D >= a) & (df.D < b)].copy()
+        Z, mu, sd = prep(tr, FEATS)
+        w = fit_logit(Z, tr.E10.astype(float).values, lam=5.0)
+        Zt, _, _ = prep(te, FEATS, mu, sd)
+        te["p"] = 1 / (1 + np.exp(-(w[0] + Zt @ w[1:])))
+        test_all.append(te)
+        s_ser = te[te.n_ep252 >= 1]
+        print(f"  اختبار {a}→{b}: n={len(te):,} · AUC {auc(te.E10.values, te.p.values):.3f} · داخل المتكرر "
+              f"{auc(s_ser.E10.values, s_ser.p.values):.3f} · الأساس {pr(te.E10.mean())}")
+        for q in (0.01, 0.05, 0.10):
+            top = te[te.p >= te.p.quantile(1 - q)]
+            print(f"     أعلى {int(q * 100)}%: انفجار خلال 10 {pr(top.E10.mean())} (متوقع بنفس التذبذب والسعر {pr(matched_expect(top, te, 'E10'))})"
+                  f" · خلال 20 {pr(top.E20.mean())} · خطة +50% متوسط {pr(top.tr50.mean())} وسيط {pr(top.tr50.median())}"
+                  f" · خطة +100% متوسط {pr(top.tr100.mean())}")
+        daily = te.sort_values("p", ascending=False).groupby("D").head(10)
+        print(f"     أعلى 10 كل يوم: انفجار خلال 10 {pr(daily.E10.mean())} · متوقع بنفس الشرائح {pr(matched_expect(daily, te, 'E10'))}"
+              f" · خطة +50% متوسط {pr(daily.tr50.mean())} (عشوائي بنفس الشرائح {pr(matched_expect(daily, te, 'tr50'))})"
+              f" · +100% متوسط {pr(daily.tr100.mean())} (عشوائي {pr(matched_expect(daily, te, 'tr100'))})")
+        heur = te[(te.n_ep252 >= 2)]
+        print(f"     مقارنة: «انفجر مرتين+ بسنة» لحاله: n={len(heur):,} · خلال 10 {pr(heur.E10.mean())} · خطة +50% {pr(heur.tr50.mean())}")
+    T = pd.concat(test_all)
+    T["dec"] = pd.qcut(T.p.rank(method="first"), 10, labels=False)
+    print("\nمعايرة (خارج العينة، المرحلتين): العُشر · المتوقع · الفعلي خلال 10 · خلال 20 · خطة +50% متوسط · وسيط أعلى ربح 20")
+    calib = []
+    for k, g in T.groupby("dec"):
+        calib.append({"dec": int(k), "p_lo": float(g.p.min()), "p_hi": float(g.p.max()), "e10": float(g.E10.mean()),
+                      "e20": float(g.E20.mean()), "tr50": float(g.tr50.mean()), "mx20": float(g.mx20.median()), "n": int(len(g))})
+        print(f"  {k}: {g.p.mean() * 100:.2f}% · {pr(g.E10.mean())} · {pr(g.E20.mean())} · {pr(g.tr50.mean())} · {pr(g.mx20.median())}")
+    top1 = T[T.p >= T.p.quantile(0.99)]
+    print(f"\nأعلى 1% (خارج العينة): +50% خلال 20 {pr((top1.mx20 >= 0.5).mean())} · +100% {pr((top1.mx20 >= 1).mean())} "
+          f"· نزل −30% خلال 20 {pr((top1.dd20 <= -0.3).mean())} · وسيط العائد بعد 20 {pr(top1.r20.median())}")
+
+    print("\n==== أوزان النموذج النهائي (كل البيانات) ====")
+    Z, mu, sd = prep(df, FEATS)
+    w = fit_logit(Z, df.E10.astype(float).values, lam=5.0)
+    for f_, c_ in sorted(zip(FEATS, w[1:]), key=lambda x: -abs(x[1])):
+        print(f"  {f_:>11}: {c_:+.3f}")
+    model = {"version": "hr1-" + datetime.now(timezone.utc).strftime("%Y%m%d"), "feats": FEATS, "w": [float(x) for x in w],
+             "mean": [float(x) for x in mu], "std": [float(x) for x in sd], "calib": calib,
+             "base_e10": float(df.E10.mean()), "base_e20": float(df.E20.mean()), "n_rows": int(len(df)), "n_eps": int(len(ev)),
+             "period": [int(df.D.min()), int(df.D.max())]}
+    js = json.dumps(model, ensure_ascii=False)
+    print("HR_MODEL_BEGIN")
+    for k in range(0, len(js), 900):
+        print("HM|" + js[k:k + 900])
+    print("HR_MODEL_END")
+    print(f"\nخلص في {round(time.time() - t0)} ثانية", flush=True)
+
+
+if __name__ == "__main__":
+    main()
