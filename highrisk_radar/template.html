@@ -214,7 +214,7 @@ function newsHTML(list){
       ${(n.text_ar || n.summary_ar || n.summary) ? `<div class="newsfull">${esc(n.text_ar || n.summary_ar || n.summary)}</div>` : ""}
       <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span></div></div>`).join("");
 }
-const ST = {fire:["🔥 انطلق اليوم","near"], ready:["🧨 مرشح قوي","ready"], near:["🟠 مرشح","near"], watch:["👀 متكرر","watch"]};
+const ST = {fire:["🔥 انطلق للتو","near"], ready:["🧨 مرشح قوي","ready"], near:["🟠 مرشح","near"], watch:["👀 متكرر","watch"]};
 const FN = {l_price:"السعر", l_dv20:"السيولة اليومية", n_ep252:"عدد انفجاراته بآخر سنة", l_days_ep:"الجلسات من آخر انفجار",
   recent_ep:"انفجر خلال آخر 60 جلسة", last_mag:"قوة آخر انفجار", base_ratio:"السعر ÷ قاعدة ما قبل آخر انفجار", from_peak:"النزول من قمة آخر انفجار",
   vol5_60:"فوليوم آخر 5 أيام ÷ 60", vol1_20:"فوليوم اليوم ÷ المعتاد", atr5_60:"التذبذب 5 أيام ÷ 60", atr20p:"التذبذب اليومي",
@@ -242,7 +242,7 @@ $("#rules").innerHTML = [
   `<b>لو بتجرب (تذكرة):</b> شراء Stop فوق السعر +${Math.round((PL.trig||0.15)*100)}% (ما تدخل إلا إذا بدأ يطير فعلاً) · بيع Limit +${Math.round(PL.t1*100)}% من سعر دخولك · وقف إغلاق −${Math.round(PL.stop*100)}% · أقصى ${PL.days} جلسات. بالاختبار لـ 🧨: <b class="num">${pct1(BT.mean)}</b> بالمتوسط مقابل <span class="num">${pct1(BT.rand)}</span> للعشوائي — تقريباً تعادل، يعني <b>ما فيه أفضلية مثبتة</b>.`,
   `<b>الحجم:</b> خل خسارة الوقف ≤ ${PL.risk ?? 0.5}% من محفظتك (الصفقة ≈ ${((PL.risk ?? 0.5) / PL.stop).toFixed(1)}% من المحفظة) ووزّع على أكثر من سهم.`,
   "<b>دائماً:</b> أمر البيع Limit جاهز قبل القفزة (حتى البري والأفتر) — RUBI طار 2.23 ← 5.91 ورجع 1.66 بنفس الساعة.",
-  "🔥 «انطلق اليوم» للمتابعة مو للمطاردة. للموجة الثانية بعد الانفجار عندنا 🔥 برادار الأفتر (أفضلية بعينة صغيرة)."].map(r => `<li>${r}</li>`).join("");
+  "🔥 «انطلق للتو» (اليوم وقت السوق، وإلا آخر جلسة) للمتابعة مو للمطاردة. للموجة الثانية بعد الانفجار عندنا 🔥 برادار الأفتر (أفضلية بعينة صغيرة)."].map(r => `<li>${r}</li>`).join("");
 function tiles(){
   const n = k => stocks.filter(s => s.status === k).length;
   $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
@@ -300,7 +300,7 @@ function render(){
     return `<div class="card" style="cursor:pointer" data-s="${esc(s.symbol)}">
       <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
         <div><span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span>
-          <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct ?? "-"}%</span>${s.status === "fire" ? ` <span class="note">(أعلى اليوم +<span class="num">${s.jump_today_pct}</span>%)</span>` : ""}
+          <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct ?? "-"}%</span>${s.status === "fire" ? ` <span class="note">(الأعلى +<span class="num">${s.jump_today_pct}</span>% فوق الإغلاق اللي قبله)</span>` : ""}
           <div class="name" style="max-width:none"><bdi>${esc(s.name)}</bdi>${s.sector ? " · " + esc(s.sector) : ""}</div></div>
         <div style="text-align:left"><span class="badge ${cls}">${lab}</span>
           <div class="note">احتمال انفجار خلال 10 جلسات <b class="num" style="color:var(--text)">${pc(s.e10)}</b>${lift ? ` (<span class="num">${lift.toFixed(1)}</span> ضعف الأساس)` : ""}</div></div>
