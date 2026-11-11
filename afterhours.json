@@ -194,6 +194,38 @@
    "pm_high_pct": 8.1,
    "close_next_pct": -12.5,
    "result": "nofill"
+  },
+  {
+   "symbol": "CHSN",
+   "D": "2026-11-10",
+   "close": 2.37,
+   "ah_high": 2.74,
+   "ah_last": 2.6599,
+   "ah_vwap": 2.5967,
+   "jump_pct": 15.6,
+   "hold_pct": 78,
+   "ah_vol": 87461,
+   "rth_vol": 632068,
+   "limit": 2.5967,
+   "name": "Chanson International Holding",
+   "price": 2.6599,
+   "float": 2095145,
+   "short": 150000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "الشورت 150,000 فوق 50,000"
+   ],
+   "news": [],
+   "country": "China",
+   "flag": "🇨🇳",
+   "country_ar": "الصين",
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 2.8564,
+   "t2": 2.9862,
+   "stop": 2.337,
+   "pm_min_vol": 6122
   }
  ],
  "fire_sent": []
