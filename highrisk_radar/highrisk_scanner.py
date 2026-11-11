@@ -48,7 +48,10 @@ ETF_RX = re.compile(r"\b(ETF|ETN|Fund|Trust|ProShares|Direxion|iShares|Leveraged
                     r"Index|Shares|SPDR|Invesco|VanEck|WisdomTree|Global X|Vanguard|Schwab|Portfolio)\b", re.I)
 # حالات الرادار (من الدراسة — highrisk_model.json → thresholds): الأعلى احتمال = 🧨، بعده 🟠، والباقي من المتكرر 👀
 ST_AR = {"fire": "🔥 انطلق اليوم", "ready": "🧨 مرشح قوي", "near": "🟠 مرشح", "watch": "👀 متكرر"}
-PLAN = {"t1": 0.5, "t2": 1.0, "stop": 0.30, "days": 20}   # نفس خطة الاختبار: Limit +50% ثم +100%، وقف إغلاق −30%، أقصى 20 جلسة
+# الخطة الأقل سوءاً بالاختبار (7 طرق، خارج العينة): شراء Stop فوق إغلاق اليوم +15% باليوم التالي (ما تدخل إلا إذا بدأ يطير)،
+# بيع Limit +30% من سعر الدخول، وقف إغلاق −15%، أقصى 3 جلسات — 🧨: +0.3% بالمتوسط مقابل −0.6% للعشوائي (تقريباً تعادل).
+# الدخول على الإغلاق خسران بكل المدد (−2% إلى −3% مقابل ~0% للعشوائي). الحجم: خسارة الوقف ≤ 0.5% من المحفظة.
+PLAN = {"trig": 0.15, "t1": 0.30, "stop": 0.15, "days": 3, "risk": 0.5}
 
 
 def _r(x, n=4):
@@ -79,6 +82,23 @@ def alpaca_universe() -> list[str]:
     return sorted(set(syms))
 
 
+def fetch_daily(tickers: list[str]) -> dict:
+    """يومي من Alpaca لكل المجال (~5 آلاف سهم): 420 يوم تكفي (الميزات تحتاج 252 جلسة) — نص حمل download_daily (730 يوم)."""
+    import alpaca_data as A
+    out = {}
+    for i in range(0, len(tickers), 100):
+        batch = tickers[i:i + 100]
+        for attempt in range(3):
+            try:
+                out.update({t: d for t, d in A.daily(batch, days=420).items() if len(d) >= 120})
+                break
+            except Exception as e:
+                log(f"  [عالي مخاطرة] Alpaca خطأ (محاولة {attempt + 1}):", repr(e)[:120])
+                time.sleep(5 * (attempt + 1))
+    log(f"[عالي مخاطرة] اليومي من Alpaca: {len(out)} من {len(tickers)}")
+    return out
+
+
 def run(cfg, tickers=None) -> dict:
     t0 = time.time()
     M = HR.model()
@@ -90,7 +110,7 @@ def run(cfg, tickers=None) -> dict:
         if len(tickers) < 500:
             tickers = data.get_universe(dict(cfg, universe=dict(cfg["universe"], min_price=0.0001, max_price=1_000_000,
                                                                 min_avg_volume=0)))
-    daily = data.download_daily(tickers, cfg)
+    daily = fetch_daily(tickers)
     TH = (M or {}).get("thresholds") or {}
     # الحالة: 🔥 انطلق اليوم (أعلى ≥ +50% فوق إغلاق أمس) · 🧨/🟠 حسب حدود الاحتمال من الدراسة · 👀 متكرر (انفجر مرتين+ بسنة)
     p_ready, p_near = TH.get("ready", 1.0), TH.get("near", 1.0)
@@ -150,9 +170,9 @@ def run(cfg, tickers=None) -> dict:
                "n_year": hist["n_year"], "days_since": hist["days_since"], "cycle_days": hist["cycle_days"],
                "episodes": hist["episodes"][-8:], "reverse_splits": hist["reverse_splits"][-4:],
                "short_hist": len(d) < 260,
-               "plan": {"entry": _r(px), "t1": _r(px * (1 + PLAN["t1"])), "t2": _r(px * (1 + PLAN["t2"])),
-                        "stop": _r(px * (1 - PLAN["stop"])), "days": PLAN["days"],
-                        "base_low": _r(float(last["lo20"])), "size_pct": round(1 / PLAN["stop"], 1)},
+               "plan": {"trigger": _r(px * (1 + PLAN["trig"])), "t1": _r(px * (1 + PLAN["trig"]) * (1 + PLAN["t1"])),
+                        "stop": _r(px * (1 + PLAN["trig"]) * (1 - PLAN["stop"])), "days": PLAN["days"],
+                        "base_low": _r(float(last["lo20"])), "size_pct": round(PLAN["risk"] / PLAN["stop"], 1)},
                "flags": [], "tags": [],
                "chart": {"d": [str(i)[:10] for i in tail.index], "o": [_r(v) for v in tail["Open"]],
                          "h": [_r(v) for v in tail["High"]], "l": [_r(v) for v in tail["Low"]],

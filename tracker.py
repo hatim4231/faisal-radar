@@ -33,14 +33,15 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 MAX_SESSIONS = 20
 # قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
 # إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
-HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60}
+HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60, "highrisk": 3}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
 # (+ التجميع والمدارس: نفس قواعد اختبارهم التاريخي — الهدف يُفحص أول، والوقف بإغلاق اليوم تحته)
-NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners"}
+NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners", "highrisk"}
 # قرار المستخدم: رادار التجميع والمدارس والطيارات نراقب نتايجهم بالسجل بدون رسائل تيليجرام
 # + «⚠ طرح متكرر» (الخيار 2، 2026-11-10 بعد RUBI): شركات الطرح المتكرر تنعرض بقسم مخاطرة عالية بصفحة فيصل المطوّر
 #   وتنحفظ هنا صامتة بنفس قواعد فيصل المطوّر — عشان نعرف بالأرقام هل قاعدة «ما تترشح» صح
-MUTED = {"accumulation", "schools", "runners", "faisal_dil"}
+# + 🧨 عالي مخاطرة (2026-11-11، صامت): خطة «اشترِ بس إذا بدأ يطير» = شراء معلّق (pending) يتفعّل باليوم التالي لو وصل السعر للـ trigger
+MUTED = {"accumulation", "schools", "runners", "faisal_dil", "highrisk"}
 WIN = ("t1", "t2", "t1_then_stop", "t1_expired")
 
 
@@ -74,6 +75,7 @@ RADARS = {
     "accumulation": ("🔍 التجميع", ROOT / "output" / "sig_accumulation.json"),
     "schools": ("🧭 المدارس", ROOT / "output" / "sig_schools.json"),
     "runners": ("🚀 الطيارات", ROOT / "output" / "sig_runners.json"),
+    "highrisk": ("🧨 عالي مخاطرة", ROOT / "output" / "sig_highrisk.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
@@ -81,6 +83,7 @@ STATUS_AR_INS = {"ready": "🟢 شراء داخلي قوي", "near": "🟡 شر�
 STATUS_AR_ACC = {"ready": "🔍 تجميع مؤكد", "near": "🟡 تجميع محتمل"}
 STATUS_AR_SCH = {"ready": "🎯 قوي", "near": "🟡 جيد"}
 STATUS_AR_RUN = {"ready": "🚀 جاهز", "near": "🟡 قريب"}
+STATUS_AR_HR = {"ready": "🧨 مرشح قوي", "near": "🟠 مرشح"}
 SCH_AR = {"classic": "📐 الكلاسيكية", "wyckoff": "⚖️ وايكوف", "elliott": "〰️ إليوت"}
 
 
@@ -107,6 +110,19 @@ def signals(key: str, payload: dict) -> list[dict]:
     out = []
     stocks = (payload.get("diluters") or []) if key == "faisal_dil" else payload.get("stocks", [])
     for s in stocks:
+        if key == "highrisk":
+            st = s.get("status") if s.get("status") in ("ready", "near") else None
+            p = s.get("plan") or {}
+            if not st or not p.get("trigger") or not p.get("t1") or not p.get("stop"):
+                continue
+            out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_HR[st],
+                        "entry": p["trigger"], "trigger": p["trigger"], "pending": True, "ref_close": s["price"],
+                        "stop": p["stop"], "t1": p["t1"], "t2": None, "horizon": p.get("days") or HORIZON["highrisk"],
+                        "score": s.get("p_raw"), "date": s.get("date"), "name": s.get("name"),
+                        "why": f"احتمال انفجار خلال 10 جلسات {round((s.get('e10') or 0) * 100)}% (الأساس {round((s.get('base_e10') or 0) * 100, 1)}%)"
+                               f" · انفجر {s.get('n_year')} مرة بسنة · شراء Stop {fp(p['trigger'])} باليوم التالي",
+                        "dilution": (s.get("dilution") or {}).get("level"), "twins": s.get("twins")})
+            continue
         if key == "runners":
             st = s.get("status") if s.get("status") in ("ready", "near") else None
             p = s.get("plan") or {}
@@ -208,6 +224,18 @@ def evaluate(t: dict, d: pd.DataFrame) -> list[str]:
     """يحدّث التوصية من الشارت اليومي ويرجع الأحداث الجديدة (للتنبيه)."""
     events = []
     after = d[d.index > pd.Timestamp(t["date"])]
+    if t.get("pending") and len(after):
+        # شراء Stop (عالي مخاطرة): يتفعّل باليوم التالي بس إذا الأعلى وصل الـ trigger (لو فتح فوقه = سعر الافتتاح)،
+        # وإلا «ما تفعّل» وما ينحسب — نفس الاختبار التاريخي بالضبط
+        r0 = after.iloc[0]
+        if float(r0["High"]) >= t["trigger"]:
+            ent = float(r0["Open"]) if float(r0["Open"]) > t["trigger"] else float(t["trigger"])
+            k = ent / t["trigger"]
+            t.update(pending=False, activated=str(after.index[0].date()), entry=round(ent, 4),
+                     stop=round(t["stop"] * k, 4), t1=round(t["t1"] * k, 4))
+        else:
+            t.update(pending=False, result="no_fill", closed=str(after.index[0].date()), sessions=len(after))
+            return events
     t["sessions"] = len(after)
     if len(d):
         t["last"] = round(float(d["Close"].iloc[-1]), 4)
@@ -380,6 +408,14 @@ def run():
                     continue
                 if not px2 or not t.get("stop") or not t.get("t1"):
                     continue
+                if t.get("pending"):  # نفس الشراء المعلّق: trigger بنفس النسبة فوق إغلاق التوأم
+                    trg2 = px2 * t["trigger"] / t["ref_close"]
+                    track.setdefault("twins", []).append({
+                        "id": f"{t['id']}:r{k}", "of": t["id"], "radar": key, "radar_name": "🎲 عشوائي مماثل",
+                        "symbol": sym2, "date": t["date"], "entry": round(trg2, 4), "trigger": round(trg2, 4), "pending": True,
+                        "ref_close": px2, "result": "open", "horizon": t["horizon"],
+                        "stop": round(trg2 * t["stop"] / t["trigger"], 4), "t1": round(trg2 * t["t1"] / t["trigger"], 4), "t2": None})
+                    continue
                 track.setdefault("twins", []).append({
                     "id": f"{t['id']}:r{k}", "of": t["id"], "radar": key, "radar_name": "🎲 عشوائي مماثل",
                     "symbol": sym2, "date": t["date"], "entry": px2, "result": "open", "horizon": t["horizon"],
@@ -480,6 +516,7 @@ def telegram(events: list[str]):
 
 def stats(trades):
     # المحسوبة = اللي تحدد مصيرها (وصلت هدف أو وقف أو انتهت). المفتوحة بدون نتيجة ما تنحسب
+    trades = [t for t in trades if t["result"] != "no_fill"]   # الشراء المعلّق اللي ما تفعّل ما ينحسب
     closed_like = [t for t in trades if t["result"] != "open"]
     n = len(closed_like)
     hit = sum(t["result"] in ("t1", "t2", "t1_then_stop", "t1_expired") for t in closed_like)
@@ -500,9 +537,9 @@ def vs_random(trades: list[dict], twins: list[dict], key: str = "schools", days:
     H = HORIZON.get(key, MAX_SESSIONS)
     days = days or (H * 7 + 4) // 5 + 2
     cut = (date.today() - timedelta(days=days)).isoformat()
-    m = [t for t in trades if t["radar"] == key and str(t.get("date")) <= cut and t.get("sessions")]
+    m = [t for t in trades if t["radar"] == key and str(t.get("date")) <= cut and t.get("sessions") and t["result"] != "no_fill"]
     ids = {t["id"] for t in m}
-    tw = [x for x in twins if x.get("of") in ids and x.get("sessions")]
+    tw = [x for x in twins if x.get("of") in ids and x.get("sessions") and x["result"] != "no_fill"]
     rp = [t["rand_p"] for t in m if t.get("rand_p") is not None]
     out = {"n": len(m), "n_twins": len(tw), "n_total": sum(t["radar"] == key for t in trades), "horizon": H}
     if m:
@@ -530,7 +567,7 @@ def build_page(track):
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "radars": {k: v[0] for k, v in RADARS.items()}, "stats": by, "stats_status": by_status,
                "muted": sorted(MUTED),
-               "vs_random": {k: vs_random(trades, track.get("twins", []), k) for k in ("schools", "runners")},
+               "vs_random": {k: vs_random(trades, track.get("twins", []), k) for k in ("schools", "runners", "highrisk")},
                "trades": sorted(trades, key=lambda t: t["opened_at"], reverse=True)}
     html = (ROOT / "template_track.html").read_text(encoding="utf-8")
     out = ROOT / "site" / "track" / "index.html"

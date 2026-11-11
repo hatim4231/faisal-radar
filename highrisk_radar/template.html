@@ -179,8 +179,9 @@ ul.clean{margin:0;padding-right:18px}
   </header>
   <div class="card" style="margin-bottom:12px;border-color:var(--bad)">⚠ <b>عالي مخاطرة — كل شي مفتوح (قرارك):</b> هالرادار ما يطبق أي فلتر من فلاترك
     (السعر، الشورت، HRT، الطرح المتكرر، الامتثال، الفلووت، القيمة، الفوليوم) — كلها تطلع <b>تحذير</b> بالبطاقة بس.
-    <br>🔇 <b>تجريبي صامت:</b> ما يرسل تيليجرام. 🧨 و🟠 تنحفظ في <a href="../track/" style="color:var(--accent)">سجل التوصيات</a> لمدة 20 جلسة
-    (الهدف +50%، الوقف إغلاق −30%)، ومع كل وحدة 3 أسهم عشوائية بنفس التذبذب والسعر — عشان نعرف بالأرقام هل الرادار أحسن من الصدفة.
+    <br>🔇 <b>تجريبي صامت:</b> ما يرسل تيليجرام. 🧨 و🟠 تنحفظ في <a href="../track/" style="color:var(--accent)">سجل التوصيات</a> بخطة
+    «اشترِ بس إذا بدأ يطير» (شراء Stop +15% باليوم التالي، بيع +30%، وقف إغلاق −15%، 3 جلسات) — واللي ما يتفعّل شراه ما ينحسب —
+    ومع كل وحدة 3 أسهم عشوائية بنفس التذبذب والسعر بنفس الخطة، عشان نعرف بالأرقام هل الرادار أحسن من الصدفة.
     <div class="note" style="margin-top:6px" id="modelnote"></div></div>
   <details class="card" style="margin-bottom:12px" open><summary style="cursor:pointer;font-weight:700">📋 الخطة (من دراسة الأسهم اللي تنفجر بشكل متكرر)</summary>
     <ol class="rules" id="rules"></ol>
@@ -231,15 +232,17 @@ $("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.g
 if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
 $("#modelnote").innerHTML = MD.version ? `📊 النموذج <span class="num">${esc(MD.version)}</span> · ${Number(MD.n_rows||0).toLocaleString("en")} سهم-يوم ·
   ${Number(MD.n_eps||0).toLocaleString("en")} انفجار · الأساس (أي سهم بأي يوم): انفجار خلال 10 جلسات <b class="num">${pc(MD.base_e10)}</b>` + (SUM.line ? `<br>${esc(SUM.line)}` : "") : "⚠ النموذج مو موجود.";
-const PL = (DATA && DATA.plan) || {t1:0.5, t2:1, stop:0.3, days:20};
-$("#rules").innerHTML = (SUM.rules || [
-  "<b>وش ندوّر:</b> أسهم انفجرت قبل (مرة أو أكثر بآخر سنة) — الانفجار يتكرر بنفس الأسهم لأن نفس المضاربين يرجعون لها.",
-  "<b>بصمة التجميع قبل الانطلاقة:</b> شوف ✓/✗ بكل بطاقة (فوليوم ناشف ثم يصحى، تذبذب ينكمش، قيعان ترتفع، السعر رجع لقاعدته).",
-  `<b>الدخول:</b> بحجم صغير وموزّع على أكثر من سهم — ما تدري أي واحد بيطير.`,
-  `<b>البيع وقت القفزة:</b> أوامر بيع Limit جاهزة: نص الكمية عند +${Math.round(PL.t1*100)}% والباقي عند +${Math.round(PL.t2*100)}% (حتى بالبري والأفتر). القفزات ترجع بدقايق (RUBI طار 2.23 ← 5.91 ورجع 1.66 بنفس الساعة).`,
-  `<b>الوقف:</b> إغلاق تحت −${Math.round(PL.stop*100)}% من الدخول، وخل خسارة الوقف = 1% من محفظتك (يعني الصفقة ≈ ${Math.round(100/ (PL.stop*100) * 10) / 10}% من المحفظة).`,
-  `<b>المدة:</b> أقصى ${PL.days} جلسة — ما طار = اطلع وبدّل.`,
-  "<b>انتبه:</b> 🔥 «انطلق اليوم» = متأخر غالباً، للمتابعة مو للمطاردة."]).map(r => `<li>${r}</li>`).join("");
+const PL = (DATA && DATA.plan) || {trig:0.15, t1:0.3, stop:0.15, days:3, risk:0.5};
+const BT = SUM.plan_bt || {};
+const pct1 = x => x == null ? "-" : (x > 0 ? "+" : "") + (x * 100).toFixed(1) + "%";
+$("#rules").innerHTML = [
+  "<b>وش يلقط:</b> الأسهم اللي احتمال تنفجر (أعلى سعر ≥ ضعف إغلاق أمس) خلال 10 جلسات أعلى. أقوى العوامل: <b>سبق انفجر</b> (الانفجار يتكرر بنفس الأسهم — انفجر مرة بسنة: 2.9% خلال 10 جلسات، 4-5 مرات: 8%، ما انفجر: 0.3%)، منهار 85-95% من قمة السنة، عند قاع مداه، وسيولته خفيفة.",
+  "<b>بصمة المضارب:</b> الفوليوم يصحى <b>قبل الانفجار بيوم</b> (حوالي 2.6 ضعف المعتاد) — قبلها بأسبوعين ما فيه شي واضح. والسعر نازل قبلها (−15% إلى −20% بآخر 20 جلسة)، وغالباً تحت قاعدة انفجاره اللي قبل. التقسيم العكسي خلال 60 جلسة أكثر بـ 8 مرات قبل الانفجارات.",
+  "<b>الصدق أول:</b> الشراء على الإشارة <b>خسران</b> بكل الطرق اللي جربناها (7 طرق: مدد 3-20 جلسة، أهداف 30-100%، بوقف وبدونه) — أغلبها يكمل نزيف، والقفزة ترجع بنفس اليوم. فاستخدمه <b>قائمة مراقبة</b> ولا تشتري لأنه طلع هنا.",
+  `<b>لو بتجرب (تذكرة):</b> شراء Stop فوق السعر +${Math.round((PL.trig||0.15)*100)}% (ما تدخل إلا إذا بدأ يطير فعلاً) · بيع Limit +${Math.round(PL.t1*100)}% من سعر دخولك · وقف إغلاق −${Math.round(PL.stop*100)}% · أقصى ${PL.days} جلسات. بالاختبار لـ 🧨: <b class="num">${pct1(BT.mean)}</b> بالمتوسط مقابل <span class="num">${pct1(BT.rand)}</span> للعشوائي — تقريباً تعادل، يعني <b>ما فيه أفضلية مثبتة</b>.`,
+  `<b>الحجم:</b> خل خسارة الوقف ≤ ${PL.risk ?? 0.5}% من محفظتك (الصفقة ≈ ${((PL.risk ?? 0.5) / PL.stop).toFixed(1)}% من المحفظة) ووزّع على أكثر من سهم.`,
+  "<b>دائماً:</b> أمر البيع Limit جاهز قبل القفزة (حتى البري والأفتر) — RUBI طار 2.23 ← 5.91 ورجع 1.66 بنفس الساعة.",
+  "🔥 «انطلق اليوم» للمتابعة مو للمطاردة. للموجة الثانية بعد الانفجار عندنا 🔥 برادار الأفتر (أفضلية بعينة صغيرة)."].map(r => `<li>${r}</li>`).join("");
 function tiles(){
   const n = k => stocks.filter(s => s.status === k).length;
   $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
@@ -263,7 +266,7 @@ function chart(s){
   let g = "";
   for (let k = 0; k <= 4; k++){ const v = lo + (hi-lo)*k/4; g += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${line}"/><text x="${W-pad.r+4}" y="${y(v)+4}" fill="${muted}" font-size="11">${fp(v)}</text>`; }
   const hl = (v, col, label, dash) => v == null || v > hi || v < lo ? "" : `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="5 4"':""}/><text x="${pad.l+4}" y="${y(v)-3}" fill="${col}" font-size="11" font-weight="600">${label} ${fp(v)}</text>`;
-  g += hl(p.stop, cssv("--bad"), "الوقف", true) + hl(p.t1, cssv("--good"), "+50%", true) + hl(p.t2, cssv("--good"), "+100%", true) + hl(p.base_low, cssv("--info"), "أدنى 20 جلسة", false);
+  g += hl(p.stop, cssv("--bad"), "الوقف", true) + hl(p.trigger, cssv("--warn"), "شراء Stop", true) + hl(p.t1, cssv("--good"), "البيع", true) + hl(p.base_low, cssv("--info"), "أدنى 20 جلسة", false);
   const vmax = Math.max(...c.v);
   for (let i = 0; i < n; i++){ const o = c.o[i], h = c.h[i], l = c.l[i], cl = c.c[i]; if (cl == null) continue;
     const col = cl >= o ? up : dn, bw = Math.max(1, cw * 0.62);
@@ -311,10 +314,10 @@ function render(){
         <span>الشورت المتاح: <b class="num">${s.short != null ? fM(s.short) : "؟"}</b></span><span>سيولة يومية: <b class="num">$${fM(s.dv20)}</b></span>
       </div>
       <div class="facts" style="margin-top:6px">
-        <span>بيع نص: <b class="num" style="color:var(--good)">${fp(p.t1)}</b> (+${Math.round(PL.t1*100)}%)</span>
-        <span>الباقي: <b class="num" style="color:var(--good)">${fp(p.t2)}</b> (+${Math.round(PL.t2*100)}%)</span>
+        <span>شراء Stop: <b class="num">${fp(p.trigger)}</b> (+${Math.round((PL.trig||0.15)*100)}% باليوم التالي)</span>
+        <span>بيع: <b class="num" style="color:var(--good)">${fp(p.t1)}</b> (+${Math.round(PL.t1*100)}% من الدخول)</span>
         <span>الوقف (إغلاق): <b class="num" style="color:var(--bad)">${fp(p.stop)}</b> (−${Math.round(PL.stop*100)}%)</span>
-        <span>المدة: <b class="num">${p.days}</b> جلسة · الحجم ≈ <b class="num">${p.size_pct}%</b> من المحفظة</span>
+        <span>المدة: <b class="num">${p.days}</b> جلسات · الحجم ≈ <b class="num">${p.size_pct}%</b> من المحفظة</span>
       </div>
       ${warnLines(s)}
       ${n0 ? `<div class="left">${sentBadge(n0)} ${esc(n0.title_ar || n0.title)}</div>` : ""}
@@ -328,7 +331,7 @@ function toggle(el){
   const d = document.createElement("div"); d.className = "more"; d.style.marginTop = "10px"; d.onclick = e => e.stopPropagation();
   const eps = s.episodes || [];
   d.innerHTML = `${chart(s)}
-    <div class="legend"><span>▼ = يوم انفجار (×2)</span><span><i style="background:var(--good)"></i>+50% / +100%</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--info)"></i>أدنى 20 جلسة</span></div>
+    <div class="legend"><span>▼ = يوم انفجار (×2)</span><span><i style="background:var(--warn)"></i>شراء Stop</span><span><i style="background:var(--good)"></i>البيع</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--info)"></i>أدنى 20 جلسة</span></div>
     <div class="setupbox"><div class="t">ليش الاحتمال كذا؟ (أقوى العوامل)</div><ul class="clean note" style="margin-top:4px">${(s.why||[]).map(([f,v]) => `<li>${esc(FN[f]||f)}: ${v > 0 ? "يرفع" : "ينزّل"} <span class="num">(${v > 0 ? "+" : ""}${v})</span></li>`).join("")}</ul></div>
     ${eps.length ? `<div class="setupbox"><div class="t">انفجاراته (من إغلاق اليوم اللي قبله)</div><div style="overflow-x:auto"><table class="note num" style="width:100%;border-collapse:collapse;margin-top:4px">
       <tr><th style="text-align:right">التاريخ</th><th>قبله</th><th>أعلى</th><th>×</th><th>أعلى 5 أيام</th><th>بعد 5</th><th>بعد 20</th></tr>
