@@ -455,7 +455,11 @@ function renderDil(){
 
 // ------- chart (SVG candlesticks + levels)
 function chartSVG(s){
-  const c = s.chart, n = c.c.length, W = 800, H = 330, VH = 50, pad = {l:8, r:58, t:10, b:22};
+  // الجوال (طلب المستخدم 2026-11-11): آخر 60 جلسة بمقاس أصغر عشان الأرقام والخطوط تنقرا — الكمبيوتر زي ما هو (100 جلسة)
+  const small = window.innerWidth < 600;
+  let c = s.chart;
+  if (small && c.c.length > 60){ const k0 = c.c.length - 60; c = Object.fromEntries(Object.entries(c).map(([key, a]) => [key, Array.isArray(a) ? a.slice(k0) : a])); }
+  const n = c.c.length, W = small ? 440 : 800, H = 330, VH = 50, pad = {l:small ? 6 : 8, r:small ? 48 : 58, t:10, b:22};
   const p = s.plan;
   const levels = [];
   if (p.entry_zone[0]) levels.push(p.entry_zone[0], p.entry_zone[1]);
@@ -531,7 +535,7 @@ function openDetail(sym){
       <div class="tags" style="margin-top:8px">${s.tags.map(t => `<span class="tag ${tagClass(t)}">${esc(t)}</span>`).join("")}</div>
     </div>
 
-    <div class="card chart"><h3>الشارت اليومي (آخر 100 جلسة)</h3>${chartSVG(s)}
+    <div class="card chart"><h3>الشارت اليومي (آخر ${Math.min(s.chart.c.length, window.innerWidth < 600 ? 60 : 100)} جلسة)</h3>${chartSVG(s)}
       <div class="legend"><span><i style="background:var(--ma20)"></i>MA20</span><span><i style="background:var(--ma50)"></i>MA50</span><span><i style="background:var(--good)"></i>الدعم</span><span><i style="background:var(--zone);height:9px"></i>منطقة الطلب</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--accent)"></i>الأهداف الأربعة</span></div>
     </div>
 
