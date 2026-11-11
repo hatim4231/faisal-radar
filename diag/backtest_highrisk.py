@@ -126,6 +126,42 @@ def feat(job):
                 rest = ~done & np.isfinite(ck)
                 out[rest] = ck[rest] / c[rest] - 1
         res[T] = out
+    # طرق ثانية: (أ) دخول الإغلاق بمدد/وقف أضيق  (ب) أمر شراء فوق السعر (يدخل بس إذا السهم بدأ يتحرك فعلاً) — الهدف من سعر الدخول
+    def close_entry(T, S, Hh):
+        out = np.full(n, np.nan); done = np.zeros(n, bool)
+        for k in range(1, Hh + 1):
+            hk, ck = fsh(h, k), fsh(c, k)
+            hit = ~done & (hk >= c * (1 + T)); out[hit] = T; done |= hit
+            if S is not None:
+                st = ~done & (ck <= c * (1 - S)); out[st] = ck[st] / c[st] - 1; done |= st
+            if k == Hh:
+                rest = ~done & np.isfinite(ck); out[rest] = ck[rest] / c[rest] - 1
+        return out
+
+    def stop_entry(trig, T, S, Hh):
+        """شراء بأمر Stop عند إغلاق اليوم × (1+trig) باليوم التالي (لو فتح فوقه = سعر الافتتاح)، ثم بيع Limit عند +T من الدخول،
+        ووقف إغلاق −S من الدخول، أقصى Hh جلسة. يوم الدخول نفسه: إذا الأعلى وصل الهدف نحسبه هدف (الأعلى جا بعد الاختراق غالباً)."""
+        o1, h1, c1 = fsh(o, 1), fsh(h, 1), fsh(c, 1)
+        lvl = c * (1 + trig)
+        trg = np.isfinite(h1) & (h1 >= lvl)
+        ent = np.where(np.isfinite(o1) & (o1 > lvl), o1, lvl)
+        out = np.full(n, np.nan); done = ~trg
+        hit = ~done & (h1 >= ent * (1 + T)); out[hit] = T; done |= hit
+        st = ~done & (c1 <= ent * (1 - S)); out[st] = c1[st] / ent[st] - 1; done |= st
+        for k in range(2, Hh + 1):
+            hk, ck = fsh(h, k), fsh(c, k)
+            hit = ~done & (hk >= ent * (1 + T)); out[hit] = T; done |= hit
+            st = ~done & (ck <= ent * (1 - S)); out[st] = ck[st] / ent[st] - 1; done |= st
+            if k == Hh:
+                rest = ~done & np.isfinite(ck); out[rest] = ck[rest] / ent[rest] - 1
+        return out, trg.astype(float)
+
+    v_c10 = close_entry(0.5, 0.20, 10)
+    v_c5 = close_entry(0.3, 0.15, 5)
+    v_lot = close_entry(1.0, None, 20)
+    v_s15, trg15 = stop_entry(0.15, 0.5, 0.20, 5)
+    v_s25, trg25 = stop_entry(0.25, 0.5, 0.20, 5)
+    v_s15b, _ = stop_entry(0.15, 0.3, 0.15, 3)
     F = pd.DataFrame({
         "t": sym, "D": d.index.strftime("%Y%m%d").astype(int).to_numpy(np.int32), "close": c, "dv20": dv20,
         "l_price": np.log(np.maximum(c, 0.01)), "l_dv20": np.log10(np.maximum(dv20, 1)),
@@ -142,6 +178,8 @@ def feat(job):
         "l_days_rs": np.log1p(np.minimum(days_rs, 1000)),
         "E5": E5, "E10": E10, "E20": E20, "mx10": mx10, "mx20": mx20, "dd20": dd20, "r20": r20,
         "tr50": res[0.5], "tr100": res[1.0], "ex_today": exf,
+        "v_c10": v_c10, "v_c5": v_c5, "v_lot": v_lot, "v_s15": v_s15, "v_s25": v_s25, "v_s15b": v_s15b,
+        "trg15": trg15, "trg25": trg25,
     })
     keep = (idx >= 260) & (idx <= n - H - 1) & (idx % 2 == 0) & (c >= 0.05) & (np.nan_to_num(dv20) >= 5_000) & ~ex
     rows = F[keep].copy()
@@ -306,6 +344,26 @@ def main():
               f" · خطة +50% متوسط {pr(g.tr50.mean())} (عشوائي {pr(matched_expect(g, df, 'tr50'))})"
               f" · +100% {pr(g.tr100.mean())} (عشوائي {pr(matched_expect(g, df, 'tr100'))})")
     T = pd.concat(test_all)
+    VAR = [("tr50", "دخول إغلاق · +50% · وقف −30% · 20 جلسة"), ("v_c10", "دخول إغلاق · +50% · وقف −20% · 10 جلسات"),
+           ("v_c5", "دخول إغلاق · +30% · وقف −15% · 5 جلسات"), ("v_lot", "دخول إغلاق · +100% · بدون وقف · 20 جلسة (يانصيب)"),
+           ("v_s15", "شراء Stop +15% (لو بدأ يتحرك) · +50% · وقف −20% · 5 جلسات"),
+           ("v_s25", "شراء Stop +25% · +50% · وقف −20% · 5 جلسات"),
+           ("v_s15b", "شراء Stop +15% · +30% · وقف −15% · 3 جلسات")]
+    print("\n==== س4: طرق الدخول والخروج (خارج العينة) — متوسط الصفقة | وسيط | مقابل عشوائي بنفس التذبذب والسعر ====")
+    for nm_, g in (("أعلى 1%", T[T.p >= T.p.quantile(0.99)]), ("أعلى 5%", T[T.p >= T.p.quantile(0.95)]),
+                   ("أعلى 10 كل يوم", T.sort_values("p", ascending=False).groupby("D").head(10)),
+                   ("مرتين+ وفوليوم اليوم ≥ 3×", T[(T.n_ep252 >= 2) & (T.vol1_20 >= 3)])):
+        print(f"\n-- {nm_} (n={len(g):,})")
+        for col, lab in VAR:
+            x = g[col].dropna()
+            trg = ""
+            if col in ("v_s15", "v_s15b"):
+                trg = f" · تفعّل الشراء {pr(g.trg15.mean())}"
+            elif col == "v_s25":
+                trg = f" · تفعّل الشراء {pr(g.trg25.mean())}"
+            base = T.dropna(subset=[col])
+            print(f"   {lab}: متوسط {pr(x.mean())} · وسيط {pr(x.median())} · رابحة {pr((x > 0).mean())} (n={len(x):,})"
+                  f" · العشوائي {pr(matched_expect(g.dropna(subset=[col]), base, col))}{trg}")
     T["dec"] = pd.qcut(T.p.rank(method="first"), 10, labels=False)
     print("\nمعايرة (خارج العينة، المرحلتين): العُشر · المتوقع · الفعلي خلال 10 · خلال 20 · خطة +50% متوسط · وسيط أعلى ربح 20")
     calib = []
