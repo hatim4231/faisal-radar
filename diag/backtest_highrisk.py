@@ -29,7 +29,7 @@ from backtest_confidence import fit_logit, prep, auc
 
 DAYS = 1180
 H = 20  # أقصى مدة
-FEATS = ["l_price", "l_dv20", "n_ep252", "n_ep_all", "l_days_ep", "recent_ep", "last_mag", "base_ratio", "from_peak",
+FEATS = ["l_price", "l_dv20", "n_ep252", "l_days_ep", "recent_ep", "last_mag", "base_ratio", "from_peak",
          "vol5_60", "vol1_20", "atr5_60", "atr20p", "rng20", "pos60", "dd252", "ret5", "ret20", "rsi", "closepos10",
          "upv10", "obv20", "hl_up", "gap20", "rs_recent", "n_rs", "l_days_rs"]
 
@@ -74,7 +74,7 @@ def feat(job):
             if 0 <= p < n:
                 rs[p] = True
     rcs = np.cumsum(rs)
-    n_rs = lagd(rcs, 504)
+    n_rs = lagd(rcs, 252)
     lastrs = np.maximum.accumulate(np.where(rs, idx, -1))
     days_rs = np.where(lastrs >= 0, idx - lastrs, 9999)
     # ميزات السعر والفوليوم
@@ -283,6 +283,28 @@ def main():
               f" · +100% متوسط {pr(daily.tr100.mean())} (عشوائي {pr(matched_expect(daily, te, 'tr100'))})")
         heur = te[(te.n_ep252 >= 2)]
         print(f"     مقارنة: «انفجر مرتين+ بسنة» لحاله: n={len(heur):,} · خلال 10 {pr(heur.E10.mean())} · خطة +50% {pr(heur.tr50.mean())}")
+    print("\n==== قواعد بسيطة (كل الفترة) — مقابل عشوائي بنفس التذبذب والسعر ====")
+    dse = np.expm1(df.l_days_ep)
+    rules = {
+        "انفجر مرتين+ بسنة": df.n_ep252 >= 2,
+        "انفجر 3+ بسنة": df.n_ep252 >= 3,
+        "مرتين+ وآخر انفجار قبل 20-120 جلسة": (df.n_ep252 >= 2) & dse.between(20, 120),
+        "مرتين+ ورجع لقاعدته (≤1.3× ما قبل آخر انفجار)": (df.n_ep252 >= 2) & (df.base_ratio <= 1.3),
+        "مرتين+ وفوليوم ناشف (5/60 < 0.6)": (df.n_ep252 >= 2) & (df.vol5_60 < 0.6),
+        "مرتين+ وفوليوم اليوم ≥ 3× (بدون انفجار)": (df.n_ep252 >= 2) & (df.vol1_20 >= 3),
+        "انفجر مرة+ وتقسيم عكسي خلال 60 جلسة": (df.n_ep252 >= 1) & (df.rs_recent > 0),
+        "تقسيم عكسي خلال 60 جلسة (أي سهم)": df.rs_recent > 0,
+        "مرتين+ وقيعان متصاعدة (3) وتذبذب منكمش": (df.n_ep252 >= 2) & (df.hl_up >= 3) & (df.atr5_60 < 0.8),
+        "سعر تحت 1$ ومرتين+": (df.n_ep252 >= 2) & (df.close < 1),
+    }
+    for name, m in rules.items():
+        g = df[m]
+        if len(g) < 200:
+            print(f"  {name}: عدد قليل ({len(g)})")
+            continue
+        print(f"  {name}: n={len(g):,} · خلال 10 {pr(g.E10.mean())} (عشوائي {pr(matched_expect(g, df, 'E10'))})"
+              f" · خطة +50% متوسط {pr(g.tr50.mean())} (عشوائي {pr(matched_expect(g, df, 'tr50'))})"
+              f" · +100% {pr(g.tr100.mean())} (عشوائي {pr(matched_expect(g, df, 'tr100'))})")
     T = pd.concat(test_all)
     T["dec"] = pd.qcut(T.p.rank(method="first"), 10, labels=False)
     print("\nمعايرة (خارج العينة، المرحلتين): العُشر · المتوقع · الفعلي خلال 10 · خلال 20 · خطة +50% متوسط · وسيط أعلى ربح 20")
