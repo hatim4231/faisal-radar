@@ -24,7 +24,40 @@ sys.path.insert(0, str(ROOT / "diag"))
 import numpy as np
 import pandas as pd
 import alpaca_data as A
-from backtest_runners2 import universe, rsi_np
+import re
+import requests
+from backtest_runners2 import rsi_np, ETF_RX
+
+# مو أسهم عادية (Warrants بأي حرف مثل OPENZ/AMPGZ، حقوق، وحدات، ممتازة، سندات) — أول تشغيل دخلت وقلبت أعلى القائمة
+NOT_COMMON_RX = re.compile(r"\b(Warrants?|Wts?|Rights?|Units?|Preferred|Pref|Depositary Shares? Representing|Notes?|Debentures?|"
+                           r"Subordinated|Perpetual|Contingent Value)\b", re.I)
+
+
+def universe():
+    """كل أسهم Alpaca (نشط + موقوف/مشطوب) — أسهم عادية بس (بدون ETF/Warrants/حقوق/وحدات/ممتازة/سندات)."""
+    import alpaca_data as A
+    syms, drop = {}, 0
+    for base in ("https://paper-api.alpaca.markets", "https://api.alpaca.markets"):
+        try:
+            for st in ("active", "inactive"):
+                r = requests.get(f"{base}/v2/assets", headers=A._headers(),
+                                 params={"status": st, "asset_class": "us_equity"}, timeout=90)
+                r.raise_for_status()
+                for a in r.json():
+                    s, ex, nm = a.get("symbol", ""), a.get("exchange", ""), a.get("name") or ""
+                    if ex not in ("NASDAQ", "NYSE", "AMEX", "ARCA", "BATS") or not re.fullmatch(r"[A-Z]{1,5}", s):
+                        continue
+                    if (len(s) == 5 and s[-1] in "WRUZ") or ETF_RX.search(nm) or NOT_COMMON_RX.search(nm):
+                        drop += 1
+                        continue
+                    syms[s] = st
+            break
+        except Exception as e:
+            print("assets:", base, repr(e)[:120], flush=True)
+            syms = {}
+    act = sum(v == "active" for v in syms.values())
+    print(f"المجال: {len(syms)} سهم عادي (نشط {act} · موقوف/مشطوب {len(syms) - act}) · مستبعد مو سهم عادي {drop}", flush=True)
+    return sorted(syms)
 from backtest_confidence import fit_logit, prep, auc
 
 DAYS = 1180
