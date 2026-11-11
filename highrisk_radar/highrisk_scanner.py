@@ -49,6 +49,10 @@ ETF_RX = re.compile(r"\b(ETF|ETN|Fund|Trust|ProShares|Direxion|iShares|Leveraged
 # مو أسهم عادية (Warrants بأي حرف مثل OPENZ/AMPGZ — أول تشغيل دخلت وقلبت أعلى القائمة، حقوق، وحدات، ممتازة، سندات)
 NOT_COMMON_RX = re.compile(r"\b(Warrants?|Wts?|Rights?|Units?|Preferred|Pref|Depositary Shares? Representing|Notes?|Debentures?|"
                            r"Subordinated|Perpetual|Contingent Value)\b", re.I)
+# 🎯 أقوى 3 (طلب المستخدم 2026-11-11: «القائمة كثيرة ... عطني اللي جاهز إنه بينطلق قريب»): أعلى 3 بالاحتمال من 🧨 اللي فوليوم
+# آخر جلسة ≥ 2× وسيط 20 جلسة وما انفجر فيها. مختبرة خارج العينة (diag/hr_pick.py، 2025-11 ← 2026-10، 653 اختيار بـ 232 يوم):
+PICK_STATS = {"e5": 0.101, "e10": 0.145, "rand_e10": 0.025, "mx10_50": 0.237, "any3_e10": 0.315,
+              "stop_mean": -0.022, "stop_rand": -0.011}
 TRACK_TOP = 10       # السجل: أعلى 10 من 🧨 بالاحتمال (نفس مجموعة «أعلى 10 كل يوم» بالدراسة) — بس من مسح قبل الافتتاح/بعد الإغلاق
 # حالات الرادار (من الدراسة — highrisk_model.json → thresholds): الأعلى احتمال = 🧨، بعده 🟠، والباقي من المتكرر 👀
 ST_AR = {"fire": "🔥 انطلق للتو", "ready": "🧨 مرشح قوي", "near": "🟠 مرشح", "watch": "👀 متكرر"}   # 🔥 = اليوم وقت السوق، وإلا آخر جلسة
@@ -159,6 +163,9 @@ def run(cfg, tickers=None) -> dict:
     CAP = {"fire": 40, "ready": 60, "near": 40, "watch": 60}
     shown = [x for k in ("fire", "ready", "near", "watch") for x in [y for y in shown if y["status"] == k][:CAP[k]]]
     trk = set(x["t"] for x in [y for y in shown if y["status"] == "ready"][:TRACK_TOP]) if can_track else set()
+    picks = [x["t"] for x in sorted((y for y in shown if y["status"] == "ready" and float(y["last"]["vol1_20"]) >= 2
+                                      and float(y["last"]["jump"] if np.isfinite(y["last"]["jump"]) else 1) < 2),
+                                     key=lambda y: -y["sc"]["p_raw"])[:3]]
     infos = data.get_info([x["t"] for x in shown], cfg)
     try:
         ib = data.load_ib_short()
@@ -187,7 +194,7 @@ def run(cfg, tickers=None) -> dict:
                                                      "rsi", "closepos10", "upv10", "obv20", "hl_up", "base_ratio", "from_peak")},
                "n_year": hist["n_year"], "days_since": hist["days_since"], "cycle_days": hist["cycle_days"],
                "episodes": hist["episodes"][-8:], "reverse_splits": hist["reverse_splits"][-4:],
-               "short_hist": len(d) < 260, "track": t in trk,
+               "short_hist": len(d) < 260, "track": t in trk, "pick": (picks.index(t) + 1) if t in picks else None,
                "plan": {"trigger": _r(px * (1 + PLAN["trig"])), "t1": _r(px * (1 + PLAN["trig"]) * (1 + PLAN["t1"])),
                         "stop": _r(px * (1 + PLAN["trig"]) * (1 - PLAN["stop"])), "days": PLAN["days"],
                         "base_low": _r(float(last["lo20"])), "size_pct": round(PLAN["risk"] / PLAN["stop"], 1)},
@@ -252,7 +259,8 @@ def run(cfg, tickers=None) -> dict:
                "seconds": round(time.time() - t0), "stocks": rows, "plan": PLAN,
                "model": {k: (M or {}).get(k) for k in ("version", "base_e10", "base_e20", "n_rows", "n_eps", "period", "summary")},
                "counts": dict(cnt), "serial_total": int(sum(1 for x in rows_all if x["last"]["n_ep252"] >= 2)),
-               "rth": rth, "tracked": sorted(trk), "track_top": TRACK_TOP}
+               "rth": rth, "tracked": sorted(trk), "track_top": TRACK_TOP, "picks": picks, "pick_stats": PICK_STATS}
+    log(f"🎯 أقوى 3: {', '.join(picks) or '-'}")
     log(f"## رادار عالي مخاطرة: انطلق اليوم {cnt['fire']} · مرشح قوي {cnt['ready']} · مرشح {cnt['near']} · متكرر {cnt['watch']}"
         f" · من {len(rows_all)} سهم · خلص في {payload['seconds']} ثانية")
     for r in rows[:15]:

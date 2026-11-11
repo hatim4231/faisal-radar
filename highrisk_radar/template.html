@@ -183,7 +183,8 @@ ul.clean{margin:0;padding-right:18px}
     «اشترِ بس إذا بدأ يطير» (شراء Stop +15% باليوم التالي، بيع +30%، وقف إغلاق −15%، 3 جلسات) — واللي ما يتفعّل شراه ما ينحسب —
     ومع كل وحدة 3 أسهم عشوائية بنفس التذبذب والسعر بنفس الخطة، عشان نعرف بالأرقام هل الرادار أحسن من الصدفة.
     <div class="note" style="margin-top:6px" id="modelnote"></div></div>
-  <details class="card" style="margin-bottom:12px" open><summary style="cursor:pointer;font-weight:700">📋 الخطة (من دراسة الأسهم اللي تنفجر بشكل متكرر)</summary>
+  <div class="card" id="picks" style="margin-bottom:12px;border:2px solid var(--accent);display:none"></div>
+  <details class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700">📋 الخطة (من دراسة الأسهم اللي تنفجر بشكل متكرر)</summary>
     <ol class="rules" id="rules"></ol>
   </details>
   <div class="tiles" id="tiles"></div>
@@ -243,6 +244,31 @@ $("#rules").innerHTML = [
   `<b>الحجم:</b> خل خسارة الوقف ≤ ${PL.risk ?? 0.5}% من محفظتك (الصفقة ≈ ${((PL.risk ?? 0.5) / PL.stop).toFixed(1)}% من المحفظة) ووزّع على أكثر من سهم.`,
   "<b>دائماً:</b> أمر البيع Limit جاهز قبل القفزة (حتى البري والأفتر) — RUBI طار 2.23 ← 5.91 ورجع 1.66 بنفس الساعة.",
   "🔥 «انطلق للتو» (اليوم وقت السوق، وإلا آخر جلسة) للمتابعة مو للمطاردة. للموجة الثانية بعد الانفجار عندنا 🔥 برادار الأفتر (أفضلية بعينة صغيرة)."].map(r => `<li>${r}</li>`).join("");
+// 🎯 أقوى 3 — نفس القاعدة المختبرة (أعلى 3 من 🧨 فوليومها صحى ضعفين+ بآخر جلسة وما انفجرت)
+(function(){
+  const P = ((DATA && DATA.picks) || []).map(t => stocks.find(s => s.symbol === t)).filter(Boolean), K = (DATA && DATA.pick_stats) || {};
+  if (!P.length) return;
+  const box = $("#picks"); box.style.display = "";
+  const pct = x => x == null ? "-" : (x * 100).toFixed(1) + "%";
+  box.innerHTML = `<h3 style="margin:0 0 4px">🎯 أقوى 3 — جاهزة تنطلق (قاعدة مختبرة)</h3>
+    <div class="note" style="margin-bottom:6px">أعلى 3 احتمال من 🧨 اللي فوليومها صحى ضعفين أو أكثر بآخر جلسة وما انفجرت للحين. خارج العينة (سنة ما شافها النموذج):
+      كل سهم من نوعها تضاعف بيوم خلال 10 جلسات <b class="num">${pct(K.e10)}</b> (العشوائي <span class="num">${pct(K.rand_e10)}</span>) ·
+      واحد على الأقل من الثلاث <b class="num">${pct(K.any3_e10)}</b> من الأيام · <b>بس الشراء فيها خسران بالمتوسط</b>
+      (الشراء المعلّق <span class="num">${pct(K.stop_mean)}</span> مقابل <span class="num">${pct(K.stop_rand)}</span> للعشوائي) — تذكرة صغيرة بس.</div>`
+    + P.map(s => {
+      const p = s.plan, le = (s.episodes || []).slice(-1)[0], dl = s.dilution;
+      const risk = [(s.dilution_events || []).length ? `⚠ طرح متكرر (${s.dilution_events.length})` :
+                    dl && dl.level === "high" ? "⛔ تخفيف SEC" : dl && dl.level === "medium" ? "⚠ تخفيف محتمل" : "", ...(s.flags || [])].filter(Boolean);
+      return `<div class="setupbox" style="cursor:pointer" data-go="${esc(s.symbol)}"><div class="t"><span class="num">${s.pick}.</span> ${s.flag || ""} <span class="ltr">${esc(s.symbol)}</span>
+          <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct >= 0 ? "up" : "down"}">${s.change_pct > 0 ? "+" : ""}${s.change_pct ?? "-"}%</span>
+          <span class="note">· فوليوم آخر جلسة <span class="num">${s.fp && s.fp.vol1_20 != null ? Math.round(s.fp.vol1_20) : "-"}</span> ضعف · انفجر <span class="num">${s.n_year}</span> مرة بسنة${le ? ` (آخرها قبل <span class="num">${s.days_since}</span> جلسة)` : ""}</span></div>
+        <div class="note" style="margin-top:3px">شراء معلّق <b class="num">${fp(p.trigger)}</b> ← بيع <b class="num" style="color:var(--good)">${fp(p.t1)}</b> · وقف إغلاق <b class="num" style="color:var(--bad)">${fp(p.stop)}</b> · ${p.days} جلسات${risk.length ? ` · <span style="color:var(--bad)">${risk.map(esc).join(" · ")}</span>` : ""}</div></div>`;
+    }).join("");
+  box.querySelectorAll("[data-go]").forEach(el => el.onclick = () => {
+    $("#q").value = el.dataset.go; filt = null; render();
+    const c = document.querySelector(`#list .card[data-s="${el.dataset.go}"]`); if (c) c.scrollIntoView({behavior: "smooth", block: "start"});
+  });
+})();
 function tiles(){
   const n = k => stocks.filter(s => s.status === k).length;
   $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
