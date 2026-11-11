@@ -43,9 +43,13 @@ log = data.log
 OUT = ROOT / "output"
 OUT.mkdir(exist_ok=True)
 N_TWINS = 3
-SHOW = 120           # كم سهم ينعرض (الأعلى احتمال) + اللي انطلقت اليوم
 ETF_RX = re.compile(r"\b(ETF|ETN|Fund|Trust|ProShares|Direxion|iShares|Leveraged|Daily|2X|3X|Bull|Bear|Ultra|Notes|"
-                    r"Index|Shares|SPDR|Invesco|VanEck|WisdomTree|Global X|Vanguard|Schwab|Portfolio)\b", re.I)
+                    r"Warrant|Rights?|Units?|Acquisition|SPDR|Invesco|Vanguard|Global X|MicroSectors|GraniteShares|"
+                    r"Tradr|Defiance|T-Rex|YieldMax|Roundhill|Volatility|VIX)\b", re.I)   # نفس الدراسة
+# مو أسهم عادية (Warrants بأي حرف مثل OPENZ/AMPGZ — أول تشغيل دخلت وقلبت أعلى القائمة، حقوق، وحدات، ممتازة، سندات)
+NOT_COMMON_RX = re.compile(r"\b(Warrants?|Wts?|Rights?|Units?|Preferred|Pref|Depositary Shares? Representing|Notes?|Debentures?|"
+                           r"Subordinated|Perpetual|Contingent Value)\b", re.I)
+TRACK_TOP = 10       # السجل: أعلى 10 من 🧨 بالاحتمال (نفس مجموعة «أعلى 10 كل يوم» بالدراسة) — بس من مسح قبل الافتتاح/بعد الإغلاق
 # حالات الرادار (من الدراسة — highrisk_model.json → thresholds): الأعلى احتمال = 🧨، بعده 🟠، والباقي من المتكرر 👀
 ST_AR = {"fire": "🔥 انطلق اليوم", "ready": "🧨 مرشح قوي", "near": "🟠 مرشح", "watch": "👀 متكرر"}
 # الخطة الأقل سوءاً بالاختبار (7 طرق، خارج العينة): شراء Stop فوق إغلاق اليوم +15% باليوم التالي (ما تدخل إلا إذا بدأ يطير)،
@@ -72,7 +76,7 @@ def alpaca_universe() -> list[str]:
                 s, ex, nm = a.get("symbol", ""), a.get("exchange", ""), a.get("name") or ""
                 if ex not in ("NASDAQ", "NYSE", "AMEX", "ARCA", "BATS"):
                     continue
-                if not re.fullmatch(r"[A-Z]{1,5}", s) or (len(s) == 5 and s[-1] in "WRU") or ETF_RX.search(nm):
+                if not re.fullmatch(r"[A-Z]{1,5}", s) or (len(s) == 5 and s[-1] in "WRUZ") or ETF_RX.search(nm) or NOT_COMMON_RX.search(nm):
                     continue
                 syms.append(s)
             if syms:
@@ -111,12 +115,20 @@ def run(cfg, tickers=None) -> dict:
             tickers = data.get_universe(dict(cfg, universe=dict(cfg["universe"], min_price=0.0001, max_price=1_000_000,
                                                                 min_avg_volume=0)))
     daily = fetch_daily(tickers)
+    import pandas as pd
+    now_ny = pd.Timestamp.now(tz="America/New_York")
+    today = now_ny.normalize().tz_localize(None)
+    rth = now_ny.weekday() < 5 and (9 * 60 + 30) <= now_ny.hour * 60 + now_ny.minute < 16 * 60
+    can_track = not rth          # السجل يسجل بس من مسح خارج وقت السوق (قرار الدخول قبل ما تبدأ الجلسة اللي بعدها — بدون نظرة للمستقبل)
     TH = (M or {}).get("thresholds") or {}
     # الحالة: 🔥 انطلق اليوم (أعلى ≥ +50% فوق إغلاق أمس) · 🧨/🟠 حسب حدود الاحتمال من الدراسة · 👀 متكرر (انفجر مرتين+ بسنة)
     p_ready, p_near = TH.get("ready", 1.0), TH.get("near", 1.0)
     rows_all = []
     for t in list(daily):
         d = daily.pop(t)
+        part = None
+        if rth and len(d) and d.index[-1].normalize() >= today:
+            part, d = d.iloc[-1], d.iloc[:-1]      # شمعة اليوم الناقصة
         if len(d) < 120:
             continue
         try:
@@ -128,7 +140,11 @@ def run(cfg, tickers=None) -> dict:
             continue
         if not sc:
             continue
-        jump = float(last["jump"]) if np.isfinite(last["jump"]) else 1.0
+        if part is not None:
+            jump = float(part["High"]) / float(d["Close"].iloc[-1])
+            d = pd.concat([d, part.to_frame().T])  # للعرض (السعر الحالي والشارت)
+        else:
+            jump = float(last["jump"]) if np.isfinite(last["jump"]) else 1.0
         p = sc["p_raw"]
         st = ("fire" if jump >= 1.5 else "ready" if p >= p_ready else "near" if p >= p_near
               else "watch" if last["n_ep252"] >= 2 else None)
@@ -140,7 +156,9 @@ def run(cfg, tickers=None) -> dict:
     order = {"fire": 0, "ready": 1, "near": 2, "watch": 3}
     shown = [x for x in rows_all if x["status"]]
     shown.sort(key=lambda x: (order[x["status"]], -x["sc"]["p_raw"]))
-    shown = [x for x in shown if x["status"] == "fire"] + [x for x in shown if x["status"] != "fire"][:SHOW]
+    CAP = {"fire": 40, "ready": 60, "near": 40, "watch": 60}
+    shown = [x for k in ("fire", "ready", "near", "watch") for x in [y for y in shown if y["status"] == k][:CAP[k]]]
+    trk = set(x["t"] for x in [y for y in shown if y["status"] == "ready"][:TRACK_TOP]) if can_track else set()
     infos = data.get_info([x["t"] for x in shown], cfg)
     try:
         ib = data.load_ib_short()
@@ -169,7 +187,7 @@ def run(cfg, tickers=None) -> dict:
                                                      "rsi", "closepos10", "upv10", "obv20", "hl_up", "base_ratio", "from_peak")},
                "n_year": hist["n_year"], "days_since": hist["days_since"], "cycle_days": hist["cycle_days"],
                "episodes": hist["episodes"][-8:], "reverse_splits": hist["reverse_splits"][-4:],
-               "short_hist": len(d) < 260,
+               "short_hist": len(d) < 260, "track": t in trk,
                "plan": {"trigger": _r(px * (1 + PLAN["trig"])), "t1": _r(px * (1 + PLAN["trig"]) * (1 + PLAN["t1"])),
                         "stop": _r(px * (1 + PLAN["trig"]) * (1 - PLAN["stop"])), "days": PLAN["days"],
                         "base_low": _r(float(last["lo20"])), "size_pct": round(PLAN["risk"] / PLAN["stop"], 1)},
@@ -223,7 +241,7 @@ def run(cfg, tickers=None) -> dict:
         px_of = {x["t"]: float(x["last"]["close"]) for x in rows_all}
         key = {t: (int(np.searchsorted(qs, a)), tier(px_of[t])) for t, a in atrp.items()}
         for r in rows:
-            if r["status"] not in ("ready", "near") or r["symbol"] not in key:
+            if not r.get("track") or r["symbol"] not in key:
                 continue
             pool = sorted(t for t, k in key.items() if k == key[r["symbol"]] and t != r["symbol"])
             pick = random.Random(f"{r['symbol']}:{r['date']}").sample(pool, min(N_TWINS, len(pool)))
@@ -233,7 +251,8 @@ def run(cfg, tickers=None) -> dict:
                "source": "الأسعار: Alpaca + الشركة: Yahoo + SEC", "scanned": n_scanned, "scored": len(rows_all),
                "seconds": round(time.time() - t0), "stocks": rows, "plan": PLAN,
                "model": {k: (M or {}).get(k) for k in ("version", "base_e10", "base_e20", "n_rows", "n_eps", "period", "summary")},
-               "counts": dict(cnt), "serial_total": int(sum(1 for x in rows_all if x["last"]["n_ep252"] >= 2))}
+               "counts": dict(cnt), "serial_total": int(sum(1 for x in rows_all if x["last"]["n_ep252"] >= 2)),
+               "rth": rth, "tracked": sorted(trk), "track_top": TRACK_TOP}
     log(f"## رادار عالي مخاطرة: انطلق اليوم {cnt['fire']} · مرشح قوي {cnt['ready']} · مرشح {cnt['near']} · متكرر {cnt['watch']}"
         f" · من {len(rows_all)} سهم · خلص في {payload['seconds']} ثانية")
     for r in rows[:15]:

@@ -113,8 +113,8 @@ def signals(key: str, payload: dict) -> list[dict]:
         if key == "highrisk":
             st = s.get("status") if s.get("status") in ("ready", "near") else None
             p = s.get("plan") or {}
-            if not st or not p.get("trigger") or not p.get("t1") or not p.get("stop"):
-                continue
+            if not st or not s.get("track") or not p.get("trigger") or not p.get("t1") or not p.get("stop"):
+                continue   # أعلى 10 من 🧨 بس، ومن مسح خارج وقت السوق (المسح يحدد track)
             out.append({"symbol": s["symbol"], "status": st, "label": STATUS_AR_HR[st],
                         "entry": p["trigger"], "trigger": p["trigger"], "pending": True, "ref_close": s["price"],
                         "stop": p["stop"], "t1": p["t1"], "t2": None, "horizon": p.get("days") or HORIZON["highrisk"],
@@ -368,6 +368,13 @@ def run():
     # توصيات انحفظت ببيانات غلط (تُحذف من السجل)
     PURGE = {"insiders:LONA:2026-11-06", "insiders:LONA:2026-11-05"}
     track["trades"] = [t for t in track["trades"] if t.get("id") not in PURGE]
+    if not track.get("hr_purge_v1"):
+        # أول تشغيل لعالي مخاطرة (2026-11-11) سجل كل 🧨/🟠 (~120) وفيها Warrants — ننظفها مرة وحدة ونبدأ بأعلى 10 بس
+        n0 = len(track["trades"])
+        track["trades"] = [t for t in track["trades"] if t.get("radar") != "highrisk"]
+        track["twins"] = [x for x in track.get("twins", []) if x.get("radar") != "highrisk"]
+        track["hr_purge_v1"] = True
+        log(f"تنظيف عالي مخاطرة (مرة وحدة): انشال {n0 - len(track['trades'])} توصية")
     trades = track["trades"]
     new_events = []
     migrated = migrate_stops(track)

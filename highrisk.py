@@ -131,6 +131,11 @@ def score(row: pd.Series) -> dict | None:
         if p >= k["p_lo"]:
             cal = k
     cal = cal or (M.get("calib") or [None])[0]
+    th, tiers = M.get("thresholds") or {}, M.get("tiers") or {}
+    tier = "ready" if p >= th.get("ready", 9) else "near" if p >= th.get("near", 9) else None
+    if tier and tier in tiers:   # 🧨/🟠: نسبتهم الفعلية خارج العينة (أدق من العُشر الأعلى اللي يجمع أعلى 10%)
+        T = tiers[tier]
+        cal = {"dec": cal["dec"] if cal else None, "e10": T["e10"], "e20": T["e20"], "tr50": T.get("tr50"), "mx20": None}
     contrib = sorted(((f, float(w[i + 1] * z[i])) for i, f in enumerate(M["feats"])), key=lambda t: -abs(t[1]))
     return {"p_raw": p, "decile": cal["dec"] if cal else None, "e10": cal["e10"] if cal else None,
             "e20": cal["e20"] if cal else None, "tr50": cal.get("tr50") if cal else None, "mx20": cal.get("mx20") if cal else None,
