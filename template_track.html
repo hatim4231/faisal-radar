@@ -196,6 +196,7 @@ function statsHTML(){
       المطابق: ${r.hit_pct ?? "-"}% من ${r.n} · القريب: ${n.hit_pct ?? "-"}% من ${n.n}<br>
       تحت 1$: ${(DATA.stats_status[k+":sub1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":sub1"]||{}).n ?? 0} · فوق 1$: ${(DATA.stats_status[k+":over1"]||{}).hit_pct ?? "-"}% من ${(DATA.stats_status[k+":over1"]||{}).n ?? 0}
       ${(k === "schools" || k === "runners" || k === "highrisk") ? vsRandHTML(k) : ""}
+      ${k === "highrisk" ? `<br>ℹ️ هذي توصيات الخطة القديمة بس (شراء معلّق، لين 12 نوفمبر). الرادار تطوّر: سجله الجديد «📒 سجل الصدق» داخل <a href="../highrisk/" style="color:var(--accent)">صفحة الرادار</a>.` : ""}
       ${k === "faisal_dil" ? dilCmpHTML() : ""}
       ${k === "faisal_dev" ? "<br>🎯 حسب الثقة: " + ["عالية","متوسطة","منخفضة"].map(l => { const c = DATA.stats_status["faisal_dev:conf:"+l] || {}; return l + " " + (c.hit_pct ?? "-") + "% من " + (c.n ?? 0); }).join(" · ") : ""}</div></div>`;
   }).join("");
