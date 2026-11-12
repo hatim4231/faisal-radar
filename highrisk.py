@@ -58,6 +58,16 @@ def _fsh(a, k):
     return np.r_[a[k:], np.full(k, np.nan)] if len(a) > k else np.full(len(a), np.nan)
 
 
+def raw_factor(d: pd.DataFrame) -> np.ndarray:
+    """معامل يرجّع السعر المعدّل للتقسيم لسعره الحقيقي ذاك اليوم = حاصل ضرب نسب التقسيمات اللي **بعده**.
+    (سهم سوى تقسيم عكسي 1:100 بعدين: سعره المعدّل قبلها ×100 — والحقيقي كان بنسات. مهم للتكاليف وتصنيف البيني.)"""
+    n = len(d)
+    spl = d["Stock Splits"].to_numpy(float) if "Stock Splits" in d else np.zeros(n)
+    r = np.where(spl > 0, spl, 1.0)
+    after = np.r_[np.cumprod(r[::-1])[::-1][1:], 1.0]      # حاصل ضرب نسب الأيام t+1..الآخر
+    return after
+
+
 def episodes(d: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """jump = أعلى ÷ إغلاق أمس · ex = انفجار حقيقي (≥ ×2 وتداول اليوم ≥ 500 ألف$) · ep = بداية حلقة (أول انفجار بعد 20 جلسة بدونه)."""
     h, l, c, v = (d[k].to_numpy(float) for k in ("High", "Low", "Close", "Volume"))
@@ -116,10 +126,11 @@ def features(d: pd.DataFrame) -> pd.DataFrame:
     m5 = _roll(l, 5, "min")
     hl_up = (m5 > _sh(m5, 5)).astype(float) + (_sh(m5, 5) > _sh(m5, 10)).astype(float) + (_sh(m5, 10) > _sh(m5, 15)).astype(float)
     gap20 = _roll((o >= 1.1 * pc).astype(float), 20, "sum")
+    praw = c * raw_factor(d)                                 # السعر الحقيقي ذاك اليوم
     return pd.DataFrame({
-        "close": c, "dv20": dv20, "atr20": atr20, "lo20": lo20, "hi20": hi20, "jump": jump, "ex": ex, "ep": ep,
+        "close": c, "praw": praw, "dv20": dv20, "atr20": atr20, "lo20": lo20, "hi20": hi20, "jump": jump, "ex": ex, "ep": ep,
         "days_ep_raw": days_ep, "days_rs_raw": days_rs, "n_ep_all": cs,
-        "l_price": np.log(np.maximum(c, 0.01)), "l_dv20": np.log10(np.maximum(dv20, 1)),
+        "l_price": np.log(np.maximum(praw, 0.01)), "l_dv20": np.log10(np.maximum(dv20, 1)),
         "n_ep252": n_ep252, "l_days_ep": np.log1p(np.minimum(days_ep, 1000)),
         "recent_ep": (days_ep <= 60).astype(float), "last_mag": np.minimum(last_mag, 20),
         "base_ratio": np.where(np.isfinite(base_before), np.minimum(c / np.maximum(base_before, 1e-9), 10), 1.0),
@@ -145,10 +156,11 @@ def market_frame(d: pd.DataFrame, F: pd.DataFrame) -> pd.DataFrame:
     n = len(c)
     idx = np.arange(n)
     pc = np.r_[np.nan, c[:-1]]
-    act = (np.nan_to_num(_sh(F["dv20"].to_numpy(float), 1)) >= ACT_MIN_DV20) & (np.nan_to_num(pc) >= ACT_MIN_PX)
+    pcr = np.nan_to_num(_sh(F["praw"].to_numpy(float), 1))      # إغلاق أمس الحقيقي
+    act = (np.nan_to_num(_sh(F["dv20"].to_numpy(float), 1)) >= ACT_MIN_DV20) & (pcr >= ACT_MIN_PX)
     ex = F["ex"].to_numpy(bool) & act
     r1 = np.nan_to_num(c / pc - 1)
-    pn = act & (pc < 5) & (idx >= 20)
+    pn = act & (pcr < 5) & (idx >= 20)
     ma20 = _roll(c, 20, "mean")
     out = np.zeros((n, len(MK_COLS)), np.float32)
     col = {k: i for i, k in enumerate(MK_COLS)}
