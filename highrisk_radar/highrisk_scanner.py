@@ -269,6 +269,13 @@ class Scoreboard:
                 x["res20"] = {"all_n": a["n20"], "all_b": a["b20"], "radar_n": a["nr"], "radar_b": a["br"],
                               "b25_n": len(b25), "b25_b": int(sum(b25)), "b40_n": len(b40), "b40_b": int(sum(b40))}
                 x["done"] = True
+                for s_, t in x["tickets"].items():
+                    if "ret" not in t:
+                        oo = o.get(s_) or {}
+                        if oo.get("c"):
+                            t.update(ret=round(oo["c"][-1] / t["entry"] - 1 - cost_of(oo["c0"]), 4), partial=True)
+                        else:
+                            t["lost"] = True
                 for key in ("ready", "b25", "b40"):
                     x.pop(key, None)
 
@@ -289,7 +296,7 @@ class Scoreboard:
         S = {"days": len(D), "start": D[0]["date"] if D else None,
              "picks": {"n": 0, "e": 0, "wait": 0}, "ready": {"n": 0, "e": 0}, "base10": {"n": 0, "e": 0},
              "b40": {"n": 0, "b": 0}, "b25": {"n": 0, "b": 0}, "radar": {"n": 0, "b": 0}, "all": {"n": 0, "b": 0},
-             "tickets": {"n": 0, "hit": 0, "ext": 0, "sum": 0.0, "open": 0}, "recent": []}
+             "tickets": {"n": 0, "hit": 0, "ext": 0, "sum": 0.0, "open": 0, "lost": 0}, "recent": []}
         for x in D:
             r10, r20 = x.get("res10"), x.get("res20")
             if r10:
@@ -312,13 +319,14 @@ class Scoreboard:
                     S["tickets"]["ext"] += t.get("src") == "ext"
                     S["tickets"]["sum"] += t["ret"]
                 else:
-                    S["tickets"]["open"] += 1
+                    S["tickets"]["lost" if x.get("done") else "open"] += 1
         for x in D[-12:][::-1]:
             for p in x.get("picks", []):
                 t = (x.get("tickets") or {}).get(p["s"]) or {}
                 e = ((x.get("res10") or {}).get("picks") or {}).get(p["s"])
                 S["recent"].append({"date": x["date"], "s": p["s"], "c": p.get("c"), "e": e, "entry": t.get("entry"),
-                                    "hit": t.get("hit"), "src": t.get("src"), "ret": t.get("ret"), "n": t.get("n")})
+                                    "hit": t.get("hit"), "src": t.get("src"), "ret": t.get("ret"), "n": t.get("n"),
+                                    "lost": bool(t.get("lost") or (x.get("done") and not t))})
         S["recent"] = S["recent"][:24]
         return S
 
