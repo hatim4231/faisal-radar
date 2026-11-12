@@ -263,7 +263,13 @@
    "t1": 2.9601,
    "t2": 3.0946,
    "stop": 2.4219,
-   "pm_min_vol": 66178
+   "pm_min_vol": 66178,
+   "N": "2026-11-12",
+   "pm_high_pct": 4.4,
+   "close_next_pct": 4.4,
+   "r10": "hit",
+   "r15": "none",
+   "result": "t1"
   }
  ],
  "fire_sent": []
