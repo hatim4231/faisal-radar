@@ -284,8 +284,8 @@ const asAll = s => ALL[s.symbol] || {s:s.symbol, c:s.price, p:s.p_raw, pb:s.pb, 
     <ol class="rules" style="margin-top:4px">
       <li>الرادار <b>يتوقع الانفجار صح</b>: من «أقوى 3» كل يوم <b class="num">${P0(t3.e10)}</b> تضاعفت بيوم خلال 10 جلسات — أسهم مثلها بالضبط <span class="num">${P0(t3.exp_e10)}</span>.</li>
       <li><b>بس الشراء قبل الانفجار خسّر</b> بكل الطرق (<span class="num">${STU.plans_n || 20}</span> خطة) وبكل سنة — لأن <b class="num">${P0(t3.bleed)}</b> من نفس الأسهم نزل −30% خلال شهر. فهذي <b>قائمة مراقبة، مو قائمة شراء</b>.</li>
-      <li>اللي ينفعك فعلاً: <b>🩸 كاشف النزيف</b> — يتوقع أي سهم بينزل −30% بدقة (المتوقع يطابق اللي صار). <b>افحص أي سهم قبل ما تدخله</b> وحط أسهمك في «محفظتي».</li>
-      <li>لو معك سهم من هالنوع: خل <b>أمر البيع Limit جاهز ومفعّل للبري والأفتر</b> (كثير من القفزات تصير خارج الجلسة)، و<b>بع يوم الانفجار</b> — بعده بـ 5 جلسات ينزل <span class="num">${P0(-(d2.d5 || 0))}</span> بالمتوسط.</li>
+      <li>اللي ينفعك فعلاً: <b>🩸 كاشف النزيف</b> — يعطي كل سهم احتمال ينزل −30% خلال شهر، والاحتمال طلع صادق (لما قال 34% صار فعلاً 34%). <b>افحص أي سهم قبل ما تدخله</b> وحط أسهمك في «محفظتي».</li>
+      <li>لو معك سهم من هالنوع: خل <b>أمر البيع Limit جاهز ومفعّل للبري والأفتر</b> (تقريباً واحد من كل 6 أهداف انصاد خارج الجلسة العادية)، و<b>بع يوم الانفجار</b> — بعده بـ 5 جلسات ينزل <span class="num">${P0(-(d2.d5 || 0))}</span> بالمتوسط.</li>
     </ol>
     <div class="note">🔇 رادار صامت (بدون تيليجرام) · كل شي مفتوح بقرارك: ما يطبق فلاتر السعر/الشورت/HRT/الطرح — تطلع تحذير بالبطاقة بس.</div>`;
 })();
@@ -325,7 +325,7 @@ function xrayHTML(sym){
   if (a.st === 1) adv.push(`🔥 <b>انطلق</b> (الأعلى +<span class="num">${a.j}</span>% فوق الإغلاق اللي قبله). لا تطارده: الشراء بإغلاق يوم الانفجار خسّر <span class="num">${P0(d2.open)}</span> بافتتاح اليوم التالي بالمتوسط
     (<span class="num">${N(d2.n)}</span> حالة). لو معك السهم: بع على القفزة. وللموجة الثانية شوف 🔥 برادار الأفتر.`);
   if (a.ac !== 0 && (a.st === 2 || a.st === 3 || a.ny >= 1)) adv.push(`💡 <b>لو معك السهم:</b> خل أمر بيع Limit جاهز ومفعّل للبري والأفتر (GTC + Extended Hours) — بالدراسة زاد الوصول لهدف +50%
-    من <span class="num">${P0(EXT3.hit_r)}</span> إلى <span class="num">${P0(EXT3.hit_x)}</span> لأن كثير من القفزات تصير خارج الجلسة وترجع قبل الافتتاح. ولو انفجر بع يومها.`);
+    من <span class="num">${P0(EXT3.hit_r)}</span> إلى <span class="num">${P0(EXT3.hit_x)}</span> لأن جزء من القفزات يصير خارج الجلسة ويرجع قبل الافتتاح. ولو انفجر بع يومها.`);
   return `<div class="setupbox" style="margin-top:10px">
     <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
       <div class="t">${s && s.flag ? s.flag + " " : ""}<span class="ltr sym">${esc(a.s)}</span> <span class="num">$${fp(a.c)}</span>
@@ -445,12 +445,12 @@ pfRender();
     ${blk("🧨 مرشح قوي — تتضاعف بيوم خلال 10 جلسات", pr(S.ready.e, S.ready.n), `<span class="num">${P0(rd.e10)}</span>`, pr(S.base10.e, S.base10.n))}
     ${blk("🩸🩸 خطر شديد (بمجال راداراتك) — يلمس −30% خلال 20 جلسة", pr(S.b40.b, S.b40.n), rng(42, 53), pr(S.radar.b, S.radar.n))}
     ${blk("🩸 خطر عالي (بمجال راداراتك) — يلمس −30% خلال 20 جلسة", pr(S.b25.b, S.b25.n), rng(28, 34), pr(S.radar.b, S.radar.n))}
-    ${blk(`🎟 التذاكر — توصل <span class="num">+${Math.round(TK.limit * 100)}%</span> خلال ${TK.days} جلسة`, pr(T.hit, T.n) + (T.n ? ` · متوسط التذكرة <b class="num">${SP(T.sum / T.n)}</b>` : ""),
+    ${blk(`🎟 التذاكر — توصل <span class="num">+${Math.round(TK.limit * 100)}%</span> خلال ${TK.days} جلسة`, pr(T.hit, T.n) + (T.n ? ` · متوسط التذكرة <b class="num">${SP(T.sum / T.n)}</b>` : "") + (T.lost ? ` · <span class="num">${T.lost}</span> راحت بياناتها` : ""),
           `<span class="num">${P0(EXT3.hit_x)}</span> · متوسط التذكرة <span class="num">${SP(EXT3.ext)}</span>`, "")}
     ${(S.recent || []).length ? `<div class="note" style="margin-top:8px">آخر اختيارات «أقوى 3»:</div><div style="overflow-x:auto"><table class="mtbl" style="font-size:12.5px">
       <tr class="note"><th>السهم</th><th>التاريخ</th><th>الإغلاق</th><th>انفجر خلال 10؟</th><th>التذكرة</th></tr>
       ${S.recent.map(r => `<tr><td class="ltr" style="font-weight:700">${esc(r.s)}</td><td class="num" style="white-space:nowrap">${esc(r.date)}</td><td class="num">${fp(r.c)}</td><td>${r.e == null ? "⏳" : r.e ? "✅ نعم" : "✗ لا"}</td>
-        <td>${r.entry == null ? "⏳ ما دخلت للحين" : r.ret != null ? (r.hit ? `✅ وصلت الهدف${r.src === "ext" ? " (بالتداول الممتد)" : ""}` : "انتهت بدون الهدف") + ` <b class="num">${SP(r.ret)}</b>`
+        <td>${r.lost ? "⚠ راحت بياناته (إيقاف/شطب) — ما انحسبت" : r.entry == null ? "⏳ ما دخلت للحين" : r.ret != null ? (r.hit ? `✅ وصلت الهدف${r.src === "ext" ? " (بالتداول الممتد)" : ""}` : "انتهت بدون الهدف") + ` <b class="num">${SP(r.ret)}</b>`
           : `⏳ مفتوحة (جلسة <span class="num">${r.n}</span> من <span class="num">${TK.days}</span>) · دخول <span class="num">${fp(r.entry)}</span>`}</td></tr>`).join("")}</table></div>` : ""}`;
 })();
 
@@ -476,7 +476,8 @@ function tiles(){
   $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${tot[k] ?? n(k)}</b><span>${l}</span></div>`).join("");
   document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = filt === el.dataset.k ? null : el.dataset.k; render(); });
 }
-$("#listnote").innerHTML = `🔥 انطلق بآخر جلسة (للمتابعة مو للمطاردة) · 🧨 أعلى 1% احتمال انفجار · 🟠 أعلى 5% · 👀 انفجر مرتين+ بآخر سنة. نعرض الأقوى من كل نوع بس — وأي سهم ثاني تلقاه بـ «افحص أي سهم» فوق.`;
+$("#listnote").innerHTML = `🔥 انطلق بآخر جلسة (للمتابعة مو للمطاردة) · 🧨 مرشح قوي: من مستواه <span class="num">${P0((TIERS.ready || {}).e10)}</span> تضاعفت بيوم خلال 10 جلسات بالدراسة ·
+  🟠 مرشح: <span class="num">${P0((TIERS.near || {}).e10)}</span> (المعتاد <span class="num">${P0(MD.base_e10)}</span>) · 👀 انفجر مرتين+ بآخر سنة. نعرض الأقوى من كل نوع بس (الرقم بالمربع = العدد الكلي) — وأي سهم ثاني تلقاه بـ «افحص أي سهم» فوق.`;
 function fpChips(s){
   const f = s.fp || {};
   const it = [["فوليوم ناشف", f.vol5_60 != null && f.vol5_60 < 0.6], ["فوليوم اليوم يصحى (3×+)", f.vol1_20 != null && f.vol1_20 >= 3],
