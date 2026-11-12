@@ -418,7 +418,7 @@ pfRender();
       const risk = [(s.dilution_events || []).length ? `⚠ طرح متكرر (${s.dilution_events.length})` : dl && dl.level === "high" ? "⛔ تخفيف SEC" : dl && dl.level === "medium" ? "⚠ تخفيف محتمل" : "", ...(s.flags || [])].filter(Boolean);
       return `<div class="setupbox" style="cursor:pointer" data-go="${esc(s.symbol)}"><div class="t"><span class="num">${s.pick}.</span> ${s.flag || ""} <span class="ltr">${esc(s.symbol)}</span>
           <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct >= 0 ? "up" : "down"}">${s.change_pct > 0 ? "+" : ""}${s.change_pct ?? "-"}%</span>
-          <span class="note">· انفجر <span class="num">${s.n_year}</span> مرة بسنة${le ? ` (آخرها قبل <span class="num">${s.days_since}</span> جلسة)` : ""} · 🩸 خطر −30%: <b class="num" style="color:${B ? BCOL[B.lv] : "inherit"}">${B ? P0(B.rate) : "-"}</b></span></div>
+          <span class="note">${s.status === "fire" ? "· 🔥 تحرك بقوة بآخر جلسة " : ""}· انفجر <span class="num">${s.n_year}</span> مرة بسنة${le ? ` (آخرها قبل <span class="num">${s.days_since}</span> جلسة)` : ""} · 🩸 خطر −30%: <b class="num" style="color:${B ? BCOL[B.lv] : "inherit"}">${B ? P0(B.rate) : "-"}</b></span></div>
         ${risk.length ? `<div class="note" style="margin-top:3px;color:var(--bad)">${risk.map(esc).join(" · ")}</div>` : ""}</div>`; }).join("")
     + `<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">🎟 لو مصرّ تاخذ تذكرة — أقل الطرق خسارة (يانصيب، مو استثمار)</summary>
       <ol class="rules"><li>اشترِ عند <b>افتتاح الجلسة الجاية</b> بمبلغ <b>تتحمل تخسره كله</b> (تذكرة، مو صفقة).</li>
