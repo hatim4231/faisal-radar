@@ -141,6 +141,10 @@ ul.clean{margin:0;padding-right:18px}
 .chk span{font-size:11.5px;padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
 .chk .y{background:var(--good-bg);color:var(--good);border-color:transparent} .chk .n{background:var(--panel2);color:var(--muted)}
 .rules{margin:6px 0 0;padding-right:18px;font-size:13.5px;line-height:1.75}
+.mtbl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+.mtbl td,.mtbl th{padding:5px 6px;text-align:center;vertical-align:middle;border-bottom:1px solid var(--line)}
+.mtbl tr:last-child td{border-bottom:0}
+.mtbl td:first-child,.mtbl th:first-child,.mtbl td:last-child,.mtbl th:last-child{text-align:right}
 </style>
 <script>
 /* أعلام الدول: ويندوز (كروم/إيدج) يعرض العلم حرفين مثل «US» ← خط أعلام Twemoji (CC-BY 4.0، country-flag-emoji-polyfill)
@@ -177,25 +181,46 @@ ul.clean{margin:0;padding-right:18px}
       <button class="btn" id="theme">🌓</button>
     </div>
   </header>
-  <div class="card" style="margin-bottom:12px;border-color:var(--bad)">⚠ <b>عالي مخاطرة — كل شي مفتوح (قرارك):</b> هالرادار ما يطبق أي فلتر من فلاترك
-    (السعر، الشورت، HRT، الطرح المتكرر، الامتثال، الفلووت، القيمة، الفوليوم) — كلها تطلع <b>تحذير</b> بالبطاقة بس.
-    <br>🔇 <b>تجريبي صامت:</b> ما يرسل تيليجرام. 🧨 و🟠 تنحفظ في <a href="../track/" style="color:var(--accent)">سجل التوصيات</a> بخطة
-    «اشترِ بس إذا بدأ يطير» (شراء Stop +15% باليوم التالي، بيع +30%، وقف إغلاق −15%، 3 جلسات) — واللي ما يتفعّل شراه ما ينحسب —
-    ومع كل وحدة 3 أسهم عشوائية بنفس التذبذب والسعر بنفس الخطة، عشان نعرف بالأرقام هل الرادار أحسن من الصدفة.
-    <div class="note" style="margin-top:6px" id="modelnote"></div></div>
-  <details class="card" style="margin-bottom:12px" open><summary style="cursor:pointer;font-weight:700">📋 الخطة (من دراسة الأسهم اللي تنفجر بشكل متكرر)</summary>
+  <div class="card" id="verdict" style="margin-bottom:12px;border-color:var(--bad)"></div>
+  <div class="card" id="xray" style="margin-bottom:12px;border:2px solid var(--accent)">
+    <h3 style="margin:0 0 4px">🔎 افحص أي سهم قبل ما تدخله</h3>
+    <div class="note" style="margin-bottom:8px">اكتب رمز أي سهم أمريكي (حتى لو مو بالقائمة تحت) — يعطيك <b>خطر النزيف</b> و<b>احتمال الانفجار</b> ووش صار فعلاً لأسهم بنفس وضعه.</div>
+    <form id="xform" style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="search" id="xq" placeholder="رمز السهم — مثال: OMH" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase">
+      <button class="btn primary" type="submit">افحص</button>
+    </form>
+    <div id="xres"></div>
+  </div>
+  <div class="card" id="pfbox" style="margin-bottom:12px">
+    <h3 style="margin:0 0 4px">💼 محفظتي — حارس أسهمك</h3>
+    <div class="note" style="margin-bottom:8px">اكتب رموز الأسهم اللي معك (بينها فاصلة أو مسافة) واضغط حفظ — وكل ما تفتح الصفحة يوريك أي سهم منها عليه خطر.
+      الرموز تنحفظ <b>بجهازك هذا بس</b> وما تنرسل لأي مكان.</div>
+    <form id="pfform" style="display:flex;gap:8px;flex-wrap:wrap">
+      <input type="search" id="pfq" placeholder="مثال: OMH, RUBI, NUWE" autocomplete="off" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase">
+      <button class="btn" type="submit">حفظ</button>
+    </form>
+    <div id="pfres"></div>
+  </div>
+  <div class="card" id="traps" style="margin-bottom:12px;display:none"></div>
+  <div class="card" id="picks" style="margin-bottom:12px;display:none"></div>
+  <details class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700">📒 سجل الصدق — هل كلام الرادار يصير فعلاً؟</summary>
+    <div id="score" style="margin-top:8px"></div></details>
+  <details class="card" style="margin-bottom:12px"><summary style="cursor:pointer;font-weight:700">📋 وش تقول الدراسة (7 سنين) — بالتفصيل</summary>
     <ol class="rules" id="rules"></ol>
+    <div class="note" style="margin-top:6px" id="modelnote"></div>
   </details>
+  <h3 style="margin:18px 0 2px;font-size:16px">👁 قائمة المراقبة</h3>
+  <div class="note" style="margin-bottom:8px" id="listnote"></div>
   <div class="tiles" id="tiles"></div>
   <div class="toolbar" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-    <input type="search" id="q" placeholder="ابحث برمز السهم...">
-    <select id="sort" class="btn"><option value="status">الترتيب: الحالة ثم الاحتمال</option><option value="p">الأعلى احتمال</option>
-      <option value="n">الأكثر انفجارات</option><option value="days">آخر انفجار الأقرب</option><option value="price">الأرخص</option></select>
+    <input type="search" id="q" placeholder="فلتر القائمة برمز السهم...">
+    <select id="sort" class="btn"><option value="status">الترتيب: الحالة ثم الاحتمال</option><option value="p">الأعلى احتمال انفجار</option>
+      <option value="pb">الأعلى خطر نزيف</option><option value="n">الأكثر انفجارات</option><option value="days">آخر انفجار الأقرب</option><option value="price">الأرخص</option></select>
   </div>
   <div class="list" id="list"></div>
-  <div class="disc">الانفجار = أعلى سعر باليوم ≥ ضعف إغلاق اليوم اللي قبله. الاحتمال من نموذج مدرّب على كل الأسهم الأمريكية مع المشطوبة (~3 سنين)
-    ومعاير على فترات ما شافها — «احتمال انفجار خلال 10 جلسات» = كم مرة صار فعلاً لأسهم بنفس المستوى بالاختبار.
-    الأسهم هذي أغلبها شركات تحرق فلوس وتطرح وتسوي تقسيم عكسي، وتطير بدقايق وترجع. <b>ليس توصية شراء أو بيع.</b></div>
+  <div class="disc">الانفجار = أعلى سعر باليوم ≥ ضعف إغلاق اليوم اللي قبله وبتداول ≥ نص مليون دولار ذاك اليوم. خطر النزيف = السهم يلمس −30% من سعره خلال 20 جلسة.
+    النسب المعروضة = <b>وش صار فعلاً</b> لأسهم بنفس المستوى على سنين ما شافها النموذج (2021 ← 2026، كل الأسهم الأمريكية العادية مع المشطوبة).
+    الماضي ما يضمن المستقبل. الأسهم هذي أغلبها شركات تحرق فلوس وتطرح وتسوي تقسيم عكسي، وتطير بدقايق وترجع. <b>ليس توصية شراء أو بيع.</b></div>
 </div>
 <script>
 const DATA = /*__DATA__*/null;
@@ -204,7 +229,10 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
 const fM = n => n == null ? "-" : n >= 1e9 ? (n/1e9).toFixed(2)+"B" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n >= 1e3 ? (n/1e3).toFixed(0)+"K" : String(Math.round(n));
-const pc = x => x == null ? "-" : Math.round(x * 100) + "%";
+const P0 = x => x == null ? "-" : (Math.abs(x) < 0.0995 ? (x * 100).toFixed(1) : Math.round(x * 100)) + "%";
+const SP = x => x == null ? "-" : (x > 0 ? "+" : "") + (x * 100).toFixed(1) + "%";
+const N = x => Number(x || 0).toLocaleString("en");
+const escD = t => esc(t).replace(/\d{4}-\d{2}-\d{2}/g, m => `<span class="num">${m}</span>`);   // التاريخ داخل نص عربي ينقلب بدون عزل
 const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const SENT = {positive:["✅","إيجابي"], negative:["❌","سلبي"], neutral:["➖","محايد"]};
 function sentBadge(n){ const s = SENT[n.sentiment] || SENT.neutral; return `<span class="sent ${n.sentiment||"neutral"}">${s[0]} ${s[1]}</span>`; }
@@ -215,39 +243,240 @@ function newsHTML(list){
       <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span></div></div>`).join("");
 }
 const ST = {fire:["🔥 انطلق للتو","near"], ready:["🧨 مرشح قوي","ready"], near:["🟠 مرشح","near"], watch:["👀 متكرر","watch"]};
+const STC = [null, "fire", "ready", "near", "watch"];
 const FN = {l_price:"السعر", l_dv20:"السيولة اليومية", n_ep252:"عدد انفجاراته بآخر سنة", l_days_ep:"الجلسات من آخر انفجار",
   recent_ep:"انفجر خلال آخر 60 جلسة", last_mag:"قوة آخر انفجار", base_ratio:"السعر ÷ قاعدة ما قبل آخر انفجار", from_peak:"النزول من قمة آخر انفجار",
   vol5_60:"فوليوم آخر 5 أيام ÷ 60", vol1_20:"فوليوم اليوم ÷ المعتاد", atr5_60:"التذبذب 5 أيام ÷ 60", atr20p:"التذبذب اليومي",
   rng20:"مدى آخر 20 جلسة", pos60:"مكان السعر بمدى 60 جلسة", dd252:"النزول من قمة السنة", ret5:"تغير آخر 5 جلسات", ret20:"تغير آخر 20 جلسة",
   rsi:"RSI", closepos10:"قوة الإغلاقات (10 أيام)", upv10:"فوليوم الصعود ÷ النزول", obv20:"OBV آخر 20 جلسة", hl_up:"قيعان متصاعدة",
-  gap20:"فجوات صاعدة (20 جلسة)", rs_recent:"تقسيم عكسي خلال 60 جلسة", n_rs:"تقسيمات عكسية بسنة", l_days_rs:"الجلسات من آخر تقسيم عكسي"};
+  gap20:"فجوات صاعدة (20 جلسة)", rs_recent:"تقسيم عكسي خلال 60 جلسة", n_rs:"تقسيمات عكسية بسنة", l_days_rs:"الجلسات من آخر تقسيم عكسي",
+  ret1:"تغير آخر جلسة", closepos1:"مكان الإغلاق بمدى آخر جلسة", rng1:"مدى آخر جلسة", m60:"تغير آخر 60 جلسة", m120:"تغير آخر 120 جلسة", m250:"تغير آخر سنة"};
 const stocks = (DATA && DATA.stocks) || [];
-const MD = (DATA && DATA.model) || {};
-const SUM = MD.summary || {};
+const MD = (DATA && DATA.model) || {}, CAL = MD.cal || {}, STU = MD.study || {}, TIERS = MD.tiers || {};
+const LIQ = MD.liq || 30000, RNG = (DATA && DATA.radar) || [0.7, 10], TK = (DATA && DATA.ticket) || {limit:0.5, days:20};
+const EXT3 = ((MD.ext || {}).top3 || {})[`${TK.limit}:None:${TK.days}`] || {};
+const ALL = {}, SHOWN = {}, OTH = (DATA && DATA.others) || {};
+(function(){ const A = DATA && DATA.all; if (!A) return; A.rows.forEach(r => { const o = {}; A.cols.forEach((k,i) => o[k] = r[i]); ALL[o.s] = o; }); })();
+stocks.forEach(s => SHOWN[s.symbol] = s);
 let filt = null;
 $("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx) }catch(e){} render(); };
-$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · فحص <span class="num">${DATA.scanned ?? "-"}</span> سهم بدون فلاتر`
-  + ` · متكرر (انفجر مرتين+ بسنة): <span class="num">${DATA.serial_total ?? "-"}</span> · ${esc(DATA.source||"")}` : "";
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · فحص <span class="num">${N(DATA.scanned)}</span> سهم بدون فلاتر`
+  + ` · ${esc(DATA.source||"")}` : "";
 if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
-$("#modelnote").innerHTML = MD.version ? `📊 النموذج <span class="num">${esc(MD.version)}</span> · ${Number(MD.n_rows||0).toLocaleString("en")} سهم-يوم ·
-  ${Number(MD.n_eps||0).toLocaleString("en")} انفجار · الأساس (أي سهم بأي يوم): انفجار خلال 10 جلسات <b class="num">${pc(MD.base_e10)}</b>` + (SUM.line ? `<br>${esc(SUM.line)}` : "") : "⚠ النموذج مو موجود.";
-const PL = (DATA && DATA.plan) || {trig:0.15, t1:0.3, stop:0.15, days:3, risk:0.5};
-const BT = SUM.plan_bt || {};
-const pct1 = x => x == null ? "-" : (x > 0 ? "+" : "") + (x * 100).toFixed(1) + "%";
-$("#rules").innerHTML = [
-  "<b>وش يلقط:</b> الأسهم اللي احتمال تنفجر (أعلى سعر ≥ ضعف إغلاق أمس) خلال 10 جلسات أعلى. أقوى العوامل: <b>سبق انفجر</b> (الانفجار يتكرر بنفس الأسهم — انفجر مرة بسنة: 2.9% خلال 10 جلسات، 4-5 مرات: 8%، ما انفجر: 0.3%)، منهار 85-95% من قمة السنة، عند قاع مداه، وسيولته خفيفة.",
-  "<b>بصمة المضارب:</b> الفوليوم يصحى <b>قبل الانفجار بيوم</b> (حوالي 2.6 ضعف المعتاد) — قبلها بأسبوعين ما فيه شي واضح. والسعر نازل قبلها (−15% إلى −20% بآخر 20 جلسة)، وغالباً تحت قاعدة انفجاره اللي قبل. التقسيم العكسي خلال 60 جلسة أكثر بـ 8 مرات قبل الانفجارات.",
-  "<b>الصدق أول:</b> الشراء على الإشارة <b>خسران</b> بكل الطرق اللي جربناها (7 طرق: مدد 3-20 جلسة، أهداف 30-100%، بوقف وبدونه) — أغلبها يكمل نزيف، والقفزة ترجع بنفس اليوم. فاستخدمه <b>قائمة مراقبة</b> ولا تشتري لأنه طلع هنا.",
-  `<b>لو بتجرب (تذكرة):</b> شراء Stop فوق السعر +${Math.round((PL.trig||0.15)*100)}% (ما تدخل إلا إذا بدأ يطير فعلاً) · بيع Limit +${Math.round(PL.t1*100)}% من سعر دخولك · وقف إغلاق −${Math.round(PL.stop*100)}% · أقصى ${PL.days} جلسات. بالاختبار لـ 🧨: <b class="num">${pct1(BT.mean)}</b> بالمتوسط مقابل <span class="num">${pct1(BT.rand)}</span> للعشوائي — تقريباً تعادل، يعني <b>ما فيه أفضلية مثبتة</b>.`,
-  `<b>الحجم:</b> خل خسارة الوقف ≤ ${PL.risk ?? 0.5}% من محفظتك (الصفقة ≈ ${((PL.risk ?? 0.5) / PL.stop).toFixed(1)}% من المحفظة) ووزّع على أكثر من سهم.`,
-  "<b>دائماً:</b> أمر البيع Limit جاهز قبل القفزة (حتى البري والأفتر) — RUBI طار 2.23 ← 5.91 ورجع 1.66 بنفس الساعة.",
-  "🔥 «انطلق للتو» (اليوم وقت السوق، وإلا آخر جلسة) للمتابعة مو للمطاردة. للموجة الثانية بعد الانفجار عندنا 🔥 برادار الأفتر (أفضلية بعينة صغيرة)."].map(r => `<li>${r}</li>`).join("");
+
+/* ---------- المعايرة: وش صار فعلاً لأسهم بنفس المستوى ---------- */
+function band(tb, v){ if (!tb || v == null) return null; let k = tb.findIndex(r => r.lo <= v && v < r.hi); if (k < 0) k = tb.length - 1;
+  while (k > 0 && tb[k].rate == null) k--; return tb[k].rate == null ? null : tb[k]; }
+const inRadar = a => a.c >= RNG[0] && a.c <= RNG[1] && a.dv >= LIQ;
+const BL = [["🟢 منخفض","g"], ["➖ متوسط",""], ["⚠️ مرتفع","w"], ["🩸 عالي","b"], ["🩸🩸 شديد","b"]];
+const BCOL = ["var(--good)", "var(--text)", "var(--warn)", "var(--bad)", "var(--bad)"];
+function bleed(a){ if (!a || a.pb == null || a.ac === 0) return null; const rad = inRadar(a), b = band(rad ? CAL.pb_radar : CAL.pb_all, a.pb); if (!b) return null;
+  const lv = a.pb >= 0.40 ? 4 : a.pb >= 0.25 ? 3 : a.pb >= 0.15 ? 2 : a.pb >= 0.06 ? 1 : 0;
+  return {rate:b.rate, dn20:b.dn20, med:b.r20_med, up30:b.up30, n:b.n, lv, rad, base: rad ? (CAL.radar_base||{}).rate : MD.base_bleed}; }
+function expl(a){ if (!a || a.p == null || a.ac === 0) return null; const b = band(a.dv >= LIQ ? CAL.p_liq : CAL.p_all, a.p); return b ? {e10:b.e10, e5:b.e5} : null; }
+const asAll = s => ALL[s.symbol] || {s:s.symbol, c:s.price, p:s.p_raw, pb:s.pb, dv:s.dv20, ny:s.n_year, ds:s.days_since, st:STC.indexOf(s.status), ac:1};
+
+/* ---------- الخلاصة ---------- */
+(function(){
+  const t3 = TIERS.top3 || {}, d2 = STU.day2 || {};
+  $("#verdict").innerHTML = `<b>🧨 الخلاصة بصراحة</b> <span class="note">(دراسة ${N(STU.stocks)} سهم على 7 سنين — النتايج على سنين ما شافها النموذج)</span>
+    <ol class="rules" style="margin-top:4px">
+      <li>الرادار <b>يتوقع الانفجار صح</b>: من «أقوى 3» كل يوم <b class="num">${P0(t3.e10)}</b> تضاعفت بيوم خلال 10 جلسات — أسهم مثلها بالضبط <span class="num">${P0(t3.exp_e10)}</span>.</li>
+      <li><b>بس الشراء قبل الانفجار خسّر</b> بكل الطرق (<span class="num">${STU.plans_n || 20}</span> خطة) وبكل سنة — لأن <b class="num">${P0(t3.bleed)}</b> من نفس الأسهم نزل −30% خلال شهر. فهذي <b>قائمة مراقبة، مو قائمة شراء</b>.</li>
+      <li>اللي ينفعك فعلاً: <b>🩸 كاشف النزيف</b> — يتوقع أي سهم بينزل −30% بدقة (المتوقع يطابق اللي صار). <b>افحص أي سهم قبل ما تدخله</b> وحط أسهمك في «محفظتي».</li>
+      <li>لو معك سهم من هالنوع: خل <b>أمر البيع Limit جاهز ومفعّل للبري والأفتر</b> (كثير من القفزات تصير خارج الجلسة)، و<b>بع يوم الانفجار</b> — بعده بـ 5 جلسات ينزل <span class="num">${P0(-(d2.d5 || 0))}</span> بالمتوسط.</li>
+    </ol>
+    <div class="note">🔇 رادار صامت (بدون تيليجرام) · كل شي مفتوح بقرارك: ما يطبق فلاتر السعر/الشورت/HRT/الطرح — تطلع تحذير بالبطاقة بس.</div>`;
+})();
+
+/* ---------- 🔎 افحص أي سهم ---------- */
+function verdictLine(a, B){
+  if (a.ac === 0) return ["b", "⛔ سهم شبه ميت: وسيط تداوله اليومي أقل من 5 آلاف دولار (أو سعره تحت 5 سنت) — لو دخلت صعب تطلع. ما ينشرى، والرادار ما يقيّمه."];
+  if (!B) return ["", "ما قدرت أحسب الخطر لهالسهم (بياناته ناقصة)."];
+  const r = `<b class="num">${P0(B.rate)}</b>`, T = [
+    `🟢 <b>خطر النزيف منخفض</b>: ${r} بس من الأسهم اللي بمستواه لمست −30% خلال 20 جلسة. هذا <b>ما يعني إنه بيطلع</b> — بس الضربة القوية احتمالها قليل.`,
+    `➖ <b>خطر متوسط</b>: ${r} من الأسهم اللي بمستواه لمست −30% خلال 20 جلسة — قريب من المعتاد لهالنوع من الأسهم.`,
+    `⚠️ <b>خطر مرتفع</b>: ${r} من الأسهم اللي بمستواه لمست −30% خلال 20 جلسة (<span class="num">${P0(B.dn20)}</span> لمست −20%). صغّر حجم الصفقة.`,
+    `🩸 <b>خطر نزيف عالي</b>: ${r} من الأسهم اللي بمستواه لمست −30% خلال 20 جلسة (<span class="num">${P0(B.dn20)}</span> لمست −20%). لو بتدخل: مبلغ صغير جداً — ولو معك السهم فكّر تخفف.`,
+    `🩸🩸 <b>فخ نزيف شديد</b>: ${r} من الأسهم اللي بمستواه لمست −30% خلال 20 جلسة، ووسيطها خسر <span class="num">${P0(-B.med)}</span>. لا تدخل — ولو معك السهم خفف أو اطلع على أول ارتفاع.`];
+  return [BL[B.lv][1], T[B.lv]];
+}
+function xrayHTML(sym){
+  const a = ALL[sym];
+  if (!a) return `<div class="setupbox"><div class="t">ما لقيت «<span class="ltr">${esc(sym)}</span>»</div><div class="note">تأكد من الرمز. الرادار يغطي الأسهم العادية النشطة بناسداك ونيويورك وأمكس
+    (بدون الصناديق ETF والـ Warrants)، ولازم يكون للسهم 6 شهور تداول على الأقل.</div></div>`;
+  const s = SHOWN[sym], B = bleed(a), E = expl(a), stK = STC[a.st], [vc, vt] = verdictLine(a, B), d2 = STU.day2 || {};
+  const col = vc === "b" ? "var(--bad)" : vc === "w" ? "var(--warn)" : vc === "g" ? "var(--good)" : "var(--text)";
+  const facts = [];
+  if (B) facts.push(`أسهم بنفس مستوى الخطر${B.rad ? " (بمجال راداراتك)" : ""} — <span class="num">${N(B.n)}</span> حالة على سنين ما شافها النموذج:
+    <b class="num">${P0(B.rate)}</b> لمست −30% · <span class="num">${P0(B.dn20)}</span> لمست −20% · <span class="num">${P0(B.up30)}</span> طلعت +30% · وسيط نتيجتها بعد 20 جلسة <b class="num">${SP(B.med)}</b>
+    <span class="note">(المعتاد${B.rad ? " بمجالك" : " لكل الأسهم"}: <span class="num">${P0(B.base)}</span> تلمس −30%)</span>`);
+  if (E) facts.push(`احتمال الانفجار (×2 بيوم) خلال 10 جلسات: <b class="num">${P0(E.e10)}</b> — المعتاد لأي سهم <span class="num">${P0(MD.base_e10)}</span>`
+    + (E.e10 >= 0.03 ? ` · 🧨 مرشح انفجار، بس الشراء المسبق لهالأسهم خسّر بكل السنين` : ""));
+  facts.push(a.ny > 0 ? `انفجر <b class="num">${a.ny}</b> مرة بآخر سنة${a.ds != null ? ` (آخرها قبل <span class="num">${a.ds}</span> جلسة)` : ""}` : "ما انفجر بآخر سنة");
+  if (a.dd != null) facts.push(`تحت قمة السنة بـ <b class="num">${P0(-a.dd)}</b>${a.r20 != null ? ` · آخر 20 جلسة <span class="num">${SP(a.r20)}</span>` : ""}`);
+  if (a.rs != null) facts.push(`✂️ تقسيم عكسي قبل <span class="num">${a.rs}</span> جلسة${a.rs <= 60 ? " — قريب (التقسيم العكسي يسبق الانفجارات والنزيف الاثنين)" : ""}`);
+  facts.push(`وسيط التداول اليومي: <span class="num">$${fM(a.dv)}</span>${a.ac !== 0 && a.dv < LIQ ? " — 💧 سيولة ضعيفة، صعب تدخل وتطلع بمبلغ كبير" : ""}`);
+  if (a.ac === 2) facts.push("⏸ ما تداول بآخر جلسة — الأرقام من آخر يوم تداول له");
+  if (a.sh) facts.push("تاريخه قصير (أقل من 260 جلسة) — التقدير أقل دقة");
+  if (OTH[sym]) facts.push(`📍 موجود اليوم عندك بـ: <b>${OTH[sym].map(escD).join(" · ")}</b>`);
+  const adv = [];
+  if (a.st === 1) adv.push(`🔥 <b>انطلق</b> (الأعلى +<span class="num">${a.j}</span>% فوق الإغلاق اللي قبله). لا تطارده: الشراء بإغلاق يوم الانفجار خسّر <span class="num">${P0(d2.open)}</span> بافتتاح اليوم التالي بالمتوسط
+    (<span class="num">${N(d2.n)}</span> حالة). لو معك السهم: بع على القفزة. وللموجة الثانية شوف 🔥 برادار الأفتر.`);
+  if (a.ac !== 0 && (a.st === 2 || a.st === 3 || a.ny >= 1)) adv.push(`💡 <b>لو معك السهم:</b> خل أمر بيع Limit جاهز ومفعّل للبري والأفتر (GTC + Extended Hours) — بالدراسة زاد الوصول لهدف +50%
+    من <span class="num">${P0(EXT3.hit_r)}</span> إلى <span class="num">${P0(EXT3.hit_x)}</span> لأن كثير من القفزات تصير خارج الجلسة وترجع قبل الافتتاح. ولو انفجر بع يومها.`);
+  return `<div class="setupbox" style="margin-top:10px">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <div class="t">${s && s.flag ? s.flag + " " : ""}<span class="ltr sym">${esc(a.s)}</span> <span class="num">$${fp(a.c)}</span>
+        ${a.ch != null ? `<span class="num ${a.ch >= 0 ? "up" : "down"}">${a.ch > 0 ? "+" : ""}${a.ch}%</span>` : ""}
+        <div class="name" style="max-width:none"><bdi>${esc((s && s.name) || a.n || "")}</bdi></div></div>
+      ${stK ? `<span class="badge ${ST[stK][1]}">${ST[stK][0]}</span>` : ""}
+    </div>
+    <div class="plan" style="margin-top:8px">
+      <div class="pbox"><span>🩸 خطر النزيف (يلمس −30% خلال 20 جلسة)</span><b class="num" style="color:${B ? BCOL[B.lv] : "var(--muted)"}">${B ? P0(B.rate) : "-"}</b> <span style="display:inline">${B ? BL[B.lv][0] : ""}</span></div>
+      <div class="pbox"><span>🧨 احتمال الانفجار (×2 بيوم خلال 10 جلسات)</span><b class="num">${E ? P0(E.e10) : "-"}</b></div>
+      <div class="pbox"><span>📈 يطلع +30% خلال 20 جلسة</span><b class="num">${B ? P0(B.up30) : "-"}</b></div>
+    </div>
+    <div class="left" style="color:${col};font-size:14px;margin-top:8px">${vt}</div>
+    <ul class="clean note" style="margin-top:6px;color:var(--text)">${facts.map(f => `<li>${f}</li>`).join("")}</ul>
+    ${adv.map(t => `<div class="left">${t}</div>`).join("")}
+    <div class="links" style="margin-top:8px">${s ? `<a href="#" data-card="${esc(sym)}">📊 البطاقة والشارت ▾</a>` : ""}
+      <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(sym)}" target="_blank" rel="noopener">TradingView</a>
+      <a href="https://finviz.com/quote.ashx?t=${encodeURIComponent(sym)}" target="_blank" rel="noopener">Finviz</a>
+      <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(sym)}&type=&dateb=&owner=include&count=40" target="_blank" rel="noopener">ملفات SEC</a></div>
+  </div>`;
+}
+function goCard(sym){ $("#q").value = sym; filt = null; render();
+  const c = document.querySelector(`#list .card[data-s="${sym}"]`); if (c){ c.scrollIntoView({behavior:"smooth", block:"start"}); if (!c.querySelector(".more")) toggle(c); } }
+function xray(sym, scroll){
+  sym = String(sym || "").toUpperCase().replace(/[^A-Z.]/g, ""); if (!sym) return;
+  $("#xq").value = sym; $("#xres").innerHTML = xrayHTML(sym);
+  $("#xres").querySelectorAll("[data-card]").forEach(el => el.onclick = e => { e.preventDefault(); goCard(el.dataset.card); });
+  if (scroll) $("#xray").scrollIntoView({behavior:"smooth", block:"start"});
+}
+$("#xform").onsubmit = e => { e.preventDefault(); xray($("#xq").value); };
+
+/* ---------- 💼 محفظتي (تنحفظ بالمتصفح بس) ---------- */
+function pfLoad(){ try{ const v = JSON.parse(localStorage.getItem("hr-pf") || "[]"); return Array.isArray(v) ? v : []; }catch(e){ return []; } }
+const pfParse = txt => [...new Set(String(txt).toUpperCase().split(/[^A-Z.]+/).filter(x => x && x.length <= 6))].slice(0, 40);
+function miniRow(sym, extra){
+  const a = ALL[sym], B = bleed(a), E = expl(a), stK = a ? STC[a.st] : null;
+  if (!a) return `<tr data-x="${esc(sym)}"><td class="ltr" style="font-weight:700">${esc(sym)}</td><td colspan="4" class="note" style="text-align:right">ما لقيته — تأكد من الرمز</td></tr>`;
+  const note = (a.ac === 0 ? ["⛔ شبه ميت (ما فيه تداول)"] : [B ? BL[B.lv][0] : "", stK === "fire" ? "🔥 انطلق — بع على القفزة" : (stK === "ready" || stK === "near") ? "🧨 حط أمر بيع Limit ممتد" : ""])
+    .filter(Boolean).join(" · ") + (extra ? `<div>${extra}</div>` : "");
+  return `<tr data-x="${esc(sym)}" style="cursor:pointer"><td class="ltr" style="font-weight:700">${esc(sym)}</td>
+    <td class="num">$${fp(a.c)}${a.ch != null ? ` <span class="${a.ch >= 0 ? "up" : "down"}">${a.ch > 0 ? "+" : ""}${a.ch}%</span>` : ""}</td>
+    <td class="num" style="font-weight:700;color:${B ? BCOL[B.lv] : "var(--muted)"}">${B ? P0(B.rate) : "-"}</td>
+    <td class="num">${E ? P0(E.e10) : "-"}</td><td>${note}</td></tr>`;
+}
+const miniTable = rows => `<div style="overflow-x:auto"><table class="mtbl">
+  <tr class="note"><th>السهم</th><th>السعر</th><th>🩸 يلمس −30%</th><th>🧨 انفجار</th><th>الحكم</th></tr>${rows}</table></div>
+  <div class="note" style="margin-top:4px">🩸 = نسبة الأسهم اللي بنفس المستوى ولمست −30% خلال 20 جلسة · 🧨 = تضاعفت بيوم خلال 10 جلسات · اضغط السهم للتفاصيل</div>`;
+function bindMini(box){ box.querySelectorAll("tr[data-x]").forEach(el => el.onclick = () => xray(el.dataset.x, true)); }
+function pfRender(){
+  const L = pfLoad(), box = $("#pfres"); $("#pfq").value = L.join(", ");
+  if (!L.length){ box.innerHTML = ""; return; }
+  const R = L.map(sym => ({sym, B: bleed(ALL[sym]), pb: ALL[sym] && ALL[sym].ac !== 0 ? (ALL[sym].pb ?? -1) : (ALL[sym] ? 2 : -2)})).sort((x,y) => y.pb - x.pb);
+  const hi = R.filter(r => r.B && r.B.lv >= 3).length, mid = R.filter(r => r.B && r.B.lv === 2).length, dead = R.filter(r => r.pb === 2).length;
+  box.innerHTML = `<div class="left" style="font-size:14px;margin-top:8px;color:${hi || dead ? "var(--bad)" : mid ? "var(--warn)" : "var(--good)"}"><b>${
+      hi || dead ? `🩸 ${hi + dead} من أسهمك (${L.length}) عليها خطر عالي — شوفها تحت` : mid ? `⚠️ ${mid} من أسهمك (${L.length}) خطرها مرتفع` : `✅ ولا سهم من أسهمك (${L.length}) عليه خطر نزيف عالي اليوم`}</b></div>`
+    + miniTable(R.map(r => miniRow(r.sym)).join(""));
+  bindMini(box);
+}
+$("#pfform").onsubmit = e => { e.preventDefault(); try{ localStorage.setItem("hr-pf", JSON.stringify(pfParse($("#pfq").value))); }catch(err){} pfRender(); };
+pfRender();
+
+/* ---------- 🩸 فخاخ من توصيات الرادارات الثانية ---------- */
+(function(){
+  const syms = Object.keys(OTH).filter(s => ALL[s]); if (!syms.length) return;
+  const R = syms.map(s => ({s, a: ALL[s], B: bleed(ALL[s])})).filter(r => r.B || r.a.ac === 0).sort((x,y) => (y.a.pb ?? 0) - (x.a.pb ?? 0));
+  const hi = R.filter(r => (r.B && r.B.lv >= 3) || r.a.ac === 0), mid = R.filter(r => r.B && r.B.lv === 2);
+  const box = $("#traps"), rb = CAL.radar_base || {}; box.style.display = ""; box.style.borderColor = hi.length ? "var(--bad)" : "var(--good)";
+  const lab = r => OTH[r.s].map(escD).join("<br>");
+  box.innerHTML = `<h3 style="margin:0 0 4px">🩸 فخاخ اليوم — من توصيات راداراتك</h3>
+    <div class="note">فحصت <b class="num">${syms.length}</b> سهم (توصيات اليوم بفيصل وعبدالله والمطّلعين والتجميع والمدارس والطيارات + التوصيات المفتوحة بالسجل):
+      <b style="color:var(--bad)" class="num">${hi.length}</b> خطر عالي · <b style="color:var(--warn)" class="num">${mid.length}</b> مرتفع · <span class="num">${R.length - hi.length - mid.length}</span> عادي.</div>
+    ${hi.length ? miniTable(hi.map(r => miniRow(r.s, `<span class="note">${lab(r)}</span>`)).join("")) : `<div class="left" style="color:var(--good);font-size:14px;margin-top:6px"><b>✅ ولا سهم من توصياتك اليوم عليه خطر نزيف عالي.</b></div>`}
+    ${mid.length ? `<details style="margin-top:6px"><summary class="note" style="cursor:pointer">⚠️ الخطر المرتفع (${mid.length})</summary>${miniTable(mid.map(r => miniRow(r.s, `<span class="note">${lab(r)}</span>`)).join(""))}</details>` : ""}
+    <div class="note" style="margin-top:6px">هذي <b>معلومة خطر</b> ما تغير حالة السهم برادارك. بمجال راداراتك (من <span class="num">${RNG[0]}$</span> إلى <span class="num">${RNG[1]}$</span>): المعتاد
+      <span class="num">${P0(rb.rate)}</span> تلمس −30% خلال 20 جلسة، و«🩸 عالي» من <span class="num">28%</span> إلى <span class="num">34%</span>، و«🩸🩸 شديد» من <span class="num">42%</span> إلى <span class="num">53%</span> — ثابتة بكل سنة من 2021.</div>`;
+  bindMini(box);
+})();
+
+/* ---------- 🎯 أقوى 3 للمراقبة + التذكرة ---------- */
+(function(){
+  const P = ((DATA && DATA.picks) || []).map(t => SHOWN[t]).filter(Boolean), t3 = TIERS.top3 || {}, Y = MD.top3_year || {};
+  if (!P.length) return;
+  const box = $("#picks"); box.style.display = ""; box.style.border = "2px solid var(--warn)";
+  const yrs = Object.keys(Y).sort().slice(-2).map(y => `<span class="num">${P0(Y[y].e10)}</span> بـ <span class="num">${y}</span>`).join(" و");
+  const by = Object.entries(EXT3.by || {}).map(([y, v]) => `${y}: ${SP(v)}`).join(" · "), bp = (STU.ticket || {}).by_price || {};
+  box.innerHTML = `<h3 style="margin:0 0 4px">🎯 أقوى 3 اليوم — للمراقبة، مو للشراء</h3>
+    <div class="note" style="margin-bottom:6px">أعلى 3 احتمال انفجار (بسيولة تسمح بالدخول والخروج). بالدراسة (<span class="num">${N(t3.n)}</span> اختيار): <b class="num">${P0(t3.e10)}</b> منها تضاعفت بيوم خلال 10 جلسات
+      (أسهم مثلها <span class="num">${P0(t3.exp_e10)}</span>${yrs ? `، وآخر سنتين ${yrs}` : ""}) — <b>لكن <span class="num">${P0(t3.bleed)}</span> منها لمست −30% خلال 20 جلسة</b>، ووسيطها خسر <span class="num">${P0(-(t3.r20_med || 0))}</span>.</div>`
+    + P.map(s => { const a = asAll(s), B = bleed(a), le = (s.episodes || []).slice(-1)[0], dl = s.dilution;
+      const risk = [(s.dilution_events || []).length ? `⚠ طرح متكرر (${s.dilution_events.length})` : dl && dl.level === "high" ? "⛔ تخفيف SEC" : dl && dl.level === "medium" ? "⚠ تخفيف محتمل" : "", ...(s.flags || [])].filter(Boolean);
+      return `<div class="setupbox" style="cursor:pointer" data-go="${esc(s.symbol)}"><div class="t"><span class="num">${s.pick}.</span> ${s.flag || ""} <span class="ltr">${esc(s.symbol)}</span>
+          <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct >= 0 ? "up" : "down"}">${s.change_pct > 0 ? "+" : ""}${s.change_pct ?? "-"}%</span>
+          <span class="note">· انفجر <span class="num">${s.n_year}</span> مرة بسنة${le ? ` (آخرها قبل <span class="num">${s.days_since}</span> جلسة)` : ""} · 🩸 خطر −30%: <b class="num" style="color:${B ? BCOL[B.lv] : "inherit"}">${B ? P0(B.rate) : "-"}</b></span></div>
+        ${risk.length ? `<div class="note" style="margin-top:3px;color:var(--bad)">${risk.map(esc).join(" · ")}</div>` : ""}</div>`; }).join("")
+    + `<details style="margin-top:8px"><summary style="cursor:pointer;font-weight:600">🎟 لو مصرّ تاخذ تذكرة — أقل الطرق خسارة (يانصيب، مو استثمار)</summary>
+      <ol class="rules"><li>اشترِ عند <b>افتتاح الجلسة الجاية</b> بمبلغ <b>تتحمل تخسره كله</b> (تذكرة، مو صفقة).</li>
+        <li>بنفس اللحظة حط <b>أمر بيع Limit عند +${Math.round(TK.limit * 100)}%</b> من سعر دخولك — نوعه <b class="ltr">GTC</b> ومفعّل <b>للبري والأفتر</b> (<span class="ltr">Extended Hours</span>). هذا أهم شي: بدونه تفوتك قفزات الفجر.</li>
+        <li><b>بدون وقف</b> (الوقف يطلّعك قبل القفزة) — وإذا ما وصل الهدف خلال <b class="num">${TK.days}</b> جلسة بع بالإغلاق.</li></ol>
+      <div class="note">بالدراسة (<span class="num">${N(EXT3.n)}</span> تذكرة): <b class="num">${P0(EXT3.hit_x)}</b> وصلت الهدف (بدون البري والأفتر <span class="num">${P0(EXT3.hit_r)}</span>) ·
+        متوسط التذكرة بعد التكاليف <b class="num" style="color:var(--bad)">${SP(EXT3.ext)}</b> (بالجلسة العادية بس <span class="num">${SP(EXT3.reg)}</span>) · الوسيط <span class="num">${SP(EXT3.med)}</span> · رابحة <span class="num">${P0(EXT3.win)}</span>.
+        <br>بكل سنة: <span class="num">${by}</span>. حسب السعر: تحت 1$ <span class="num">${SP(bp.lt1)}</span> · 1–5$ <span class="num">${SP(bp["1to5"])}</span> · فوق 5$ <span class="num">${SP(bp.gt5)}</span>.
+        <br><b>يعني المتوسط خسارة بسيطة</b> — قريب من يانصيب عادل، وما فيه أفضلية مثبتة. اللي يربح فيها = اللي حظه جاب القفزة وأمره جاهز.</div></details>`;
+  box.querySelectorAll("[data-go]").forEach(el => el.onclick = () => goCard(el.dataset.go));
+})();
+
+/* ---------- 📒 سجل الصدق ---------- */
+(function(){
+  const S = (DATA && DATA.score) || {}, box = $("#score");
+  if (!S.days){ box.innerHTML = `<div class="note">يبدأ التسجيل من أول مسح بعد إغلاق السوق. كل يوم ينحفظ وش قال الرادار، وبعد 10 و20 جلسة ينكتب هنا وش صار فعلاً — مقابل كل الأسهم بنفس الأيام.</div>`; return; }
+  const pr = (k, n) => n ? `<b class="num">${P0(k / n)}</b> <span class="note" style="white-space:nowrap">(<span class="num">${k}</span> من <span class="num">${N(n)}</span>)</span>` : `<span class="note">لسا ما نضج</span>`;
+  const T = S.tickets || {}, t3 = TIERS.top3 || {}, rd = TIERS.ready || {};
+  const rng = (a, b) => `من <span class="num">${a}%</span> إلى <span class="num">${b}%</span>`;
+  const blk = (t, got, exp, base) => `<div class="setupbox"><div class="t" style="font-size:13.5px">${t}</div>
+    <div class="facts" style="margin-top:4px"><span>اللي صار: ${got}</span><span>المتوقع بالدراسة: <b>${exp}</b></span>${base ? `<span>كل الأسهم بنفس الأيام: ${base}</span>` : ""}</div></div>`;
+  box.innerHTML = `<div class="note">من <span class="num">${esc(S.start)}</span> · <span class="num">${S.days}</span> يوم مسجل. النتيجة تنكتب بعد ما تكمل المدة (10 جلسات للانفجار، 20 للنزيف والتذاكر) — ونحتاج 100+ حالة قبل الحكم.</div>
+    ${blk("🎯 أقوى 3 — تتضاعف بيوم خلال 10 جلسات", pr(S.picks.e, S.picks.n), `<span class="num">${P0(t3.e10)}</span>`, pr(S.base10.e, S.base10.n))}
+    ${blk("🧨 مرشح قوي — تتضاعف بيوم خلال 10 جلسات", pr(S.ready.e, S.ready.n), `<span class="num">${P0(rd.e10)}</span>`, pr(S.base10.e, S.base10.n))}
+    ${blk("🩸🩸 خطر شديد (بمجال راداراتك) — يلمس −30% خلال 20 جلسة", pr(S.b40.b, S.b40.n), rng(42, 53), pr(S.radar.b, S.radar.n))}
+    ${blk("🩸 خطر عالي (بمجال راداراتك) — يلمس −30% خلال 20 جلسة", pr(S.b25.b, S.b25.n), rng(28, 34), pr(S.radar.b, S.radar.n))}
+    ${blk(`🎟 التذاكر — توصل <span class="num">+${Math.round(TK.limit * 100)}%</span> خلال ${TK.days} جلسة`, pr(T.hit, T.n) + (T.n ? ` · متوسط التذكرة <b class="num">${SP(T.sum / T.n)}</b>` : ""),
+          `<span class="num">${P0(EXT3.hit_x)}</span> · متوسط التذكرة <span class="num">${SP(EXT3.ext)}</span>`, "")}
+    ${(S.recent || []).length ? `<div class="note" style="margin-top:8px">آخر اختيارات «أقوى 3»:</div><div style="overflow-x:auto"><table class="mtbl" style="font-size:12.5px">
+      <tr class="note"><th>السهم</th><th>التاريخ</th><th>الإغلاق</th><th>انفجر خلال 10؟</th><th>التذكرة</th></tr>
+      ${S.recent.map(r => `<tr><td class="ltr" style="font-weight:700">${esc(r.s)}</td><td class="num" style="white-space:nowrap">${esc(r.date)}</td><td class="num">${fp(r.c)}</td><td>${r.e == null ? "⏳" : r.e ? "✅ نعم" : "✗ لا"}</td>
+        <td>${r.entry == null ? "⏳ ما دخلت للحين" : r.ret != null ? (r.hit ? `✅ وصلت الهدف${r.src === "ext" ? " (بالتداول الممتد)" : ""}` : "انتهت بدون الهدف") + ` <b class="num">${SP(r.ret)}</b>`
+          : `⏳ مفتوحة (جلسة <span class="num">${r.n}</span> من <span class="num">${TK.days}</span>) · دخول <span class="num">${fp(r.entry)}</span>`}</td></tr>`).join("")}</table></div>` : ""}`;
+})();
+
+/* ---------- 📋 الدراسة ---------- */
+(function(){
+  const t3 = TIERS.top3 || {}, rd = TIERS.ready || {}, pl = STU.plans_top3 || {}, d2 = STU.day2 || {}, ey = STU.ex_per_year || {};
+  $("#rules").innerHTML = [
+    `<b>الدراسة:</b> <span class="num">${N(STU.stocks)}</span> سهم عادي مع المشطوبة، <span class="num">${N(STU.rows)}</span> سهم-يوم (${esc(STU.from)} ← ${esc(STU.to)}). كل سنة تنختبر بنموذج تدرّب على اللي قبلها بس. الأسعار والتكاليف بالسعر الحقيقي ذاك اليوم (قبل تعديل التقسيمات).`,
+    `<b>الانفجارات تكثر:</b> <span class="num">${N(ey["2021"])}</span> يوم انفجار بـ 2021 ← <span class="num">${N(ey["2025"])}</span> بـ 2025 ← <span class="num">${N(ey["2026"])}</span> بأول 10 شهور من 2026. وتتكرر بنفس الأسهم (منهارة 85%+ من قمتها، سبق انفجرت، سيولتها خفيفة).`,
+    `<b>التوقع شغّال:</b> 🧨 مرشح قوي: <span class="num">${P0(rd.e10)}</span> تتضاعف بيوم خلال 10 جلسات · أقوى 3: <span class="num">${P0(t3.e10)}</span> — مقابل <span class="num">${P0(t3.exp_e10)}</span> لأسهم بنفس التذبذب والسعر و<span class="num">${P0(MD.base_e10)}</span> لأي سهم.`,
+    `<b>الشراء المسبق خسران</b> (أقوى 3، بعد التكاليف): افتتاح بكرة +30%/−15%/5 جلسات <span class="num">${SP(pl.o5)}</span> · +50%/−30%/20 <span class="num">${SP(pl.o20)}</span> · +100% بدون وقف <span class="num">${SP(pl.olot)}</span> · شراء Stop +15% <span class="num">${SP(pl.s15b)}</span> · من الإغلاق لافتتاح بكرة <span class="num">${SP(pl.on)}</span>. جربنا <span class="num">${STU.plans_n}</span> خطة ونموذج يتوقع الربح مباشرة — ولا وحدة ربحت، ولا «حرارة السوق» فرّقت.`,
+    `<b>ليش؟</b> لأن <span class="num">${P0(t3.bleed)}</span> من أقوى 3 تلمس −30% خلال 20 جلسة ووسيطها يخسر <span class="num">${P0(-(t3.r20_med || 0))}</span> — النزيف ياكل ربح القلة اللي تطير.`,
+    `<b>أمر البيع بالبري والأفتر يفرق:</b> نفس الخطة (+50% بدون وقف، 20 جلسة) من <span class="num">${SP(EXT3.reg)}</span> بالجلسة العادية إلى <span class="num">${SP(EXT3.ext)}</span> مع التداول الممتد — أحسن بـ 4 نقاط بس لسا مو رابحة.`,
+    `<b>بعد الانفجار:</b> الشراء بإغلاق يوم الانفجار (<span class="num">${N(d2.n)}</span> حالة): افتتاح بكرة <span class="num">${SP(d2.open)}</span> · إغلاق بكرة <span class="num">${SP(d2.close)}</span> · بعد 5 جلسات <span class="num">${SP(d2.d5)}</span> ← اللي معه السهم يبيع يوم الانفجار.`,
+    `<b>🩸 كاشف النزيف</b> (نفس البيانات): يرتب الأسهم باحتمال تلمس −30% خلال 20 جلسة. المتوقع يطابق اللي صار بكل الشرائح (مثلاً المتوقع 34% ← الفعلي 34%)، وثابت بكل سنة. هذا أقوى شي طلع من الدراسة — يحميك أكثر مما يربّحك.`,
+    `<b>الحجم:</b> أي سهم من هالنوع = فلوس تتحمل تخسرها كلها. لا تعوّض خسارة بحجم أكبر.`].map(r => `<li>${r}</li>`).join("");
+  $("#modelnote").innerHTML = MD.version ? `📊 النموذج <span class="num">${esc(MD.version)}</span> · الأساس (أي سهم بأي يوم): انفجار خلال 10 جلسات <span class="num">${P0(MD.base_e10)}</span> · يلمس −30% خلال 20 جلسة <span class="num">${P0(MD.base_bleed)}</span>` : "⚠ النموذج مو موجود.";
+})();
+
+/* ---------- القائمة ---------- */
 function tiles(){
-  const n = k => stocks.filter(s => s.status === k).length;
-  $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
+  const n = k => stocks.filter(s => s.status === k).length, tot = (DATA && DATA.totals) || {};
+  $("#tiles").innerHTML = Object.entries(ST).map(([k,[l]]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${tot[k] ?? n(k)}</b><span>${l}</span></div>`).join("");
   document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = filt === el.dataset.k ? null : el.dataset.k; render(); });
 }
+$("#listnote").innerHTML = `🔥 انطلق بآخر جلسة (للمتابعة مو للمطاردة) · 🧨 أعلى 1% احتمال انفجار · 🟠 أعلى 5% · 👀 انفجر مرتين+ بآخر سنة. نعرض الأقوى من كل نوع بس — وأي سهم ثاني تلقاه بـ «افحص أي سهم» فوق.`;
 function fpChips(s){
   const f = s.fp || {};
   const it = [["فوليوم ناشف", f.vol5_60 != null && f.vol5_60 < 0.6], ["فوليوم اليوم يصحى (3×+)", f.vol1_20 != null && f.vol1_20 >= 3],
@@ -257,16 +486,18 @@ function fpChips(s){
   return `<div class="chk">${it.map(([t,ok]) => `<span class="${ok?"y":"n"}">${ok?"✓":"✗"} ${t}</span>`).join("")}</div>`;
 }
 function chart(s){
-  const c = s.chart, n = c.c.length, W = 800, H = 300, VH = 46, pad = {l:8, r:58, t:14, b:22}, p = s.plan;
+  const small = window.innerWidth < 600, k0 = small ? Math.max(0, s.chart.c.length - 60) : 0;      // الجوال: آخر 60 جلسة بشموع أعرض
+  const c = {}; ["d","o","h","l","c","v","ex"].forEach(k => c[k] = (s.chart[k] || []).slice(k0));
+  const n = c.c.length, W = small ? 440 : 800, H = 300, VH = 46, pad = {l:8, r:small ? 48 : 58, t:14, b:22}, p = s.plan || {};
   let lo = Math.min(...c.l.filter(x=>x!=null)), hi = Math.max(...c.h.filter(x=>x!=null));
-  lo = Math.min(lo, p.stop || lo) * 0.97; hi = Math.max(hi, p.t1 || hi) * 1.04;
+  lo = lo * 0.97; hi = Math.max(hi, Math.min(p.limit_ref || hi, hi * 1.6)) * 1.04;
   const ph = H - VH - pad.t - pad.b, y = v => pad.t + (hi - v) / (hi - lo) * ph;
   const cw = (W - pad.l - pad.r) / n, x = i => pad.l + i * cw + cw / 2;
   const up = cssv("--up"), dn = cssv("--down"), line = cssv("--line"), muted = cssv("--muted");
   let g = "";
   for (let k = 0; k <= 4; k++){ const v = lo + (hi-lo)*k/4; g += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${line}"/><text x="${W-pad.r+4}" y="${y(v)+4}" fill="${muted}" font-size="11">${fp(v)}</text>`; }
   const hl = (v, col, label, dash) => v == null || v > hi || v < lo ? "" : `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="5 4"':""}/><text x="${pad.l+4}" y="${y(v)-3}" fill="${col}" font-size="11" font-weight="600">${label} ${fp(v)}</text>`;
-  g += hl(p.stop, cssv("--bad"), "الوقف", true) + hl(p.trigger, cssv("--warn"), "شراء Stop", true) + hl(p.t1, cssv("--good"), "البيع", true) + hl(p.base_low, cssv("--info"), "أدنى 20 جلسة", false);
+  g += hl(p.limit_ref, cssv("--good"), "+" + Math.round(TK.limit * 100) + "% من السعر", true) + hl(p.base_low, cssv("--info"), "أدنى 20 جلسة", false);
   const vmax = Math.max(...c.v);
   for (let i = 0; i < n; i++){ const o = c.o[i], h = c.h[i], l = c.l[i], cl = c.c[i]; if (cl == null) continue;
     const col = cl >= o ? up : dn, bw = Math.max(1, cw * 0.62);
@@ -283,27 +514,27 @@ function warnLines(s){
   else if (dl && dl.level === "high") W.push(["b", `⛔ تخفيف SEC: ${(dl.hits||[]).slice(0,2).map(h => h.form + " " + h.date).join(" · ")}`]);
   else if (dl && dl.level === "medium") W.push(["w", `⚠ تخفيف محتمل SEC: ${(dl.hits||[]).slice(0,2).map(h => h.form + " " + h.date).join(" · ")}`]);
   if (s.hrt) W.push(["w", "⚠ صندوق HRT من الملاك"]);
-  (s.flags||[]).forEach(f => W.push([/⛔|⚠|🏛/.test(f) ? "w" : "", f]));
-  return W.map(([c,t]) => `<div class="left" style="color:${c==="b"?"var(--bad)":c==="w"?"var(--warn)":"var(--muted)"}">${esc(t)}</div>`).join("");
+  (s.flags||[]).forEach(f => W.push([/⛔|⚠|🏛|💧/.test(f) ? "w" : "", f]));
+  return W.map(([c,t]) => `<div class="left" style="color:${c==="b"?"var(--bad)":c==="w"?"var(--warn)":"var(--muted)"}">${escD(t)}</div>`).join("");
 }
 function render(){
   tiles();
   const key = $("#sort").value, order = {fire:0, ready:1, near:2, watch:3}, q = $("#q").value.trim().toUpperCase();
   let L = stocks.filter(s => (!filt || s.status === filt) && (!q || s.symbol.includes(q)));
-  const S = {status:(a,b) => (order[a.status]-order[b.status]) || (b.p_raw-a.p_raw), p:(a,b) => b.p_raw-a.p_raw,
-             n:(a,b) => (b.n_year-a.n_year) || (b.p_raw-a.p_raw), days:(a,b) => (a.days_since ?? 1e9)-(b.days_since ?? 1e9),
+  const S = {status:(a,b) => (order[a.status]-order[b.status]) || ((b.pick ? 1 : 0)-(a.pick ? 1 : 0)) || (b.p_raw-a.p_raw), p:(a,b) => b.p_raw-a.p_raw,
+             pb:(a,b) => (b.pb ?? 0)-(a.pb ?? 0), n:(a,b) => (b.n_year-a.n_year) || (b.p_raw-a.p_raw), days:(a,b) => (a.days_since ?? 1e9)-(b.days_since ?? 1e9),
              price:(a,b) => a.price-b.price};
-  L.sort(S[key]);
-  if (!L.length){ $("#list").innerHTML = `<div class="empty">ما فيه أسهم بهذا الفلتر حالياً.</div>`; return; }
-  $("#list").innerHTML = L.map(s => { const [lab,cls] = ST[s.status] || ["-","watch"], p = s.plan, n0 = (s.news||[])[0], le = (s.episodes||[]).slice(-1)[0];
-    const lift = s.e10 != null && s.base_e10 ? (s.e10 / s.base_e10) : null;
+  if (key !== "status" || filt || q) L.sort(S[key]);      // الترتيب الأساسي جاي جاهز من المسح (السيولة أول داخل كل حالة)
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">ما فيه أسهم بهذا الفلتر بالقائمة — جرّب «افحص أي سهم» فوق.</div>`; return; }
+  $("#list").innerHTML = L.map(s => { const [lab,cls] = ST[s.status] || ["-","watch"], n0 = (s.news||[])[0], le = (s.episodes||[]).slice(-1)[0];
+    const a = asAll(s), B = bleed(a), E = expl(a);
     return `<div class="card" style="cursor:pointer" data-s="${esc(s.symbol)}">
       <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
         <div><span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span>
           <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct ?? "-"}%</span>${s.status === "fire" ? ` <span class="note">(الأعلى +<span class="num">${s.jump_today_pct}</span>% فوق الإغلاق اللي قبله)</span>` : ""}
           <div class="name" style="max-width:none"><bdi>${esc(s.name)}</bdi>${s.sector ? " · " + esc(s.sector) : ""}</div></div>
-        <div style="text-align:left"><span class="badge ${cls}">${lab}</span>
-          <div class="note">احتمال انفجار خلال 10 جلسات <b class="num" style="color:var(--text)">${pc(s.e10)}</b>${lift ? ` (<span class="num">${lift.toFixed(1)}</span> ضعف الأساس)` : ""}</div></div>
+        <div style="text-align:left"><span class="badge ${cls}">${lab}</span>${s.pick ? ` <span class="badge near">🎯 أقوى 3</span>` : ""}
+          <div class="note">🧨 انفجار خلال 10 جلسات <b class="num" style="color:var(--text)">${E ? P0(E.e10) : "-"}</b> · 🩸 يلمس −30% <b class="num" style="color:${B ? BCOL[B.lv] : "inherit"}">${B ? P0(B.rate) : "-"}</b></div></div>
       </div>
       ${fpChips(s)}
       <div class="facts" style="margin-top:8px">
@@ -313,12 +544,7 @@ function render(){
         <span>الفلووت: <b class="num">${fM(s.float)}</b></span><span>القيمة: <b class="num">${fM(s.market_cap)}</b></span>
         <span>الشورت المتاح: <b class="num">${s.short != null ? fM(s.short) : "؟"}</b></span><span>سيولة يومية: <b class="num">$${fM(s.dv20)}</b></span>
       </div>
-      <div class="facts" style="margin-top:6px">
-        <span>شراء Stop: <b class="num">${fp(p.trigger)}</b> (+${Math.round((PL.trig||0.15)*100)}% باليوم التالي)</span>
-        <span>بيع: <b class="num" style="color:var(--good)">${fp(p.t1)}</b> (+${Math.round(PL.t1*100)}% من الدخول)</span>
-        <span>الوقف (إغلاق): <b class="num" style="color:var(--bad)">${fp(p.stop)}</b> (−${Math.round(PL.stop*100)}%)</span>
-        <span>المدة: <b class="num">${p.days}</b> جلسات · الحجم ≈ <b class="num">${p.size_pct}%</b> من المحفظة</span>
-      </div>
+      ${B ? `<div class="left" style="color:${BCOL[B.lv]}">🩸 خطر النزيف ${BL[B.lv][0]}: <span class="num">${P0(B.rate)}</span> من أمثاله لمست −30% خلال 20 جلسة · وسيط نتيجتهم <span class="num">${SP(B.med)}</span> · <span class="num">${P0(B.up30)}</span> طلعت +30%</div>` : ""}
       ${warnLines(s)}
       ${n0 ? `<div class="left">${sentBadge(n0)} ${esc(n0.title_ar || n0.title)}</div>` : ""}
       <div class="note" style="margin-top:4px">اضغط للتفاصيل ▾</div>
@@ -326,13 +552,13 @@ function render(){
   document.querySelectorAll("#list .card").forEach(el => el.onclick = () => toggle(el));
 }
 function toggle(el){
-  const s = stocks.find(x => x.symbol === el.dataset.s); const ex = el.querySelector(".more");
+  const s = SHOWN[el.dataset.s]; const ex = el.querySelector(".more");
   if (ex){ ex.remove(); return; }
   const d = document.createElement("div"); d.className = "more"; d.style.marginTop = "10px"; d.onclick = e => e.stopPropagation();
-  const eps = s.episodes || [];
-  d.innerHTML = `${chart(s)}
-    <div class="legend"><span>▼ = يوم انفجار (×2)</span><span><i style="background:var(--warn)"></i>شراء Stop</span><span><i style="background:var(--good)"></i>البيع</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--info)"></i>أدنى 20 جلسة</span></div>
-    <div class="setupbox"><div class="t">ليش الاحتمال كذا؟ (أقوى العوامل)</div><ul class="clean note" style="margin-top:4px">${(s.why||[]).map(([f,v]) => `<li>${esc(FN[f]||f)}: ${v > 0 ? "يرفع" : "ينزّل"} <span class="num">(${v > 0 ? "+" : ""}${v})</span></li>`).join("")}</ul></div>
+  const eps = s.episodes || [], why = (L, t) => (L||[]).length ? `<div class="setupbox"><div class="t">${t}</div><ul class="clean note" style="margin-top:4px">${L.map(([f,v]) => `<li>${esc(FN[f]||f)}: ${v > 0 ? "يرفع" : "ينزّل"} <span class="num">(${v > 0 ? "+" : ""}${v})</span></li>`).join("")}</ul></div>` : "";
+  d.innerHTML = `<div class="note" style="margin-bottom:4px">آخر <span class="num">${Math.min(s.chart.c.length, window.innerWidth < 600 ? 60 : s.chart.c.length)}</span> جلسة</div>${chart(s)}
+    <div class="legend"><span>▼ = يوم انفجار (×2)</span><span><i style="background:var(--good)"></i>+${Math.round(TK.limit * 100)}% من السعر الحالي</span><span><i style="background:var(--info)"></i>أدنى 20 جلسة</span></div>
+    <div class="grid2" style="margin-top:8px">${why(s.why, "🧨 ليش احتمال الانفجار كذا؟")}${why(s.why_b, "🩸 ليش خطر النزيف كذا؟")}</div>
     ${eps.length ? `<div class="setupbox"><div class="t">انفجاراته (من إغلاق اليوم اللي قبله)</div><div style="overflow-x:auto"><table class="note num" style="width:100%;border-collapse:collapse;margin-top:4px">
       <tr><th style="text-align:right">التاريخ</th><th>قبله</th><th>أعلى</th><th>×</th><th>أعلى 5 أيام</th><th>بعد 5</th><th>بعد 20</th></tr>
       ${eps.slice().reverse().map(e => `<tr><td style="text-align:right">${esc(e.date)}</td><td>${fp(e.pre)}</td><td>${fp(e.high)}</td><td>${e.mag}</td><td>+${e.pk5}%</td><td>${e.c5 == null ? "-" : e.c5 + "%"}</td><td>${e.c20 == null ? "-" : e.c20 + "%"}</td></tr>`).join("")}

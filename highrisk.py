@@ -4,8 +4,11 @@
 - **انفجار حقيقي** = أعلى سعر باليوم ≥ ضعف إغلاق اليوم اللي قبله **و** تداول ذاك اليوم ≥ نص مليون دولار
   (النسخة الأولى كانت تحسب صفقة شاذة بسهم ما فيه تداول «انفجار» — يتوقعها النموذج بسهولة وما تنشرى).
 - الميزات بنافذة ثابتة (آخر 252 جلسة) عشان الرادار الحي (420 يوم) يطابق الدراسة (7 سنين) بالضبط.
-- 🌡 ميزان حرارة سوق الطيارات: مؤشرات على كل السوق (`market_frame` لكل سهم ← تتجمع ← `regime_series`).
-نفس هالملف تستخدمه الدراسة `diag/backtest_highrisk2.py` (فرع diag-flye) والرادار الحي — مصدر واحد.
+- السعر الحقيقي ذاك اليوم (`raw_factor`): بيانات Alpaca معدّلة للتقسيم، فالسعر القديم لسهم قسّم عكسي يطلع مضخّم.
+- 🩸 نموذج النزيف (نفس الميزات + زخم أطول m60/m120/m250): احتمال يلمس −30% خلال 20 جلسة — `score()["pb"]`.
+- 🌡 ميزان حرارة السوق (`market_frame` ← `regime_series`): **انختبر وما فاد** (ولا مؤشر يفرّق الفترات الرابحة) ← ما ينعرض؛
+  الدوال باقية بس عشان الدراسة `diag/backtest_highrisk2.py`.
+نفس هالملف تستخدمه الدراسات `diag/backtest_highrisk2.py` و `backtest_highrisk3.py` (فرع diag-flye) والرادار الحي — مصدر واحد.
 ما يغير أي رادار ثاني."""
 from __future__ import annotations
 
@@ -143,6 +146,9 @@ def features(d: pd.DataFrame) -> pd.DataFrame:
         "hl_up": hl_up, "gap20": gap20, "rs_recent": (days_rs <= 60).astype(float), "n_rs": n_rs,
         "l_days_rs": np.log1p(np.minimum(days_rs, 1000)),
         "ret1": np.clip(c / pc - 1, -0.9, 3), "closepos1": rngd, "rng1": np.clip((h - l) / np.maximum(pc, 1e-9), 0, 3),
+        # زخم أطول (لنموذج النزيف 🩸) — نفس معادلات الدراسة بالضبط
+        "m60": np.clip(np.nan_to_num(c / _sh(c, 60) - 1), -1, 5), "m120": np.clip(np.nan_to_num(c / _sh(c, 120) - 1), -1, 8),
+        "m250": np.clip(np.nan_to_num(c / _sh(c, 250) - 1), -1, 10),
     }, index=d.index)
 
 
@@ -224,17 +230,36 @@ def score(row: pd.Series) -> dict | None:
     M = model()
     if not M:
         return None
-    x = np.array([float(row.get(f, np.nan)) for f in M["feats"]])
-    mu, sd = np.array(M["mean"]), np.array(M["std"])
+    fb = M.get("feats_b") or M["feats"]                      # ميزات النزيف = ميزات الانفجار + زخم أطول (نفس المتوسط والانحراف)
+    nE = len(M["feats"])
+    x = np.array([float(row.get(f, np.nan)) for f in fb])
+    mu, sd = np.array(M["mean"])[:len(fb)], np.array(M["std"])[:len(fb)]
     x = np.where(np.isfinite(x), x, mu)
-    z = np.clip((x - mu) / np.where(sd == 0, 1, sd), -5, 5)
+    zb = np.clip((x - mu) / np.where(sd == 0, 1, sd), -5, 5)
+    z = zb[:nE]
     w = np.array(M["w"])
     p = float(1 / (1 + np.exp(-(w[0] + z @ w[1:]))))
     th, tiers = M.get("thresholds") or {}, M.get("tiers") or {}
     tier = "ready" if p >= th.get("ready", 9) else "near" if p >= th.get("near", 9) else None
     T = tiers.get(tier) or {}
     contrib = sorted(((f, float(w[i + 1] * z[i])) for i, f in enumerate(M["feats"])), key=lambda t: -abs(t[1]))
-    return {"p_raw": p, "tier": tier, "e10": T.get("e10"), "e5": T.get("e5"), "base": M.get("base_e10"), "top": contrib[:6]}
+    out = {"p_raw": p, "tier": tier, "e10": T.get("e10"), "e5": T.get("e5"), "base": M.get("base_e10"), "top": contrib[:6],
+           "pb": None, "bleed_top": []}
+    if M.get("wb"):                                          # 🩸 خطر النزيف: احتمال يلمس −30% خلال 20 جلسة
+        wb = np.array(M["wb"])
+        out["pb"] = float(1 / (1 + np.exp(-(wb[0] + zb @ wb[1:]))))
+        out["bleed_top"] = sorted(((f, float(wb[i + 1] * zb[i])) for i, f in enumerate(fb)), key=lambda t: -abs(t[1]))[:5]
+    return out
+
+
+def band(tb: list[dict] | None, v: float | None) -> dict | None:
+    """الشريحة اللي فيها القيمة من جدول المعايرة (lo ≤ v < hi) — لو عينتها قليلة ياخذ أقرب شريحة تحتها فيها أرقام."""
+    if not tb or v is None:
+        return None
+    k = next((i for i, r in enumerate(tb) if r["lo"] <= v < r["hi"]), len(tb) - 1)
+    while k > 0 and "rate" not in tb[k]:
+        k -= 1
+    return tb[k] if "rate" in tb[k] else None
 
 
 def history(d: pd.DataFrame, F: pd.DataFrame) -> dict:
