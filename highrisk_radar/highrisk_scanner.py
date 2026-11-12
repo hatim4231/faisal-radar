@@ -406,15 +406,16 @@ def run(cfg, tickers=None) -> dict:
         # نشط = ينشرى فعلاً (نفس حد الدراسة). وآخر جلسة مكتملة لو فيها ×2 الدراسة ما قيّمتها (ما تترشح 🧨/🟠 ذاك اليوم)
         active = float(lr["Close"]) >= HR.ACT_MIN_PX and dv20 >= HR.ACT_MIN_DV20
         p = sc["p_raw"]
-        st = None
-        if jump >= 1.5 and dvd >= HR.EX_MIN_DV and px >= HR.ACT_MIN_PX:
-            st = "fire"                                  # انطلق (اليوم وقت السوق، وإلا آخر جلسة) بتداول حقيقي
-        elif active and jump_last < 2:
-            st = "ready" if p >= p_ready else "near" if p >= p_near else None
+        # tier = تصنيف الدراسة (على آخر جلسة مكتملة؛ اللي فيها ×2 الدراسة ما قيّمتها) — منه «أقوى 3» وسجل الصدق.
+        # status = اللي ينعرض: 🔥 يغطي على التصنيف (انطلق اليوم وقت السوق، وإلا آخر جلسة) بتداول حقيقي.
+        tier = None
+        if active and jump_last < 2:
+            tier = "ready" if p >= p_ready else "near" if p >= p_near else None
+        st = "fire" if (jump >= 1.5 and dvd >= HR.EX_MIN_DV and px >= HR.ACT_MIN_PX) else tier
         if st is None and active and last["n_ep252"] >= 2:
             st = "watch"
         rows_all.append({"t": t, "d": d if st else None, "F": F if st else None, "last": last, "sc": sc, "jump": jump,
-                         "status": st, "active": active, "px": px, "chg": (px / prev - 1) * 100 if prev > 0 else None,
+                         "status": st, "tier": tier, "active": active, "px": px, "chg": (px / prev - 1) * 100 if prev > 0 else None,
                          "dv20": dv20, "short_hist": nfull < 260, "date": str(d.index[-1])[:10],
                          "sig_date": str(lr.name)[:10], "sig_close": float(lr["Close"])})
     n_scanned = len(rows_all)
@@ -423,13 +424,13 @@ def run(cfg, tickers=None) -> dict:
     sig_date = max(x["sig_date"] for x in rows_all)      # آخر جلسة مكتملة
     for x in rows_all:
         x["stale"] = x["sig_date"] < sig_date            # ما تداول بآخر جلسة ← ما يترشح (الدراسة تختار من أسهم ذاك اليوم بس)
-        if x["stale"] and x["status"]:
-            x.update(status=None, d=None, F=None)
+        if x["stale"]:
+            x.update(status=None, tier=None, d=None, F=None)
     liq_ok = lambda x: x["dv20"] >= LIQ
     key = {"fire": lambda x: -x["jump"], "ready": lambda x: (not liq_ok(x), -x["sc"]["p_raw"]),
            "near": lambda x: (not liq_ok(x), -x["sc"]["p_raw"]), "watch": lambda x: -x["sc"]["p_raw"]}
     # 🎯 أقوى 3 للمراقبة = نفس مجموعة «أعلى 3 كل يوم» بالدراسة: أعلى احتمال بسيولة ≥ 30 ألف$ (وتاريخ كامل، وما انفجر بآخر جلسة)
-    cand = sorted((x for x in rows_all if x["status"] == "ready" and liq_ok(x) and not x["short_hist"]), key=lambda x: -x["sc"]["p_raw"])
+    cand = sorted((x for x in rows_all if x["tier"] == "ready" and liq_ok(x) and not x["short_hist"]), key=lambda x: -x["sc"]["p_raw"])
     picks = [x["t"] for x in cand[:3]]
     shown = []
     for k in ("fire", "ready", "near", "watch"):
@@ -455,7 +456,7 @@ def run(cfg, tickers=None) -> dict:
                "jump_today_pct": _r((x["jump"] - 1) * 100, 1), "status": x["status"], "status_ar": ST_AR[x["status"]],
                "market_cap": inf.get("marketCap"), "float": inf.get("floatShares"), "short": sv, "short_src": short_src,
                "dv20": _r(x["dv20"], 0), "vol20": int(d["Volume"].tail(20).mean()), "date": x["date"],
-               "p_raw": _r(sc["p_raw"], 4), "pb": _r(sc["pb"], 3), "liq": bool(liq_ok(x)),
+               "p_raw": _r(sc["p_raw"], 4), "pb": _r(sc["pb"], 3), "liq": bool(liq_ok(x)), "tier": x["tier"],
                "why": [[f, _r(v, 3)] for f, v in sc["top"]], "why_b": [[f, _r(v, 3)] for f, v in sc["bleed_top"]],
                "fp": {k: _r(last[k], 3) for k in ("vol5_60", "vol1_20", "atr5_60", "rng20", "pos60", "dd252", "ret5", "ret20",
                                                      "rsi", "closepos10", "upv10", "obv20", "hl_up", "base_ratio", "from_peak")},
@@ -527,7 +528,7 @@ def run(cfg, tickers=None) -> dict:
             rr = [x for x in rows_all if x["active"] and liq_ok(x) and RADAR_LO <= x["sig_close"] <= RADAR_HI and x["sc"]["pb"] is not None]
             added = sb.add_day(sig_date, [{"s": t, "c": _r(by[t]["sig_close"]), "p": _r(by[t]["sc"]["p_raw"], 4), "pb": _r(by[t]["sc"]["pb"], 3)}
                                           for t in picks],
-                               [x["t"] for x in rows_all if x["status"] == "ready"],
+                               [x["t"] for x in rows_all if x["tier"] == "ready"],
                                [x["t"] for x in rr if 0.25 <= x["sc"]["pb"] < 0.40], [x["t"] for x in rr if x["sc"]["pb"] >= 0.40])
             if added:
                 log(f"[عالي مخاطرة] 📒 سجل الصدق: انضاف يوم {sig_date}")
