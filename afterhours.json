@@ -232,6 +232,38 @@
    "r10": "hit",
    "r15": "hit",
    "result": "t2"
+  },
+  {
+   "symbol": "CURI",
+   "D": "2026-11-11",
+   "close": 2.36,
+   "ah_high": 2.79,
+   "ah_last": 2.73,
+   "ah_vwap": 2.691,
+   "jump_pct": 18.2,
+   "hold_pct": 86,
+   "ah_vol": 945406,
+   "rth_vol": 858623,
+   "limit": 2.691,
+   "name": "CuriosityStream Inc.",
+   "price": 2.73,
+   "float": 40602639,
+   "short": 600000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "الشورت 600,000 فوق 50,000"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 2.9601,
+   "t2": 3.0946,
+   "stop": 2.4219,
+   "pm_min_vol": 66178
   }
  ],
  "fire_sent": []
