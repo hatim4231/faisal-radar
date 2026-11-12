@@ -166,12 +166,16 @@ def job(args):
 
     Dint = d.index.strftime("%Y%m%d").astype(int).to_numpy(np.int32)
     dv20 = np.nan_to_num(F["dv20"].to_numpy(float))
-    cols = {"t": sym, "D": Dint, "close": c, "dv20": dv20}
+    praw = F["praw"].to_numpy(float)
+    sh = HR._sh
+    cols = {"t": sym, "D": Dint, "close": c, "praw": praw, "dv20": dv20,
+            "m60": np.clip(np.nan_to_num(c / sh(c, 60) - 1), -1, 5), "m120": np.clip(np.nan_to_num(c / sh(c, 120) - 1), -1, 8),
+            "m250": np.clip(np.nan_to_num(c / sh(c, 250) - 1), -1, 10)}
     for f_ in FEATS:
         cols[f_] = F[f_].to_numpy(float)
     cols.update({"E5": E5, "E10": E10, "E20": E20, "mx5": mx5, "mx10": mx10, "mx20": mx20, "dd20": dd20, "trg15": trg15.astype(float)})
     cols.update(P)
-    keep = (idx >= 260) & (idx <= n - H - 1) & (idx % 2 == 0) & (c >= HR.ACT_MIN_PX) & (dv20 >= HR.ACT_MIN_DV20) & ~ex_raw
+    keep = (idx >= 260) & (idx <= n - H - 1) & (idx % 2 == 0) & (praw >= HR.ACT_MIN_PX) & (dv20 >= HR.ACT_MIN_DV20) & ~ex_raw
     rows = pd.DataFrame(cols)[keep]
     for col in rows.columns:
         if rows[col].dtype == np.float64:
@@ -180,7 +184,7 @@ def job(args):
     r1 = c / pc - 1
     evm = (idx >= 60) & (idx <= n - 7) & (ex | ((r1 >= 0.3) & (dvd >= 1e6))) & (np.nan_to_num(pc) >= HR.ACT_MIN_PX)
     E = np.flatnonzero(evm)
-    ev = pd.DataFrame({"t": sym, "D": Dint[E], "pc": pc[E], "close": c[E], "r1": r1[E], "jump": jump[E], "isex": ex[E].astype(float),
+    ev = pd.DataFrame({"t": sym, "D": Dint[E], "pc": (pc * (praw / np.maximum(c, 1e-12)))[E], "close": c[E], "praw": praw[E], "r1": r1[E], "jump": jump[E], "isex": ex[E].astype(float),
                        "cp": F["closepos1"].to_numpy(float)[E], "vol": F["vol1_20"].to_numpy(float)[E], "dvd": dvd[E],
                        "n_prior": F["n_ep252"].to_numpy(float)[np.maximum(E - 1, 0)], "dd_prior": F["dd252"].to_numpy(float)[np.maximum(E - 1, 0)],
                        "gap": (o / pc - 1)[E], "on1": (o1 / c - 1)[E], "hi1": (h1 / c - 1)[E], "lo1": (l1 / c - 1)[E], "c1": (c1 / c - 1)[E],
@@ -190,7 +194,8 @@ def job(args):
             "raw": {int(y): int(k) for y, k in zip(*np.unique(yr[ex_raw], return_counts=True))},
             "real": {int(y): int(k) for y, k in zip(*np.unique(yr[ex], return_counts=True))},
             "raw_dv": [float(x) for x in dvd[ex_raw]]}
-    return rows, (Dint, mk.to_numpy(np.float32)), ev, info
+    path = (Dint, o.astype(np.float32), h.astype(np.float32), l.astype(np.float32), c.astype(np.float32))
+    return rows, (Dint, mk.to_numpy(np.float32)), ev, info, path
 
 
 def fit_logit(X, y, lam=5.0, iters=40):
@@ -249,7 +254,8 @@ def pr(x, d=1):
 
 def net_cols(G):
     """عوائد الخطط بعد التكاليف: ذهاب وعودة 4% تحت 1$ · 2% تحت 5$ · 1% فوقها (+1% لأوامر Stop)."""
-    cost = np.where(G["close"].to_numpy(float) < 1, 0.04, np.where(G["close"].to_numpy(float) < 5, 0.02, 0.01))
+    px = G["praw"].to_numpy(float)
+    cost = np.where(px < 1, 0.04, np.where(px < 5, 0.02, 0.01))
     X = pd.DataFrame({p: G[p].to_numpy(float) - cost - (0.01 if p in STOP_PL else 0) for p in PL})
     X["D"] = G["D"].to_numpy()
     return X
@@ -315,7 +321,7 @@ def main():
             for res in ex.map(job, jobs, chunksize=4):
                 if res is None:
                     continue
-                rows, (Dm, vals), ev, info = res
+                rows, (Dm, vals), ev, info = res[:4]
                 pos = np.searchsorted(calD, Dm)
                 ok = (pos < len(calD)) & (calD[np.minimum(pos, len(calD) - 1)] == Dm)
                 ACC[pos[ok]] += vals[ok]
@@ -413,7 +419,7 @@ def main():
     T = df[df.p.notna()].copy()
     del df
     T["vq"] = pd.qcut(T["atr20p"].rank(method="first"), 5, labels=False)
-    T["pq"] = pd.cut(T["close"], [0, 1, 5, 1e9], labels=False)
+    T["pq"] = pd.cut(T["praw"], [0, 1, 5, 1e9], labels=False)
     T["liq"] = T.dv20 >= LIQ
     T["rkL"] = T[T.liq].groupby("D").p.rank(ascending=False, method="first")
     Bm = T.liq & (T.p >= T.q99) & (T.vol1_20 >= 2)
@@ -442,7 +448,7 @@ def main():
             print(f"  {GA[k]}: عدد قليل ({len(g)})")
             continue
         print(f"  {GA[k]}: n={len(g):,} · خلال 5 {pr(g.E5.mean())} ({pr(matched(g, base_e, 'E5'))}) · خلال 10 {pr(g.E10.mean())} ({pr(matched(g, base_e, 'E10'))})"
-              f" · +50% خلال 10 {pr((g.mx10 >= 0.5).mean())} · −30% خلال 20 {pr((g.dd20 <= -0.3).mean())} · وسيط السعر {g.close.median():.2f}$ · وسيط السيولة {g.dv20.median():,.0f}$")
+              f" · +50% خلال 10 {pr((g.mx10 >= 0.5).mean())} · −30% خلال 20 {pr((g.dd20 <= -0.3).mean())} · وسيط السعر الحقيقي {g.praw.median():.2f}$ · وسيط السيولة {g.dv20.median():,.0f}$")
     print("\nبكل سنة — أعلى 3 كل يوم: انفجر خلال 10 (المماثل) · وأعلى 10:")
     for Y, g in G["top3"].groupby("Y"):
         g10 = G["top10"][G["top10"].Y == Y]
@@ -587,7 +593,7 @@ def main():
     if len(ev):
         ev = ev.replace([np.inf, -np.inf], np.nan).dropna(subset=["on1", "c1", "hi1"])
         ev["Y"] = ev.D // 10000
-        cost = np.where(ev.close < 1, 0.04, np.where(ev.close < 5, 0.02, 0.01))
+        cost = np.where(ev.praw < 1, 0.04, np.where(ev.praw < 5, 0.02, 0.01))
         ev["n_on"] = ev.on1 - cost
         ev["n_d1"] = ev.c1 - cost
         ev["n_L20"] = np.where(ev.on1 >= 0.2, ev.on1, np.where(ev.hi1 >= 0.2, 0.2, ev.c1)) - cost
