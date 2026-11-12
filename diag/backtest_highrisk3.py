@@ -25,6 +25,9 @@ import highrisk as HR
 import backtest_highrisk2 as B2
 from backtest_highrisk2 import job, fit_logit, auc, zs, predict, pr, net_cols, PL, START, FEATS, LIQ
 
+FAST = os.environ.get("DATA_RUN", "") == "fast"      # تشغيل سريع: بدون قسم التداول الممتد (شموع الساعة ~15 دقيقة)
+PB_EDGES = [0, .03, .06, .10, .15, .20, .25, .30, .40, .50, 1.01]
+P_EDGES = [0, .001, .002, .005, .01, .02, .04, .0632, .10, .15, .25, 1.01]
 FB = FEATS + ["m60", "m120", "m250"]            # ميزات نموذج النزيف والنموذج المباشر
 GRID = [(T, S, Hh) for Hh in (5, 10, 20) for T in (0.3, 0.5, 1.0, 2.0) for S in (None, 0.3)]
 
@@ -286,6 +289,49 @@ def main():
     print("  🧨 × 🩸: " + " · ".join(f"{nm} n={len(g):,} يلمس −30% {pr(g.B.mean())} انفجر {pr(g.E10.mean())}" for nm, g in (
         ("🧨 وخطر نزيف عالي (أعلى 10%)", T[(T.p >= T.q99) & (T.bdec == 9)]), ("🧨 وخطر أقل", T[(T.p >= T.q99) & (T.bdec < 9)]))))
 
+    def band_table(g, col, edges):
+        out = []
+        ix = np.digitize(g[col].to_numpy(float), edges) - 1
+        for k in range(len(edges) - 1):
+            x = g[ix == k]
+            rec = {"lo": edges[k], "hi": edges[k + 1], "n": int(len(x))}
+            if len(x) >= 150:
+                rec.update({"p": float(x[col].mean()), "rate": float(x.B.mean()), "dn20": float((x.dd20 <= -0.2).mean()),
+                            "r20_med": float(x.h20.median()), "r20_mean": float(x.h20.mean()), "up30": float((x.mx20 >= 0.3).mean()),
+                            "e5": float(x.E5.mean()), "e10": float(x.E10.mean())})
+            out.append(rec)
+        return out
+
+    def show_bands(title, tb, key="rate"):
+        print(f"  {title}")
+        for r in tb:
+            if "rate" not in r:
+                print(f"    {r['lo']:.3f}-{r['hi']:.3f}: n={r['n']:,} (قليل)")
+                continue
+            print(f"    {r['lo']:.3f}-{r['hi']:.3f}: n={r['n']:,} · متوقع {pr(r['p'], 2)} · يلمس −30% {pr(r['rate'])} · يلمس −20% {pr(r['dn20'])} · وسيط 20 جلسة {pr(r['r20_med'])}"
+                  f" (متوسط {pr(r['r20_mean'])}) · يطلع +30% {pr(r['up30'])} · انفجر خلال 5 {pr(r['e5'], 2)} · خلال 10 {pr(r['e10'], 2)}")
+
+    rr = T[T.liq & (T.praw >= 0.7) & (T.praw <= 10)]
+    rdy = T[T.p >= T.q99]
+    print("\n==== 2ب) معايرة بالشرائح المطلقة (خارج العينة) ====")
+    cal = {"pb_all": band_table(T, "pb", PB_EDGES), "pb_radar": band_table(rr, "pb", PB_EDGES), "pb_ready": band_table(rdy, "pb", PB_EDGES),
+           "p_all": band_table(T, "p", P_EDGES), "p_liq": band_table(T[T.liq], "p", P_EDGES)}
+    show_bands("🩸 كل الأسهم (حسب خطر النزيف):", cal["pb_all"])
+    show_bands("🩸 مجال راداراتنا 0.7-10$ وسيولة ≥ 30 ألف$:", cal["pb_radar"])
+    show_bands("🩸 داخل 🧨 (أعلى 1% انفجار):", cal["pb_ready"])
+    show_bands("🧨 كل الأسهم (حسب احتمال الانفجار):", cal["p_all"])
+    show_bands("🧨 بسيولة ≥ 30 ألف$:", cal["p_liq"])
+    cal["radar_q"] = {str(q): float(rr.pb.quantile(q)) for q in (0.5, 0.75, 0.9, 0.95, 0.99)}
+    cal["all_q"] = {str(q): float(T.pb.quantile(q)) for q in (0.5, 0.75, 0.9, 0.95, 0.99)}
+    cal["radar_base"] = {"rate": float(rr.B.mean()), "dn20": float((rr.dd20 <= -0.2).mean()), "r20_med": float(rr.h20.median()), "n": int(len(rr))}
+    print(f"  حدود 🩸 بمجال راداراتنا: {cal['radar_q']} · كل الأسهم: {cal['all_q']} · أساس المجال: {cal['radar_base']}")
+    for nm, g in (("كل الأسهم", T), ("مجال راداراتنا", rr)):
+        for th_ in (0.25, 0.40):
+            x = g[g.pb >= th_]
+            print(f"  ثبات 🩸 ≥ {th_} — {nm}: " + " · ".join(f"{int(y)}: {pr(v.B.mean())} (n={len(v):,}، أساس {pr(g[g.Y == y].B.mean())})" for y, v in x.groupby("Y")))
+        x = g[g.pb < 0.06]
+        print(f"  ثبات 🩸 < 0.06 — {nm}: " + " · ".join(f"{int(y)}: {pr(v.B.mean())} (n={len(v):,})" for y, v in x.groupby("Y")))
+
     # ---- 3) المجموعات والخطط بعد التكاليف (بالسعر الحقيقي)
     T["rkL"] = T[T.liq].groupby("D").p.rank(ascending=False, method="first")
     G = {"top3": T[T.rkL <= 3], "top10": T[T.rkL <= 10], "q99": T[T.liq & (T.p >= T.q99)]}
@@ -386,62 +432,65 @@ def main():
         by = " ".join(f"{int(y) % 100}:{v * 100:+.1f}" for y, v in X.groupby("Y")[tg].mean().items() if np.isfinite(v))
         print(f"  هدف {tg} · أعلى 3 بسيولة ≥ 300 ألف$: {pr(x.mean())} · وسيط {pr(x.median())} · رابحة {pr((x > 0).mean(), 0)} · [{by}]")
 
-    # ---- 5) قفزات البري والأفتر: تذكرة + أمر بيع Limit شغّال بالتداول الممتد
-    print("\n==== 5) التداول الممتد — نفس الخطة (دخول افتتاح بكرة) بقمم الجلسة بس «عادي» مقابل قمم البري والأفتر «ممتد» (بعد التكاليف) ====", flush=True)
-    wk = T[(T.inq > 0) & (T.vol1_20 >= 2)]
-    wk = wk[wk.groupby("D").p.rank(ascending=False, method="first") <= 3]
-    picks = pd.concat([G["top10"][["t", "D", "praw", "rkL"]], wk[["t", "D", "praw", "rkL"]]])
-    picks = picks[~picks.index.duplicated()].copy()
-    picks["wake"] = picks.index.isin(wk.index)
-    XH = ext_highs(picks, calD, calpos)
-    EV, ratios = ext_eval(picks, PATH, XH)
-    key = pd.MultiIndex.from_arrays([EV.t, EV.D])
-    pk = picks.set_index([picks.t.astype(str), picks.D.astype(int)])
-    EV["rk"] = pk.rkL.reindex(key).to_numpy()
-    EV["wake"] = pk.wake.reindex(key).to_numpy()
-    if len(ratios):
-        print(f"  فحص التطابق: أعلى سعر شموع الساعة (10ص-4م) ÷ أعلى اليومي — وسيط {np.median(ratios):.3f} · 1% {np.quantile(ratios, 0.01):.3f} · 99% {np.quantile(ratios, 0.99):.3f}"
-              f" · فوق 1.02: {pr((ratios > 1.02).mean())} · اختيارات بدون أي شموع ساعة: {pr((EV.has == 0).mean())}")
     ext_json = {}
-    GA["wake3"] = "أعلى 3 من 🧨 صحى فوليومها (≥ 2×)"
-    for gk, g in (("top3", EV[EV.rk <= 3]), ("top10", EV[EV.rk <= 10]), ("wake3", EV[EV.wake == True])):   # noqa: E712
-        if len(g) < 50:
-            print(f"-- {GA[gk]}: n={len(g)} (قليل)")
-            continue
-        print(f"\n-- {GA[gk]} (n={len(g):,}) · أعلى سعر خلال 20 جلسة ≥ +50%: عادي {pr((g.rmax20 >= 0.5).mean())} ← ممتد {pr((g.xmax20 >= 0.5).mean())}"
-              f" · ≥ +100%: {pr((g.rmax20 >= 1).mean())} ← {pr((g.xmax20 >= 1).mean())} · ≥ +200%: {pr((g.rmax20 >= 2).mean())} ← {pr((g.xmax20 >= 2).mean())}")
-        res = []
-        for T_, S, Hh in GRID:
-            k_ = f"{T_}:{S}:{Hh}"
-            res.append((float((g["x:" + k_] - g.cost).mean()), T_, S, Hh))
-        res.sort(key=lambda z_: -z_[0])
-        ext_json[gk] = {}
-        for xm, T_, S, Hh in res:
-            k_ = f"{T_}:{S}:{Hh}"
-            r, x, z = g["r:" + k_] - g.cost, g["x:" + k_] - g.cost, g["z:" + k_] - g.cost
+    if not FAST:
+        # ---- 5) قفزات البري والأفتر: تذكرة + أمر بيع Limit شغّال بالتداول الممتد
+        print("\n==== 5) التداول الممتد — نفس الخطة (دخول افتتاح بكرة) بقمم الجلسة بس «عادي» مقابل قمم البري والأفتر «ممتد» (بعد التكاليف) ====", flush=True)
+        wk = T[(T.inq > 0) & (T.vol1_20 >= 2)]
+        wk = wk[wk.groupby("D").p.rank(ascending=False, method="first") <= 3]
+        picks = pd.concat([G["top10"][["t", "D", "praw", "rkL"]], wk[["t", "D", "praw", "rkL"]]])
+        picks = picks[~picks.index.duplicated()].copy()
+        picks["wake"] = picks.index.isin(wk.index)
+        XH = ext_highs(picks, calD, calpos)
+        EV, ratios = ext_eval(picks, PATH, XH)
+        key = pd.MultiIndex.from_arrays([EV.t, EV.D])
+        pk = picks.set_index([picks.t.astype(str), picks.D.astype(int)])
+        EV["rk"] = pk.rkL.reindex(key).to_numpy()
+        EV["wake"] = pk.wake.reindex(key).to_numpy()
+        if len(ratios):
+            print(f"  فحص التطابق: أعلى سعر شموع الساعة (10ص-4م) ÷ أعلى اليومي — وسيط {np.median(ratios):.3f} · 1% {np.quantile(ratios, 0.01):.3f} · 99% {np.quantile(ratios, 0.99):.3f}"
+                  f" · فوق 1.02: {pr((ratios > 1.02).mean())} · اختيارات بدون أي شموع ساعة: {pr((EV.has == 0).mean())}")
+        GA["wake3"] = "أعلى 3 من 🧨 صحى فوليومها (≥ 2×)"
+        for gk, g in (("top3", EV[EV.rk <= 3]), ("top10", EV[EV.rk <= 10]), ("wake3", EV[EV.wake == True])):   # noqa: E712
+            if len(g) < 50:
+                print(f"-- {GA[gk]}: n={len(g)} (قليل)")
+                continue
+            print(f"\n-- {GA[gk]} (n={len(g):,}) · أعلى سعر خلال 20 جلسة ≥ +50%: عادي {pr((g.rmax20 >= 0.5).mean())} ← ممتد {pr((g.xmax20 >= 0.5).mean())}"
+                  f" · ≥ +100%: {pr((g.rmax20 >= 1).mean())} ← {pr((g.xmax20 >= 1).mean())} · ≥ +200%: {pr((g.rmax20 >= 2).mean())} ← {pr((g.xmax20 >= 2).mean())}")
+            res = []
+            for T_, S, Hh in GRID:
+                k_ = f"{T_}:{S}:{Hh}"
+                res.append((float((g["x:" + k_] - g.cost).mean()), T_, S, Hh))
+            res.sort(key=lambda z_: -z_[0])
+            ext_json[gk] = {}
+            for xm, T_, S, Hh in res:
+                k_ = f"{T_}:{S}:{Hh}"
+                r, x, z = g["r:" + k_] - g.cost, g["x:" + k_] - g.cost, g["z:" + k_] - g.cost
+                by = " ".join(f"{int(y) % 100}:{v * 100:+.1f}" for y, v in x.groupby(g.Y).mean().items())
+                hitx = float((g["x:" + k_] >= T_ - 1e-9).mean())
+                hitr = float((g["r:" + k_] >= T_ - 1e-9).mean())
+                print(f"   هدف +{int(T_ * 100)}% · وقف {('−' + str(int(S * 100)) + '%') if S else 'بدون'} · {Hh} جلسة: عادي {pr(r.mean())} ← ممتد {pr(x.mean())} (أشد {pr(z.mean())})"
+                      f" · وسيط {pr(x.median())} · رابحة {pr((x > 0).mean(), 0)} · وصل الهدف {pr(hitr, 0)} ← {pr(hitx, 0)} · [{by}]")
+                ext_json[gk][k_] = {"reg": float(r.mean()), "ext": float(x.mean()), "strict": float(z.mean()), "med": float(x.median()), "win": float((x > 0).mean()),
+                                    "hit_r": hitr, "hit_x": hitx, "n": int(len(g)), "by": {int(y): float(v) for y, v in x.groupby(g.Y).mean().items()}}
+            r, x, z = g["r:lad"] - g.cost, g["x:lad"] - g.cost, g["z:lad"] - g.cost
             by = " ".join(f"{int(y) % 100}:{v * 100:+.1f}" for y, v in x.groupby(g.Y).mean().items())
-            hitx = float((g["x:" + k_] >= T_ - 1e-9).mean())
-            hitr = float((g["r:" + k_] >= T_ - 1e-9).mean())
-            print(f"   هدف +{int(T_ * 100)}% · وقف {('−' + str(int(S * 100)) + '%') if S else 'بدون'} · {Hh} جلسة: عادي {pr(r.mean())} ← ممتد {pr(x.mean())} (أشد {pr(z.mean())})"
-                  f" · وسيط {pr(x.median())} · رابحة {pr((x > 0).mean(), 0)} · وصل الهدف {pr(hitr, 0)} ← {pr(hitx, 0)} · [{by}]")
-            ext_json[gk][k_] = {"reg": float(r.mean()), "ext": float(x.mean()), "strict": float(z.mean()), "med": float(x.median()), "win": float((x > 0).mean()),
-                                "hit_r": hitr, "hit_x": hitx, "n": int(len(g)), "by": {int(y): float(v) for y, v in x.groupby(g.Y).mean().items()}}
-        r, x, z = g["r:lad"] - g.cost, g["x:lad"] - g.cost, g["z:lad"] - g.cost
-        by = " ".join(f"{int(y) % 100}:{v * 100:+.1f}" for y, v in x.groupby(g.Y).mean().items())
-        print(f"   سلّم ثلث عند +50/+100/+200% بدون وقف 20 جلسة: عادي {pr(r.mean())} ← ممتد {pr(x.mean())} (أشد {pr(z.mean())}) · وسيط {pr(x.median())} · [{by}]")
-        ext_json[gk]["lad"] = {"reg": float(r.mean()), "ext": float(x.mean()), "strict": float(z.mean()), "by": {int(y): float(v) for y, v in x.groupby(g.Y).mean().items()}}
-        xm, T_, S, Hh = res[0]                      # أفضل خطة ممتدة: حسب شريحة السعر الحقيقي
-        k_ = f"{T_}:{S}:{Hh}"
-        x, r = g["x:" + k_] - g.cost, g["r:" + k_] - g.cost
-        for nm, m in (("تحت 1$", g.px < 1), ("1-5$", (g.px >= 1) & (g.px < 5)), ("فوق 5$", g.px >= 5)):
-            if m.sum() >= 30:
-                print(f"   أفضل خطة (+{int(T_ * 100)}%/{S}/{Hh}) — {nm}: n={int(m.sum())} · ممتد {pr(x[m].mean())} · عادي {pr(r[m].mean())}")
+            print(f"   سلّم ثلث عند +50/+100/+200% بدون وقف 20 جلسة: عادي {pr(r.mean())} ← ممتد {pr(x.mean())} (أشد {pr(z.mean())}) · وسيط {pr(x.median())} · [{by}]")
+            ext_json[gk]["lad"] = {"reg": float(r.mean()), "ext": float(x.mean()), "strict": float(z.mean()), "by": {int(y): float(v) for y, v in x.groupby(g.Y).mean().items()}}
+            xm, T_, S, Hh = res[0]                      # أفضل خطة ممتدة: حسب شريحة السعر الحقيقي
+            k_ = f"{T_}:{S}:{Hh}"
+            x, r = g["x:" + k_] - g.cost, g["r:" + k_] - g.cost
+            for nm, m in (("تحت 1$", g.px < 1), ("1-5$", (g.px >= 1) & (g.px < 5)), ("فوق 5$", g.px >= 5)):
+                if m.sum() >= 30:
+                    print(f"   أفضل خطة (+{int(T_ * 100)}%/{S}/{Hh}) — {nm}: n={int(m.sum())} · ممتد {pr(x[m].mean())} · عادي {pr(r[m].mean())}")
 
     model = {"version": "hr3-" + datetime.now(timezone.utc).strftime("%Y%m%d"), "feats": FEATS, "w": [float(x) for x in w_f],
              "feats_b": FB, "wb": [float(x) for x in wb_f], "mean": [float(x) for x in mu_f], "std": [float(x) for x in sd_f],
              "thresholds": thr_f, "tiers": tiers, "bleed_cal": bcal, "pb_q": pb_q, "liq": LIQ,
              "base_e10": float(T.E10.mean()), "base_e5": float(T.E5.mean()), "base_bleed": float(T.B.mean()),
-             "n_rows": int(len(T)), "period": [int(T.D.min()), int(T.D.max())], "direct": direct, "ext": ext_json}
+             "n_rows": int(len(T)), "period": [int(T.D.min()), int(T.D.max())], "direct": direct, "ext": ext_json, "cal": cal,
+             "top3_year": {int(y): {"e10": float(g.E10.mean()), "e5": float(g.E5.mean()), "bleed": float(g.B.mean()), "n": int(len(g))}
+                           for y, g in G["top3"].groupby("Y")}}
     js = json.dumps(model, ensure_ascii=False)
     print("HR3_BEGIN")
     for k in range(0, len(js), 900):
