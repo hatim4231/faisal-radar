@@ -44,12 +44,17 @@ NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", 
 #   (من 2026-11-12 — عالي مخاطرة 2: الرادار ما عاد يرسل توصيات هنا (ما يحط track/trigger)؛ سجله صار «سجل الصدق» بصفحته
 #    trackdata/highrisk_log.json. اللي تحت يكمل توصيات الخطة القديمة المفتوحة بس.)
 MUTED = {"accumulation", "schools", "runners", "faisal_dil", "highrisk"}
+# قرار المستخدم (2026-11-13): «أعطني الأسهم الجاهزة» — رادار «الجاهزة» (ready_radar) يرتب فيصل المطوّر + الأصلي + عبدالله
+# ويطلع أعلى 3 (🎯 ثبات + 🚀 طيران). تيليجرام يرسل بس الجاهزة؛ الباقي يبقى بالسجل (للصدق والصفحات). ready_picks.json
+# يكتبه رادار الجاهزة قبل tracker. لو الملف ناقص (تعطل) = نرجع للسلوك القديم (نرسل الكل) عشان ما نطنّش تنبيه بالغلط.
+GATED = {"faisal_dev", "faisal_orig", "abdullah"}
 WIN = ("t1", "t2", "t1_then_stop", "t1_expired")
 
 
 def is_muted(t: dict) -> bool:
-    """بدون تيليجرام: الرادارات الصامتة، وتوصيات فيصل المطوّر بثقة منخفضة (قرار المستخدم — تنحفظ بالسجل بس)."""
-    return t.get("radar") in MUTED or (t.get("radar") == "faisal_dev" and t.get("conf_label") == "منخفضة")
+    """بدون تيليجرام: الرادارات الصامتة، فيصل المطوّر بثقة منخفضة، واللي مو «جاهزة» من الرادارات المرتبة (قرار المستخدم)."""
+    return (t.get("radar") in MUTED or (t.get("radar") == "faisal_dev" and t.get("conf_label") == "منخفضة")
+            or t.get("tg") is False)
 
 
 def open_trades(radar: str) -> dict[str, dict]:
@@ -379,6 +384,16 @@ def run():
         log(f"تنظيف عالي مخاطرة (مرة وحدة): انشال {n0 - len(track['trades'])} توصية")
     trades = track["trades"]
     new_events = []
+    # 🎯 الجاهزة: أي (رادار، سهم) اختاره رادار الجاهزة اليوم → بس هذي ترسل تيليجرام من الرادارات المرتبة (قرار المستخدم)
+    rp = load(ROOT / "output" / "ready_picks.json", None)
+    ready_ok = rp is not None
+    ready_pick = {}
+    for p in (rp or {}).get("picks", []):
+        ready_pick.setdefault((p["radar"], p["symbol"]), {"flavors": [], "tier": 0})
+        ready_pick[(p["radar"], p["symbol"])]["flavors"].append(p["flavor"])
+        ready_pick[(p["radar"], p["symbol"])]["tier"] = max(ready_pick[(p["radar"], p["symbol"])]["tier"], p.get("tier", 0))
+    if ready_ok:
+        log(f"🎯 الجاهزة: {len(ready_pick)} اختيار يرسل تيليجرام (الباقي من فيصل/عبدالله يبقى بالسجل)")
     migrated = migrate_stops(track)
     if migrated:
         new_events.append(f"🔁 أعدت حساب {migrated} توصية (فيصل المطوّر وعبدالله) بالوقف الجديد: "
@@ -405,6 +420,11 @@ def run():
             t = {"id": f"{key}:{s['symbol']}:{s['date']}", "radar": key, "radar_name": name, "sub1": s["entry"] < 1,
                  "opened_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "result": "open",
                  "horizon": HORIZON.get(key, MAX_SESSIONS), **s}
+            if key in GATED and ready_ok:         # من الرادارات المرتبة: ترسل تيليجرام بس إذا اختارها رادار الجاهزة
+                rpk = ready_pick.get((key, s["symbol"]))
+                t["tg"] = rpk is not None
+                if rpk:
+                    t["ready_flavor"], t["ready_tier"] = rpk["flavors"], rpk["tier"]
             if any(x["id"] == t["id"] for x in trades):
                 continue
             twins = t.pop("twins", None) or []
@@ -443,8 +463,13 @@ def run():
                           f"لما ما تنجح {miss * 100:.0f}% · المدة {t.get('horizon', 20)} جلسات") \
                     if sim.get("hit") is not None and sim.get("avg_win") is not None and miss is not None else ""
                 warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}{simtxt}" + warn
+            TIER_AR = {1: "أعلى 20%", 2: "أعلى 10%", 3: "أعلى 5%", 4: "أعلى 2%"}
+            head = f"🔔 توصية جديدة — {name}"
+            if t.get("ready_flavor"):
+                fl = " + ".join({"steady": "🎯 ثبات", "runner": "🚀 طيران"}[x] for x in t["ready_flavor"])
+                head = f"🎯 جاهزة ({fl}) — {name}" + (f" · {TIER_AR.get(t.get('ready_tier'), '')}" if t.get("ready_tier") else "")
             new_events.append(
-                f"🔔 توصية جديدة — {name}\n{s['label']} {s.get('flag') or ''} <b>{s['symbol']}</b> ({s.get('name') or ''})"
+                f"{head}\n{s['label']} {s.get('flag') or ''} <b>{s['symbol']}</b> ({s.get('name') or ''})"
                 + (f" · {s['country_ar']}" if s.get("country_ar") else "") + "\n"
                 f"السعر {fp(s['entry'])} · الوقف {fp(s['stop'])} · الهدف 1 {fp(s['t1'])}"
                 + (f" · الهدف 2 {fp(s['t2'])}" if s.get("t2") else "") + f"\n{s['why']}{warn}")

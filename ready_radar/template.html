@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>🎯 الجاهزة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --info:#5b5bd6; --info-bg:#ececfd;
+  --up:#16a36a; --down:#e04848; --ma20:#e39a1c; --ma50:#7c5cd6; --zone:rgba(19,149,92,.13);
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+    --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+  --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Twemoji Country Flags","IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.demo{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{outline:2px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;background:var(--panel2);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:inherit;padding:6px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
+input[type=search]{flex:1;min-width:140px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;display:grid;grid-template-columns:150px 1fr 210px;gap:14px;align-items:center}
+.row:hover{border-color:var(--accent)}
+.sym{font-weight:700;font-size:17px}
+.name{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.px{font-size:14px}
+.up{color:var(--up)} .down{color:var(--down)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:600}
+.left{font-size:13px;margin-top:5px}
+.left .k{color:var(--warn);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.tag.g{background:var(--good-bg);color:var(--good);border-color:transparent}
+.tag.w{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.tag.b{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag.i{background:var(--info-bg);color:var(--info);border-color:transparent}
+.score{display:flex;flex-direction:column;gap:5px}
+.score .top{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.badge.ready{background:var(--good-bg);color:var(--good)}
+.badge.near{background:var(--warn-bg);color:var(--warn)}
+.badge.radar{background:var(--info-bg);color:var(--info)}
+.badge.no{background:var(--panel2);color:var(--muted)}
+.pct{font-size:20px;font-weight:700}
+.bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+/* detail */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20}
+.overlay.on{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(860px,100%);background:var(--bg);z-index:21;overflow-y:auto;transform:translateX(-102%);transition:transform .2s ease;border-right:1px solid var(--line)}
+.drawer.on{transform:none}
+.dhead{position:sticky;top:0;background:var(--bg);padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:2}
+#dtitle{min-width:0;flex:1} #dtitle .name{white-space:normal} #dclose{flex-shrink:0}
+.dbody{padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.check{display:grid;grid-template-columns:22px 1fr 60px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);align-items:start}
+.check:last-child{border-bottom:0}
+.check .ic{font-size:15px;line-height:1.4}
+.check .t{font-weight:600;font-size:14px}
+.check .d{color:var(--muted);font-size:13px}
+.check .r{color:var(--warn);font-size:13px;font-weight:500}
+.check .p{font-size:12px;color:var(--muted);text-align:left}
+.mini{height:5px;background:var(--panel2);border-radius:99px;margin-top:4px;overflow:hidden}
+.mini i{display:block;height:100%}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pbox{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.pbox span{display:block;color:var(--muted);font-size:12px}
+.pbox b{font-size:16px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.newsitem{padding:9px 0;border-bottom:1px solid var(--line)} .newsitem:last-of-type{border-bottom:0}
+.newsitem .nt{font-weight:600;font-size:14px} .newsitem .ns{font-size:13.5px;margin:3px 0;line-height:1.7}
+.news a{color:var(--accent);text-decoration:none}
+.news li{margin-bottom:6px;font-size:13.5px}
+.links a{color:var(--accent);margin-left:14px;font-size:13.5px;text-decoration:none}
+.note{font-size:12.5px;color:var(--muted)}
+.disc{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+ul.clean{margin:0;padding-right:18px}
+@media (max-width:820px){
+  .row{grid-template-columns:1fr;gap:8px}
+  .name{max-width:none}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .plan{grid-template-columns:repeat(2,1fr)}
+}
+.sent{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.sent.positive{background:var(--good-bg);color:var(--good)} .sent.negative{background:var(--bad-bg);color:var(--bad)} .sent.neutral{background:var(--panel2);color:var(--muted)}
+.newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:420px;overflow-y:auto;padding-left:6px}
+.newsitem .why{font-size:12px;color:var(--muted);margin-top:2px}
+
+.sch{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;margin:2px 4px 2px 0}
+.sch.classic{background:var(--info-bg);color:var(--info)} .sch.wyckoff{background:var(--warn-bg);color:var(--warn)} .sch.elliott{background:var(--good-bg);color:var(--good)}
+.badge.strong{background:var(--good-bg);color:var(--good)} .badge.good{background:var(--warn-bg);color:var(--warn)} .badge.watch{background:var(--info-bg);color:var(--info)}
+.conf{font-size:13px;font-weight:700}
+.setupbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px}
+.setupbox .t{font-weight:700;font-size:14px}
+.badge.ready{background:var(--good-bg);color:var(--good)} .badge.near{background:var(--warn-bg);color:var(--warn)} .badge.watch{background:var(--info-bg);color:var(--info)}
+.chk{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:6px}
+.chk span{font-size:11.5px;padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
+.chk .y{background:var(--good-bg);color:var(--good);border-color:transparent} .chk .n{background:var(--panel2);color:var(--muted)}
+.rules{margin:6px 0 0;padding-right:18px;font-size:13.5px;line-height:1.75}
+.mtbl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+.mtbl td,.mtbl th{padding:5px 6px;text-align:center;vertical-align:middle;border-bottom:1px solid var(--line)}
+.mtbl tr:last-child td{border-bottom:0}
+.mtbl td:first-child,.mtbl th:first-child,.mtbl td:last-child,.mtbl th:last-child{text-align:right}
+</style>
+<script>
+/* أعلام الدول: ويندوز (كروم/إيدج) يعرض العلم حرفين مثل «US» ← خط أعلام Twemoji (CC-BY 4.0، country-flag-emoji-polyfill)
+   يتحمّل بس على الأجهزة اللي ما تعرض الأعلام. الملف في assets/ والاحتياط من jsDelivr. */
+(function(){try{
+  var F='"Twemoji Mozilla","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","EmojiOne Color","Android Emoji",sans-serif';
+  function px(t,s,c){t.clearRect(0,0,100,100);t.fillStyle=c;t.fillText(s,0,0);return t.getImageData(0,0,1,1).data.join(",");}
+  function ok(s){var c=document.createElement("canvas");c.width=c.height=1;var t=c.getContext("2d",{willReadFrequently:true});
+    t.textBaseline="top";t.font="100px "+F;t.scale(.01,.01);var w=px(t,s,"#fff"),b=px(t,s,"#000");return b===w&&b.indexOf("0,0,0,")!==0;}
+  if(window.FORCE_FLAG_FONT||(ok("\uD83D\uDE0A")&&!ok("\uD83C\uDDE8\uD83C\uDDED"))){
+    var p="../",st=document.createElement("style");
+    st.textContent='@font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E0063,U+E0065,U+E0067,U+E006C,U+E006E,U+E0073-E0074,U+E0077,U+E007F;'+
+      'src:url("'+p+'assets/TwemojiCountryFlags.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.10/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}';
+    document.head.appendChild(st);
+  }
+}catch(e){}})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>🎯 الجاهزة</h1><div class="sub" id="meta"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
+      <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" href="../abdullah/" style="text-decoration:none">🌊 عبدالله</a>
+      <a class="btn" href="../insiders/" style="text-decoration:none">🟢 المطّلعين</a>
+      <a class="btn" href="../highrisk/" style="text-decoration:none">🧨 عالي مخاطرة</a>
+      <a class="btn" href="../track/" style="text-decoration:none">📈 السجل</a>
+      <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
+      <button class="btn" id="theme">🌓</button>
+    </div>
+  </header>
+  <div class="card" id="intro" style="margin-bottom:12px;border-color:var(--accent)"></div>
+  <div class="grid2" style="align-items:start">
+    <div><h3 style="margin:4px 0 8px">🎯 الثبات — كسب متكرر</h3><div class="list" id="steady"></div></div>
+    <div><h3 style="margin:4px 0 8px">🚀 الطيران — حركات كبيرة</h3><div class="list" id="runner"></div></div>
+  </div>
+  <details class="card" style="margin:14px 0 12px"><summary style="cursor:pointer;font-weight:700">📋 ليش هالقائمة؟ (الدراسة الصادقة)</summary>
+    <ol class="rules" id="rules"></ol></details>
+  <h3 style="margin:16px 0 6px">📑 كل المرشحين (مرتبين)</h3>
+  <div class="card" style="overflow-x:auto;padding:6px"><table class="mtbl" id="tbl"></table></div>
+  <div class="disc" id="disc"></div>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const N = x => Number(x || 0).toLocaleString("en");
+$("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx) }catch(e){} render(); };
+const TIER = ["", "أعلى 20%", "أعلى 10%", "أعلى 5%", "أعلى 2%"];
+const TIERC = ["var(--muted)", "var(--info)", "var(--warn)", "var(--good)", "var(--good)"];
+const steady = (DATA && DATA.steady) || [], runner = (DATA && DATA.runner) || [], all = (DATA && DATA.all) || [];
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · رتّبنا <span class="num">${DATA.n_scored ?? "-"}</span> توصية من راداراتك`
+  + ` · ${esc(DATA.source || "")}` : "";
+if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
+const mk = (DATA && DATA.market) || {};
+$("#intro").innerHTML = `<b>🎯 الجاهزة</b> — بدل ما تطالع مئات التوصيات، هذي <b>أعلى 3</b> من راداراتك (فيصل المطوّر + الأصلي + عبدالله) حسب عقلين مختبرين على 3 سنين:
+  <ol class="rules" style="margin-top:4px">
+    <li>🎯 <b>الثبات:</b> الأعلى احتمالاً توصل هدفها — كسب بسيط بس متكرر (أعلى 10% بالاختبار وصلت الهدف 70% من المرات).</li>
+    <li>🚀 <b>الطيران:</b> الأعلى احتمالاً تعمل حركة كبيرة (+30% فأكثر) — للي يبي اللي يدبّل ويطير (نصها يضرب الوقف، فحجمها صغير).</li>
+  </ol>
+  <div class="note" style="margin-top:4px">وضع السوق اليوم: صندوق الصغيرة (IWM) <b>${mk.iwm_up >= 0.5 ? "فوق" : "تحت"}</b> متوسطه · آخر 20 يوم <span class="num">${mk.iwm_ret20 != null ? (mk.iwm_ret20 > 0 ? "+" : "") + mk.iwm_ret20.toFixed(1) + "%" : "-"}</span>
+    ${mk.iwm_up < 0.5 ? "— السوق ضعيف للصغيرة، خفف الحجم" : ""}</div>
+  <div class="note" style="margin-top:4px;color:var(--warn)">⚠ هذي قائمة <b>مرتبة</b> مو ضمان. بعد التكاليف الطريقة تعادل تقريباً بالمتوسط — الكسب يجي من: اختيار قليل · دخول Limit (لا تطارد) · <b>البيع داخل القفزة</b> · حجم صغير يتحمل الوقف.
+    ولا عقل يتوقع الـ +300% (هذي تجي بخبر مفاجئ). <b>ليس توصية شراء أو بيع.</b></div>`;
+
+function plan(s){
+  return `<div class="facts" style="margin-top:6px">
+    <span>الدخول: <b class="num">${fp(s.entry)}</b>${s.last ? ` (الآن <span class="num">${fp(s.last)}</span>)` : ""}</span>
+    <span>الوقف: <b class="num" style="color:var(--bad)">${fp(s.stop)}</b> (−${s.stop_pct}%)</span>
+    <span>الهدف 1: <b class="num" style="color:var(--good)">${fp(s.t1)}</b> (+${s.t1_pct}%)</span>
+    ${s.t2 ? `<span>الهدف 2: <b class="num" style="color:var(--good)">${fp(s.t2)}</b></span>` : ""}</div>`;
+}
+function card(s, flavor){
+  const tier = flavor === "steady" ? s.steady_tier : s.runner_tier;
+  const dil = s.dilution === "high" ? ` <span class="tag b">⛔ تخفيف SEC</span>` : s.dilution === "medium" ? ` <span class="tag w">⚠ طرح محتمل</span>` : "";
+  return `<div class="card">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+      <div><span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar || "")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span>
+        <span class="note">${esc(s.radar_name)} · ${esc(s.label || s.status)}</span>${dil}
+        <div class="name" style="max-width:none"><bdi>${esc(s.name || "")}</bdi></div></div>
+      <div style="text-align:left"><span class="badge" style="background:var(--good-bg);color:${TIERC[tier]}">${tier ? TIER[tier] : "مرشح"}</span>
+        <div class="note">🩸 خطر النزيف <span class="num">${s.pb != null ? Math.round(s.pb * 100) + "%" : "-"}</span> · 🧨 <span class="num">${s.p != null ? (s.p * 100).toFixed(1) + "%" : "-"}</span></div></div>
+    </div>
+    ${plan(s)}
+    ${s.in_steady && s.in_runner ? `<div class="left" style="color:var(--good)">⭐ طلع بالقائمتين — أقوى اختيار</div>` : ""}
+    <div class="note" style="margin-top:5px">${esc(s.why || "")}</div>
+  </div>`;
+}
+function render(){
+  $("#steady").innerHTML = steady.length ? steady.map(s => card(s, "steady")).join("") : `<div class="empty">ما فيه مرشحين اليوم</div>`;
+  $("#runner").innerHTML = runner.length ? runner.map(s => card(s, "runner")).join("") : `<div class="empty">ما فيه مرشحين اليوم</div>`;
+  const rows = all.map(s => `<tr>
+    <td class="ltr" style="font-weight:700">${s.flag ? s.flag + " " : ""}${esc(s.symbol)}${s.in_steady ? " 🎯" : ""}${s.in_runner ? " 🚀" : ""}</td>
+    <td class="note">${esc((s.radar_name || "").replace(/^[^ ]+ /, ""))}</td>
+    <td>${esc(s.label || s.status)}</td>
+    <td class="num">${fp(s.entry)}</td><td class="num" style="color:var(--bad)">−${s.stop_pct}%</td><td class="num" style="color:var(--good)">+${s.t1_pct}%</td>
+    <td class="num">${s.pb != null ? Math.round(s.pb * 100) + "%" : "-"}</td>
+    <td>${s.steady_tier ? `<span style="color:${TIERC[s.steady_tier]}">${TIER[s.steady_tier]}</span>` : "-"}</td>
+    <td>${s.runner_tier ? `<span style="color:${TIERC[s.runner_tier]}">${TIER[s.runner_tier]}</span>` : "-"}</td></tr>`).join("");
+  $("#tbl").innerHTML = `<tr class="note"><th>السهم</th><th>الرادار</th><th>الحالة</th><th>الدخول</th><th>الوقف</th><th>الهدف</th><th>🩸</th><th>🎯 ثبات</th><th>🚀 طيران</th></tr>${rows}`;
+}
+$("#rules").innerHTML = [
+  `<b>الدراسة:</b> كل أسهم ناسداك العادية <b>مع المشطوبة</b> (3 سنين، 2023 ← 2026، 343 ألف سهم-يوم)، بالسعر الحقيقي ذاك اليوم وبعد تكاليف السبريد (2-4% للبيني). كل نص سنة يُختبر بنموذج تدرّب على اللي قبلها (بدون نظر للمستقبل).`,
+  `<b>اكتشاف مهم:</b> اللي يكسب <b>بثبات</b> غير اللي <b>يطير</b> — عقل «الثبات» ترابطه مع حجم الطيران <span class="num">صفر</span>. فعملنا عقلين منفصلين.`,
+  `🎯 <b>الثبات</b> (win): يرتب حسب احتمال وصول الهدف الأول خلال 10 جلسات. أعلى 10% بالاختبار وصلت الهدف <b class="num">70%</b> من المرات — بس أهدافها قريبة فالكسب بسيط.`,
+  `🚀 <b>الطيران</b> (b30): يرتب حسب احتمال حركة +30% خلال 20 جلسة. ترابطه مع أقصى ربح <b class="num">+0.31</b> — صاد BYAH (+77%) بالمرتبة الثالثة وAVAT (+46%) بالأولى بالاختبار.`,
+  `<b>الصدق كامل:</b> العقلان بعد التكاليف قريبان من التعادل بالمتوسط (الوقف والسبريد ياكلان الأفضلية). الكسب الحقيقي من: <b>اختيار قليل</b> (3 بدل 150) · دخول Limit · <b>البيع داخل القفزة</b> مو بهدف ثابت · حجم صغير.`,
+  `<b>ما يتوقعه أحد:</b> الـ +100% والـ +300% تجي بخبر/سكويز مفاجئ — PEPG (+157%) كان ترتيبه #14 يوم طلع. لا عقلنا ولا غيره يصيدها مقدماً؛ صيدها = تذاكر كثيرة صغيرة + حظ + بيع بوقتها.`].map(r => `<li>${r}</li>`).join("");
+$("#disc").innerHTML = `الترتيب من نموذج <span class="num">${esc(DATA && DATA.model_version || "")}</span> مدرّب على <span class="num">${N(DATA && DATA.n_train)}</span> إشارة.
+  هذي طبقة ترتيب فوق راداراتك — ما تغير حالة أي سهم. الماضي ما يضمن المستقبل. <b>ليس توصية شراء أو بيع.</b>`;
+render();
+</script>
+</body>
+</html>
