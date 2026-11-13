@@ -119,8 +119,10 @@ if tot["n"]:
           f" · وسيط {np.median(tot['mg']):.1f}% (الباقي {np.median(tot['all_mg']) if tot['all_mg'] else float('nan'):.1f}%)")
 # ترابط الدرجة مع أقصى ربح (كل التوصيات)
 ok = R[pd.to_numeric(R.mg, errors="coerce").notna()]
+mgv = pd.to_numeric(ok.mg, errors="coerce")
 for k in M["w"]:
-    print(f"ترابط درجة «{k}» مع أقصى ربح (سبيرمان): {ok['s_' + k].corr(pd.to_numeric(ok.mg), method='spearman'):+.3f} (n={len(ok)})")
+    c = np.corrcoef(ok['s_' + k].rank(), mgv.rank())[0, 1]
+    print(f"ترابط ترتيب درجة «{k}» مع أقصى ربح: {c:+.3f} (n={len(ok)})")
 print("\n==== 🎯 قائمة اليوم: أحدث التوصيات (آخر جلستين) مرتبة ====")
 last_days = sorted(R.date.unique())[-2:]
 for _, r in R[R.date.isin(last_days)].head(12).iterrows():
