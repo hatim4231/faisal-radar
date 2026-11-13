@@ -270,6 +270,135 @@
    "r10": "hit",
    "r15": "none",
    "result": "t1"
+  },
+  {
+   "symbol": "MRLN",
+   "D": "2026-11-12",
+   "close": 0.96,
+   "ah_high": 1.67,
+   "ah_last": 1.49,
+   "ah_vwap": 1.4816,
+   "jump_pct": 74.0,
+   "hold_pct": 75,
+   "ah_vol": 12628633,
+   "rth_vol": 1205560,
+   "limit": 1.4816,
+   "name": "Merlin, Inc.",
+   "price": 1.49,
+   "float": 39221375,
+   "short": 900000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "الشورت 900,000 فوق 50,000",
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-08-20",
+     "what": "SEC 424B3 + SEC 424B3"
+    },
+    {
+     "date": "2026-10-27",
+     "what": "SEC 424B3 + SEC 424B3"
+    }
+   ],
+   "dilution_level": "medium",
+   "eligible": false,
+   "t1": 1.6298,
+   "t2": 1.7038,
+   "stop": 1.3334,
+   "pm_min_vol": 884004
+  },
+  {
+   "symbol": "RLMD",
+   "D": "2026-11-12",
+   "close": 4.17,
+   "ah_high": 4.8,
+   "ah_last": 4.67,
+   "ah_vwap": 4.358,
+   "jump_pct": 15.1,
+   "hold_pct": 79,
+   "ah_vol": 199592,
+   "rth_vol": 830509,
+   "limit": 4.358,
+   "name": "Relmada Therapeutics, Inc.",
+   "price": 4.67,
+   "float": 82639263,
+   "short": 400000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "الشورت 400,000 فوق 50,000"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 4.7938,
+   "t2": 5.0117,
+   "stop": 3.9222,
+   "pm_min_vol": 13971
+  },
+  {
+   "symbol": "XLAB",
+   "D": "2026-11-12",
+   "close": 2.26,
+   "ah_high": 2.6,
+   "ah_last": 2.56,
+   "ah_vwap": 2.3636,
+   "jump_pct": 15.0,
+   "hold_pct": 88,
+   "ah_vol": 5430529,
+   "rth_vol": 54104126,
+   "limit": 2.3636,
+   "name": "Exascale Labs Holdings Inc.",
+   "price": 2.56,
+   "float": null,
+   "short": 0,
+   "short_src": "غير متاح للشورت عند IB",
+   "flags": [
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [
+    "⛔ تخفيف SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-09-28",
+     "what": "SEC 8-K/A EXHIBIT 99.3"
+    },
+    {
+     "date": "2026-10-30",
+     "what": "SEC S-1"
+    },
+    {
+     "date": "2026-11-05",
+     "what": "SEC 424B3 + SEC EFFECT"
+    },
+    {
+     "date": "2026-11-09",
+     "what": "SEC 424B3"
+    }
+   ],
+   "dilution_level": "high",
+   "eligible": false,
+   "t1": 2.6,
+   "t2": 2.7181,
+   "stop": 2.1272,
+   "pm_min_vol": 380137
   }
  ],
  "fire_sent": []
