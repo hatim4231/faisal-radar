@@ -314,7 +314,13 @@
    "t1": 1.6298,
    "t2": 1.7038,
    "stop": 1.3334,
-   "pm_min_vol": 884004
+   "pm_min_vol": 884004,
+   "N": "2026-11-13",
+   "pm_high_pct": 2.7,
+   "close_next_pct": -24.2,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   },
   {
    "symbol": "RLMD",
@@ -346,7 +352,13 @@
    "t1": 4.7938,
    "t2": 5.0117,
    "stop": 3.9222,
-   "pm_min_vol": 13971
+   "pm_min_vol": 13971,
+   "N": "2026-11-13",
+   "pm_high_pct": 1.9,
+   "close_next_pct": -9.7,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   },
   {
    "symbol": "XLAB",
@@ -398,7 +410,13 @@
    "t1": 2.6,
    "t2": 2.7181,
    "stop": 2.1272,
-   "pm_min_vol": 380137
+   "pm_min_vol": 380137,
+   "N": "2026-11-13",
+   "pm_high_pct": 1.6,
+   "close_next_pct": -17.2,
+   "r10": "hit",
+   "r15": "hit",
+   "result": "t2"
   }
  ],
  "fire_sent": []
