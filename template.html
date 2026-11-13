@@ -155,6 +155,7 @@ ul.clean{margin:0;padding-right:18px}
       <div class="sub" id="meta"></div>
     </div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <a class="btn primary" id="lnk-ready" href="ready/" style="text-decoration:none">🎯 الجاهزة</a>
       <a class="btn" id="lnk-other" href="original/" style="text-decoration:none">📜 فيصل الأصلي</a>
       <a class="btn" id="lnk-abd" href="abdullah/" style="text-decoration:none">🌊 رادار عبدالله</a>
       <a class="btn" id="lnk-ins" href="insiders/" style="text-decoration:none">🟢 المطّلعين</a>
@@ -235,6 +236,7 @@ if (DATA && DATA.variant === "original"){
   document.title = "فيصل الأصلي";
   const o = document.getElementById("lnk-other"); o.href = "../"; o.textContent = "📡 فيصل المطوّر";
   document.getElementById("lnk-abd").href = "../abdullah/";
+  document.getElementById("lnk-ready").href = "../ready/";
   document.getElementById("lnk-track").href = "../track/";
   document.getElementById("lnk-ins").href = "../insiders/";
   document.getElementById("lnk-acc").href = "../accumulation/";

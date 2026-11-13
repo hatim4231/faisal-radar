@@ -87,6 +87,9 @@ jobs:
       - name: رادار عالي مخاطرة (تجريبي — بالسجل بدون تيليجرام، بدون فلاتر)
         run: python highrisk_radar/highrisk_scanner.py --out site/highrisk/index.html || echo "رادار عالي مخاطرة تعطل — نكمل"
 
+      - name: رادار الجاهزة (يرتب فيصل + عبدالله ← تيليجرام يرسل بس الجاهزة)
+        run: python ready_radar/ready_scanner.py --out site/ready/index.html || echo "رادار الجاهزة تعطل — نكمل"
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -111,6 +114,9 @@ jobs:
                 --template-button "دخول" --template-error "كلمة السر غلط"
                 --template-color-primary "#2f6fde" --template-color-secondary "#0e1013")
           npx --yes staticrypt@3.5.4 site/index.html "${OPTS[@]}" --template-title "📡 رادار فيصل" -d site
+          if [ -f site/ready/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/ready/index.html "${OPTS[@]}" --template-title "🎯 الجاهزة" -d site/ready
+          fi
           npx --yes staticrypt@3.5.4 site/abdullah/index.html "${OPTS[@]}" --template-title "🌊 رادار عبدالله" -d site/abdullah
           npx --yes staticrypt@3.5.4 site/original/index.html "${OPTS[@]}" --template-title "📜 فيصل الأصلي" -d site/original
           npx --yes staticrypt@3.5.4 site/track/index.html "${OPTS[@]}" --template-title "📈 سجل التوصيات" -d site/track
