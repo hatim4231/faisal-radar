@@ -166,12 +166,11 @@ ul.clean{margin:0;padding-right:18px}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>🎯 الجاهزة</h1><div class="sub" id="meta"></div></div>
+    <div><h1>🎯 الجاهزة — فيصل المدمج</h1><div class="sub" id="meta"></div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
       <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
       <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
       <a class="btn" href="../abdullah/" style="text-decoration:none">🌊 عبدالله</a>
-      <a class="btn" href="../insiders/" style="text-decoration:none">🟢 المطّلعين</a>
       <a class="btn" href="../highrisk/" style="text-decoration:none">🧨 عالي مخاطرة</a>
       <a class="btn" href="../track/" style="text-decoration:none">📈 السجل</a>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
@@ -183,7 +182,7 @@ ul.clean{margin:0;padding-right:18px}
     <div><h3 style="margin:4px 0 8px">🎯 الثبات — كسب متكرر</h3><div class="list" id="steady"></div></div>
     <div><h3 style="margin:4px 0 8px">🚀 الطيران — حركات كبيرة</h3><div class="list" id="runner"></div></div>
   </div>
-  <details class="card" style="margin:14px 0 12px"><summary style="cursor:pointer;font-weight:700">📋 ليش هالقائمة؟ (الدراسة الصادقة)</summary>
+  <details class="card" style="margin:14px 0 12px"><summary style="cursor:pointer;font-weight:700">📋 ليش هالقائمة؟ (الدراسة الصادقة + حارس الشطب)</summary>
     <ol class="rules" id="rules"></ol></details>
   <h3 style="margin:16px 0 6px">📑 كل المرشحين (مرتبين)</h3>
   <div class="card" style="overflow-x:auto;padding:6px"><table class="mtbl" id="tbl"></table></div>
@@ -195,71 +194,128 @@ try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const fM = n => n == null ? "-" : n >= 1e9 ? (n/1e9).toFixed(2)+"B" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n >= 1e3 ? (n/1e3).toFixed(0)+"K" : String(Math.round(n));
+const pc = x => x == null ? "-" : Math.round(x*100)+"%";
 const N = x => Number(x || 0).toLocaleString("en");
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 $("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
   const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx) }catch(e){} render(); };
+const SENT = {positive:["✅","إيجابي"], negative:["❌","سلبي"], neutral:["➖","محايد"]};
+function sentBadge(n){ const s = SENT[n.sentiment] || SENT.neutral; return `<span class="sent ${n.sentiment||"neutral"}">${s[0]} ${s[1]}</span>`; }
+function newsHTML(list){
+  if (!(list||[]).length) return `<div class="note">لا توجد أخبار حديثة</div>`;
+  return list.map(n => `<div class="newsitem"><div class="nt">${sentBadge(n)} ${esc(n.title_ar || n.title)}</div>
+      ${(n.text_ar || n.summary_ar || n.summary) ? `<div class="newsfull">${esc(n.text_ar || n.summary_ar || n.summary)}</div>` : ""}
+      <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span></div></div>`).join("");
+}
 const TIER = ["", "أعلى 20%", "أعلى 10%", "أعلى 5%", "أعلى 2%"];
 const TIERC = ["var(--muted)", "var(--info)", "var(--warn)", "var(--good)", "var(--good)"];
+const DLW = [["", ""], ["⚠ خطر شطب متوسط", "var(--warn)"], ["⛔ خطر شطب عالي", "var(--bad)"]];
 const steady = (DATA && DATA.steady) || [], runner = (DATA && DATA.runner) || [], all = (DATA && DATA.all) || [];
-$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · رتّبنا <span class="num">${DATA.n_scored ?? "-"}</span> توصية من راداراتك`
-  + ` · ${esc(DATA.source || "")}` : "";
+const H = (DATA && DATA.horizon) || 10;
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · رتّبنا <span class="num">${DATA.n_scored ?? "-"}</span> مرشح من <span class="num">${DATA.n_cand ?? "-"}</span> · ${esc(DATA.source || "")}` : "";
 if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
 const mk = (DATA && DATA.market) || {};
-$("#intro").innerHTML = `<b>🎯 الجاهزة</b> — بدل ما تطالع مئات التوصيات، هذي <b>أعلى 3</b> من راداراتك (فيصل المطوّر + الأصلي + عبدالله) حسب عقلين مختبرين على 3 سنين:
+$("#intro").innerHTML = `<b>🎯 الجاهزة — فيصل المدمج</b> (الأصلي + المطوّر، بدون فلاتر الشورت/HRT/الطرح) — أقصر قائمة بعقلين مختبرين، مع <b>حارس الشطب</b>.
   <ol class="rules" style="margin-top:4px">
-    <li>🎯 <b>الثبات:</b> الأعلى احتمالاً توصل هدفها — كسب بسيط بس متكرر (أعلى 10% بالاختبار وصلت الهدف 70% من المرات).</li>
-    <li>🚀 <b>الطيران:</b> الأعلى احتمالاً تعمل حركة كبيرة (+30% فأكثر) — للي يبي اللي يدبّل ويطير (نصها يضرب الوقف، فحجمها صغير).</li>
+    <li>🎯 <b>الثبات:</b> الأعلى احتمالاً توصل هدفها (كسب بسيط متكرر). 🚀 <b>الطيران:</b> الأعلى احتمالاً تعمل حركة كبيرة (للي يبي يدبّل).</li>
+    <li>⛔ <b>حارس الشطب:</b> كل سهم عليه فحص — تحت 1$ / عداد ناسداك / تقسيم عكسي / انهيار 90%+. اللي خطر شطبه عالي يطلع له <b>تحذير أحمر</b> (ما ينشال، إنت تقرر).</li>
+    <li>⏱ المدة <b>${H} جلسات</b> · دخول بأمر Limit (لا تطارد) · بيع داخل القفزة · حجم صغير.</li>
   </ol>
-  <div class="note" style="margin-top:4px">وضع السوق اليوم: صندوق الصغيرة (IWM) <b>${mk.iwm_up >= 0.5 ? "فوق" : "تحت"}</b> متوسطه · آخر 20 يوم <span class="num">${mk.iwm_ret20 != null ? (mk.iwm_ret20 > 0 ? "+" : "") + mk.iwm_ret20.toFixed(1) + "%" : "-"}</span>
-    ${mk.iwm_up < 0.5 ? "— السوق ضعيف للصغيرة، خفف الحجم" : ""}</div>
-  <div class="note" style="margin-top:4px;color:var(--warn)">⚠ هذي قائمة <b>مرتبة</b> مو ضمان. بعد التكاليف الطريقة تعادل تقريباً بالمتوسط — الكسب يجي من: اختيار قليل · دخول Limit (لا تطارد) · <b>البيع داخل القفزة</b> · حجم صغير يتحمل الوقف.
-    ولا عقل يتوقع الـ +300% (هذي تجي بخبر مفاجئ). <b>ليس توصية شراء أو بيع.</b></div>`;
+  <div class="note" style="margin-top:4px">السوق اليوم: صندوق الصغيرة (IWM) <b>${mk.iwm_up >= 0.5 ? "فوق" : "تحت"}</b> متوسطه${mk.iwm_up < 0.5 ? " — السوق ضعيف للصغيرة، خفف الحجم" : ""}.</div>
+  <div class="note" style="margin-top:4px;color:var(--warn)">⚠ قائمة <b>مرتبة</b> مو ضمان. بعد التكاليف الطريقة تعادل بالمتوسط — الكسب من الاختيار القليل والتنفيذ الزين. ولا عقل يتوقع الـ +300%. <b>ليس توصية شراء أو بيع.</b></div>`;
 
-function plan(s){
-  return `<div class="facts" style="margin-top:6px">
-    <span>الدخول: <b class="num">${fp(s.entry)}</b>${s.last ? ` (الآن <span class="num">${fp(s.last)}</span>)` : ""}</span>
-    <span>الوقف: <b class="num" style="color:var(--bad)">${fp(s.stop)}</b> (−${s.stop_pct}%)</span>
-    <span>الهدف 1: <b class="num" style="color:var(--good)">${fp(s.t1)}</b> (+${s.t1_pct}%)</span>
-    ${s.t2 ? `<span>الهدف 2: <b class="num" style="color:var(--good)">${fp(s.t2)}</b></span>` : ""}</div>`;
+function chart(s){
+  const small = window.innerWidth < 600, k0 = small ? Math.max(0, s.chart.c.length - 60) : 0;
+  const c = {}; ["d","o","h","l","c","v","ex"].forEach(k => c[k] = (s.chart[k]||[]).slice(k0));
+  const n = c.c.length, W = small ? 440 : 800, Hh = 300, VH = 46, pad = {l:8, r:small?48:58, t:14, b:22};
+  let lo = Math.min(...c.l.filter(x=>x!=null)), hi = Math.max(...c.h.filter(x=>x!=null));
+  lo = Math.min(lo, s.stop||lo)*0.97; hi = Math.max(hi, s.t1||hi, s.t2||hi)*1.04;
+  const ph = Hh-VH-pad.t-pad.b, y = v => pad.t+(hi-v)/(hi-lo)*ph, cw = (W-pad.l-pad.r)/n, x = i => pad.l+i*cw+cw/2;
+  const up = cssv("--up"), dn = cssv("--down"), line = cssv("--line"), muted = cssv("--muted");
+  let g = "";
+  for (let k=0;k<=4;k++){ const v = lo+(hi-lo)*k/4; g += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${line}"/><text x="${W-pad.r+4}" y="${y(v)+4}" fill="${muted}" font-size="11">${fp(v)}</text>`; }
+  const hl = (v,col,lab) => v==null||v>hi||v<lo?"":`<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" stroke-dasharray="5 4"/><text x="${pad.l+4}" y="${y(v)-3}" fill="${col}" font-size="11" font-weight="600">${lab} ${fp(v)}</text>`;
+  g += hl(s.stop,cssv("--bad"),"الوقف") + hl(s.t1,cssv("--good"),"الهدف") + (s.t2?hl(s.t2,cssv("--good"),"هدف 2"):"");
+  const vmax = Math.max(...c.v);
+  for (let i=0;i<n;i++){ const o=c.o[i],h=c.h[i],l=c.l[i],cl=c.c[i]; if(cl==null)continue; const col=cl>=o?up:dn, bw=Math.max(1,cw*0.62);
+    g += `<line x1="${x(i)}" x2="${x(i)}" y1="${y(h)}" y2="${y(l)}" stroke="${col}"/><rect x="${x(i)-bw/2}" width="${bw}" y="${y(Math.max(o,cl))}" height="${Math.max(1,Math.abs(y(o)-y(cl)))}" fill="${col}"/>`;
+    if(c.ex&&c.ex[i]) g += `<text x="${x(i)}" y="${Math.max(11,y(h)-3)}" fill="${cssv("--warn")}" font-size="12" text-anchor="middle">▼</text>`;
+    const vh=c.v[i]/vmax*(VH-6); g += `<rect x="${x(i)-bw/2}" width="${bw}" y="${Hh-pad.b-vh}" height="${vh}" fill="${col}" opacity=".45"/>`; }
+  [[0,"start"],[Math.floor(n/2),"middle"],[n-1,"end"]].forEach(([i,a]) => g += `<text x="${x(i)}" y="${Hh-6}" fill="${muted}" font-size="11" text-anchor="${a}">${c.d[i]}</text>`);
+  return `<svg style="direction:ltr;width:100%;height:auto" viewBox="0 0 ${W} ${Hh}">${g}</svg>`;
+}
+function delistBanner(s){
+  const dl = s.delist || {}; if (!dl.level) return "";
+  const [lab,col] = DLW[dl.level];
+  return `<div class="left" style="color:${col};font-weight:600;border:1px solid ${col};border-radius:8px;padding:6px 9px;margin-top:6px">
+    ${lab}${dl.dd_pct!=null&&dl.dd_pct<=-70?` · منهار ${Math.abs(dl.dd_pct)}% من قمة السنة`:""}
+    ${(dl.reasons||[]).map(r=>`<div style="font-weight:400;font-size:13px;margin-top:2px">• ${esc(r)}</div>`).join("")}</div>`;
 }
 function card(s, flavor){
   const tier = flavor === "steady" ? s.steady_tier : s.runner_tier;
-  const dil = s.dilution === "high" ? ` <span class="tag b">⛔ تخفيف SEC</span>` : s.dilution === "medium" ? ` <span class="tag w">⚠ طرح محتمل</span>` : "";
-  return `<div class="card">
+  const eng = [s.label_dev?`<span class="tag i">📡 ${esc(s.label_dev)}</span>`:"", s.label_orig?`<span class="tag">📜 ${esc(s.label_orig)}</span>`:""].filter(Boolean).join(" ");
+  return `<div class="card" data-s="${esc(s.symbol)}" style="cursor:pointer">
     <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
-      <div><span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar || "")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span>
-        <span class="note">${esc(s.radar_name)} · ${esc(s.label || s.status)}</span>${dil}
-        <div class="name" style="max-width:none"><bdi>${esc(s.name || "")}</bdi></div></div>
-      <div style="text-align:left"><span class="badge" style="background:var(--good-bg);color:${TIERC[tier]}">${tier ? TIER[tier] : "مرشح"}</span>
-        <div class="note">🩸 خطر النزيف <span class="num">${s.pb != null ? Math.round(s.pb * 100) + "%" : "-"}</span> · 🧨 <span class="num">${s.p != null ? (s.p * 100).toFixed(1) + "%" : "-"}</span></div></div>
+      <div><span class="sym ltr">${s.flag?`<span title="${esc(s.country_ar||"")}">${s.flag}</span> `:""}${esc(s.symbol)}</span>
+        <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct ?? "-"}%</span>
+        <div class="name" style="max-width:none"><bdi>${esc(s.name||"")}</bdi></div></div>
+      <div style="text-align:left"><span class="badge" style="background:var(--good-bg);color:${TIERC[tier]}">${tier?TIER[tier]:"مرشح"}</span>${s.both?' <span class="badge" style="background:var(--good-bg);color:var(--good)">⭐ بالمحركين</span>':""}
+        <div class="note">🩸 <span class="num">${s.pb!=null?Math.round(s.pb*100)+"%":"-"}</span> · 🧨 <span class="num">${s.p!=null?(s.p*100).toFixed(1)+"%":"-"}</span></div></div>
     </div>
-    ${plan(s)}
-    ${s.in_steady && s.in_runner ? `<div class="left" style="color:var(--good)">⭐ طلع بالقائمتين — أقوى اختيار</div>` : ""}
-    <div class="note" style="margin-top:5px">${esc(s.why || "")}</div>
+    <div class="chk" style="margin-top:4px">${eng}</div>
+    ${delistBanner(s)}
+    <div class="facts" style="margin-top:6px">
+      <span>الدخول: <b class="num">${fp(s.entry)}</b></span><span>الوقف: <b class="num" style="color:var(--bad)">${fp(s.stop)}</b> (−${s.stop_pct}%)</span>
+      <span>الهدف: <b class="num" style="color:var(--good)">${fp(s.t1)}</b> (+${s.t1_pct}%)</span>${s.t2?`<span>هدف 2: <b class="num" style="color:var(--good)">${fp(s.t2)}</b></span>`:""}</div>
+    <div class="note" style="margin-top:4px">${esc(s.why||"")} · اضغط للتفاصيل ▾</div>
   </div>`;
 }
+function detail(s){
+  const d = document.createElement("div"); d.className = "more"; d.style.marginTop = "10px"; d.onclick = e => e.stopPropagation();
+  const eps = s.episodes || [];
+  d.innerHTML = `${chart(s)}
+    <div class="legend"><span><i style="background:var(--good)"></i>الهدف</span><span><i style="background:var(--bad)"></i>الوقف</span><span>▼ = انفجار سابق (×2)</span></div>
+    <div class="facts" style="margin-top:8px">
+      <span>الفلووت: <b class="num">${fM(s.float)}</b></span><span>القيمة: <b class="num">${fM(s.market_cap)}</b></span>
+      <span>الشورت المتاح: <b class="num">${s.short!=null?fM(s.short):"؟"}</b></span><span>RSI: <b class="num">${s.rsi ?? "-"}</b></span>
+      <span>تحت قمة السنة: <b class="num">${s.drawdown_pct!=null?s.drawdown_pct+"%":"-"}</b></span>
+      ${s.n_year?`<span>انفجر <b class="num">${s.n_year}</b> مرة بسنة${s.days_since!=null?` (قبل ${s.days_since} جلسة)`:""}</span>`:""}</div>
+    ${(s.reverse_splits||[]).length?`<div class="setupbox" style="margin-top:8px"><div class="t">✂️ تقسيمات عكسية</div><div class="note num">${s.reverse_splits.map(r=>esc((r.date||"")+" "+(r.ratio||""))).join(" · ")}</div></div>`:""}
+    ${eps.length?`<div class="setupbox" style="margin-top:8px"><div class="t">انفجاراته السابقة</div><div style="overflow-x:auto"><table class="note num" style="width:100%;border-collapse:collapse;margin-top:4px">
+      <tr><th style="text-align:right">التاريخ</th><th>×</th><th>بعد 5</th><th>بعد 20</th></tr>
+      ${eps.slice().reverse().map(e=>`<tr><td style="text-align:right">${esc(e.date)}</td><td>${e.mag}</td><td>${e.c5==null?"-":e.c5+"%"}</td><td>${e.c20==null?"-":e.c20+"%"}</td></tr>`).join("")}</table></div></div>`:""}
+    ${s.dilution?`<div style="margin-top:8px;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: ${(s.dilution.hits||[]).slice(0,4).map(h=>esc(h.form+" "+h.date)).join(" · ")||"ما لقى الفحص الآلي طرح خلال 90 يوم"}</div>`:""}
+    ${s.hrt?`<div class="left" style="color:var(--warn)">⚠ صندوق HRT من الملاك (ما يستبعد هنا)</div>`:""}
+    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}
+    <div class="links" style="margin-top:8px"><a href="https://finviz.com/quote.ashx?t=${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">Finviz</a>
+      <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">TradingView</a>
+      <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(s.symbol)}&type=&dateb=&owner=include&count=40" target="_blank" rel="noopener">SEC</a></div>`;
+  return d;
+}
+const bySym = {}; all.forEach(s => bySym[s.symbol] = s);
+function bind(box){ box.querySelectorAll(".card[data-s]").forEach(el => el.onclick = () => {
+  const ex = el.querySelector(".more"); if (ex){ ex.remove(); return; } el.appendChild(detail(bySym[el.dataset.s] || {})); }); }
 function render(){
-  $("#steady").innerHTML = steady.length ? steady.map(s => card(s, "steady")).join("") : `<div class="empty">ما فيه مرشحين اليوم</div>`;
-  $("#runner").innerHTML = runner.length ? runner.map(s => card(s, "runner")).join("") : `<div class="empty">ما فيه مرشحين اليوم</div>`;
-  const rows = all.map(s => `<tr>
-    <td class="ltr" style="font-weight:700">${s.flag ? s.flag + " " : ""}${esc(s.symbol)}${s.in_steady ? " 🎯" : ""}${s.in_runner ? " 🚀" : ""}</td>
-    <td class="note">${esc((s.radar_name || "").replace(/^[^ ]+ /, ""))}</td>
-    <td>${esc(s.label || s.status)}</td>
+  $("#steady").innerHTML = steady.length ? steady.map(s => card(s,"steady")).join("") : `<div class="empty">ما فيه مرشحين اليوم</div>`;
+  $("#runner").innerHTML = runner.length ? runner.map(s => card(s,"runner")).join("") : `<div class="empty">ما فيه مرشحين اليوم</div>`;
+  bind($("#steady")); bind($("#runner"));
+  $("#tbl").innerHTML = `<tr class="note"><th>السهم</th><th>المحرك</th><th>الدخول</th><th>الوقف</th><th>الهدف</th><th>🩸</th><th>⛔ شطب</th><th>🎯</th><th>🚀</th></tr>` + all.map(s => {
+    const dl = s.delist || {};
+    return `<tr><td class="ltr" style="font-weight:700">${s.flag?s.flag+" ":""}${esc(s.symbol)}${s.in_steady?" 🎯":""}${s.in_runner?" 🚀":""}</td>
+    <td class="note">${s.both?"📡📜":s.label_dev?"📡":"📜"}</td>
     <td class="num">${fp(s.entry)}</td><td class="num" style="color:var(--bad)">−${s.stop_pct}%</td><td class="num" style="color:var(--good)">+${s.t1_pct}%</td>
-    <td class="num">${s.pb != null ? Math.round(s.pb * 100) + "%" : "-"}</td>
-    <td>${s.steady_tier ? `<span style="color:${TIERC[s.steady_tier]}">${TIER[s.steady_tier]}</span>` : "-"}</td>
-    <td>${s.runner_tier ? `<span style="color:${TIERC[s.runner_tier]}">${TIER[s.runner_tier]}</span>` : "-"}</td></tr>`).join("");
-  $("#tbl").innerHTML = `<tr class="note"><th>السهم</th><th>الرادار</th><th>الحالة</th><th>الدخول</th><th>الوقف</th><th>الهدف</th><th>🩸</th><th>🎯 ثبات</th><th>🚀 طيران</th></tr>${rows}`;
+    <td class="num">${s.pb!=null?Math.round(s.pb*100)+"%":"-"}</td>
+    <td>${dl.level?`<span style="color:${DLW[dl.level][1]}">${dl.level===2?"⛔ عالي":"⚠ متوسط"}</span>`:'<span style="color:var(--good)">✓ آمن</span>'}</td>
+    <td>${s.steady_tier?`<span style="color:${TIERC[s.steady_tier]}">${TIER[s.steady_tier]}</span>`:"-"}</td>
+    <td>${s.runner_tier?`<span style="color:${TIERC[s.runner_tier]}">${TIER[s.runner_tier]}</span>`:"-"}</td></tr>`; }).join("");
 }
 $("#rules").innerHTML = [
-  `<b>الدراسة:</b> كل أسهم ناسداك العادية <b>مع المشطوبة</b> (3 سنين، 2023 ← 2026، 343 ألف سهم-يوم)، بالسعر الحقيقي ذاك اليوم وبعد تكاليف السبريد (2-4% للبيني). كل نص سنة يُختبر بنموذج تدرّب على اللي قبلها (بدون نظر للمستقبل).`,
-  `<b>اكتشاف مهم:</b> اللي يكسب <b>بثبات</b> غير اللي <b>يطير</b> — عقل «الثبات» ترابطه مع حجم الطيران <span class="num">صفر</span>. فعملنا عقلين منفصلين.`,
-  `🎯 <b>الثبات</b> (win): يرتب حسب احتمال وصول الهدف الأول خلال 10 جلسات. أعلى 10% بالاختبار وصلت الهدف <b class="num">70%</b> من المرات — بس أهدافها قريبة فالكسب بسيط.`,
-  `🚀 <b>الطيران</b> (b30): يرتب حسب احتمال حركة +30% خلال 20 جلسة. ترابطه مع أقصى ربح <b class="num">+0.31</b> — صاد BYAH (+77%) بالمرتبة الثالثة وAVAT (+46%) بالأولى بالاختبار.`,
-  `<b>الصدق كامل:</b> العقلان بعد التكاليف قريبان من التعادل بالمتوسط (الوقف والسبريد ياكلان الأفضلية). الكسب الحقيقي من: <b>اختيار قليل</b> (3 بدل 150) · دخول Limit · <b>البيع داخل القفزة</b> مو بهدف ثابت · حجم صغير.`,
-  `<b>ما يتوقعه أحد:</b> الـ +100% والـ +300% تجي بخبر/سكويز مفاجئ — PEPG (+157%) كان ترتيبه #14 يوم طلع. لا عقلنا ولا غيره يصيدها مقدماً؛ صيدها = تذاكر كثيرة صغيرة + حظ + بيع بوقتها.`].map(r => `<li>${r}</li>`).join("");
-$("#disc").innerHTML = `الترتيب من نموذج <span class="num">${esc(DATA && DATA.model_version || "")}</span> مدرّب على <span class="num">${N(DATA && DATA.n_train)}</span> إشارة.
-  هذي طبقة ترتيب فوق راداراتك — ما تغير حالة أي سهم. الماضي ما يضمن المستقبل. <b>ليس توصية شراء أو بيع.</b>`;
+  `<b>الدمج:</b> نشغّل محرّكي فيصل (المطوّر + الأصلي) على المجال <b>بدون</b> فلاتر الشورت/HRT/الطرح المتكرر/الفلووت/القيمة (يبقى بس السعر 0.7-10$ وسيولة أساسية). السهم يترشح لو ✅/🟡 في أي محرك.`,
+  `🎯 <b>الثبات</b> (win): احتمال وصول الهدف الأول خلال 10 جلسات — أعلى 10% بالاختبار وصلت الهدف 70%. 🚀 <b>الطيران</b> (b30): احتمال +30% خلال 20 جلسة، ترابطه +0.31 مع أقصى ربح.`,
+  `⛔ <b>حارس الشطب — بقواعد ناسداك الحقيقية</b> (مو نموذج): جرّبنا نموذج إحصائي لكن بيانات Alpaca ما تغطي الأسهم المشطوبة كفاية. فاستخدمنا القواعد الفعلية: تحت 1$ لـ 30 جلسة = إنذار عجز، مهلة 180 يوم؛ تقسيم عكسي + تحت 1$ = ما له مهلة؛ انهيار 90%+ = موت شبه مؤكد.`,
+  `<b>الصدق:</b> الدمج وفتح الفلاتر ما يضيفان ربحاً (فيصل بعد التكاليف يعادل) — بس حارس الشطب <b>يحميك من الخسارة الكاملة</b>، وهذا الأهم. اختر قليل، ادخل Limit، بع داخل القفزة، حجم صغير.`].map(r => `<li>${r}</li>`).join("");
+$("#disc").innerHTML = `الترتيب من نموذج <span class="num">${esc((DATA&&DATA.model_version)||"")}</span>. حارس الشطب بقواعد ناسداك. طبقة فوق راداراتك — ما تغير حالة أي سهم. <b>ليس توصية شراء أو بيع.</b>`;
 render();
 </script>
 </body>

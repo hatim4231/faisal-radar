@@ -33,28 +33,28 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 MAX_SESSIONS = 20
 # قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
 # إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
-HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60, "highrisk": 3}
+HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60, "highrisk": 3, "merged": 10}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
 # (+ التجميع والمدارس: نفس قواعد اختبارهم التاريخي — الهدف يُفحص أول، والوقف بإغلاق اليوم تحته)
-NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners", "highrisk"}
+NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners", "highrisk", "merged"}
 # قرار المستخدم: رادار التجميع والمدارس والطيارات نراقب نتايجهم بالسجل بدون رسائل تيليجرام
 # + «⚠ طرح متكرر» (الخيار 2، 2026-11-10 بعد RUBI): شركات الطرح المتكرر تنعرض بقسم مخاطرة عالية بصفحة فيصل المطوّر
 #   وتنحفظ هنا صامتة بنفس قواعد فيصل المطوّر — عشان نعرف بالأرقام هل قاعدة «ما تترشح» صح
 # + 🧨 عالي مخاطرة (2026-11-11، صامت): خطة «اشترِ بس إذا بدأ يطير» = شراء معلّق (pending) يتفعّل باليوم التالي لو وصل السعر للـ trigger
 #   (من 2026-11-12 — عالي مخاطرة 2: الرادار ما عاد يرسل توصيات هنا (ما يحط track/trigger)؛ سجله صار «سجل الصدق» بصفحته
 #    trackdata/highrisk_log.json. اللي تحت يكمل توصيات الخطة القديمة المفتوحة بس.)
+# قرار المستخدم (2026-11-13، المرحلة 2): «الجاهزة» صار **فيصل المدمج** (المطوّر + الأصلي، بدون فلاتر، حارس شطب، 10 جلسات)
+# والمفتاح `merged` (يقرا sig_ready.json) هو **الوحيد اللي يرسل تيليجرام** من عائلة فيصل. فيصل المطوّر/الأصلي/عبدالله
+# يبقون بالسجل والصفحات (للمقارنة الصادقة) **بدون تيليجرام** (GATED → صامتين). المطّلعين رادار مستقل يبقى يرسل.
 MUTED = {"accumulation", "schools", "runners", "faisal_dil", "highrisk"}
-# قرار المستخدم (2026-11-13): «أعطني الأسهم الجاهزة» — رادار «الجاهزة» (ready_radar) يرتب فيصل المطوّر + الأصلي + عبدالله
-# ويطلع أعلى 3 (🎯 ثبات + 🚀 طيران). تيليجرام يرسل بس الجاهزة؛ الباقي يبقى بالسجل (للصدق والصفحات). ready_picks.json
-# يكتبه رادار الجاهزة قبل tracker. لو الملف ناقص (تعطل) = نرجع للسلوك القديم (نرسل الكل) عشان ما نطنّش تنبيه بالغلط.
-GATED = {"faisal_dev", "faisal_orig", "abdullah"}
+GATED = {"faisal_dev", "faisal_orig", "abdullah"}       # صامتين بتيليجرام (المدمج يغطيهم)
 WIN = ("t1", "t2", "t1_then_stop", "t1_expired")
 
 
 def is_muted(t: dict) -> bool:
-    """بدون تيليجرام: الرادارات الصامتة، فيصل المطوّر بثقة منخفضة، واللي مو «جاهزة» من الرادارات المرتبة (قرار المستخدم)."""
-    return (t.get("radar") in MUTED or (t.get("radar") == "faisal_dev" and t.get("conf_label") == "منخفضة")
-            or t.get("tg") is False)
+    """بدون تيليجرام: الرادارات الصامتة + فيصل المطوّر/الأصلي/عبدالله (المدمج يرسل بدالهم) + فيصل المطوّر ثقة منخفضة."""
+    return (t.get("radar") in MUTED or t.get("radar") in GATED
+            or (t.get("radar") == "faisal_dev" and t.get("conf_label") == "منخفضة"))
 
 
 def open_trades(radar: str) -> dict[str, dict]:
@@ -83,6 +83,7 @@ RADARS = {
     "schools": ("🧭 المدارس", ROOT / "output" / "sig_schools.json"),
     "runners": ("🚀 الطيارات", ROOT / "output" / "sig_runners.json"),
     "highrisk": ("🧨 عالي مخاطرة", ROOT / "output" / "sig_highrisk.json"),
+    "merged": ("🎯 الجاهزة (فيصل المدمج)", ROOT / "output" / "sig_ready.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
@@ -91,6 +92,7 @@ STATUS_AR_ACC = {"ready": "🔍 تجميع مؤكد", "near": "🟡 تجميع �
 STATUS_AR_SCH = {"ready": "🎯 قوي", "near": "🟡 جيد"}
 STATUS_AR_RUN = {"ready": "🚀 جاهز", "near": "🟡 قريب"}
 STATUS_AR_HR = {"ready": "🧨 مرشح قوي", "near": "🟠 مرشح"}
+STATUS_AR_MERGED = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 SCH_AR = {"classic": "📐 الكلاسيكية", "wyckoff": "⚖️ وايكوف", "elliott": "〰️ إليوت"}
 
 
@@ -115,6 +117,33 @@ def fp(x):
 
 def signals(key: str, payload: dict) -> list[dict]:
     out = []
+    if key == "merged":
+        # 🎯 الجاهزة (فيصل المدمج): اتحاد أعلى 3 ثبات + 3 طيران (dedup). المدة 10 جلسات، مع تحذير الشطب.
+        day = (payload.get("generated_at") or "")[:10] or str(date.today())
+        seen: dict[str, dict] = {}
+        for flavor, lst in (("steady", payload.get("steady") or []), ("runner", payload.get("runner") or [])):
+            for s in lst:
+                sym = s.get("symbol")
+                if not sym or not s.get("entry") or not s.get("stop") or not s.get("t1"):
+                    continue
+                if sym not in seen:
+                    seen[sym] = {"symbol": sym, "status": s.get("status"), "label": STATUS_AR_MERGED.get(s.get("status"), "✅ مطابق"),
+                                 "entry": s["entry"], "stop": s["stop"], "t1": s["t1"], "t2": s.get("t2"), "zone": s.get("zone"),
+                                 "score": None, "date": day, "name": s.get("name"), "flag": s.get("flag"), "country_ar": s.get("country_ar"),
+                                 "flavors": [], "tier": 0, "delist_level": (s.get("delist") or {}).get("level", 0),
+                                 "delist_reasons": (s.get("delist") or {}).get("reasons", []), "why": s.get("why") or ""}
+                seen[sym]["flavors"].append(flavor)
+                seen[sym]["tier"] = max(seen[sym]["tier"], s.get("steady_tier" if flavor == "steady" else "runner_tier", 0))
+        for s in seen.values():
+            fl = " + ".join({"steady": "🎯 ثبات", "runner": "🚀 طيران"}[x] for x in s["flavors"])
+            tier_ar = {1: "أعلى 20%", 2: "أعلى 10%", 3: "أعلى 5%", 4: "أعلى 2%"}.get(s["tier"], "")
+            s["why"] = f"{fl}" + (f" · {tier_ar}" if tier_ar else "") + (f" · {s['why']}" if s["why"] else "")
+            if s["delist_level"] == 2:
+                s["why"] += "\n⛔ <b>تحذير شطب عالي</b>: " + "، ".join(s["delist_reasons"][:2])
+            elif s["delist_level"] == 1:
+                s["why"] += "\n⚠ خطر شطب متوسط: " + "، ".join(s["delist_reasons"][:1])
+            out.append(s)
+        return out
     stocks = (payload.get("diluters") or []) if key == "faisal_dil" else payload.get("stocks", [])
     for s in stocks:
         if key == "highrisk":
@@ -384,16 +413,6 @@ def run():
         log(f"تنظيف عالي مخاطرة (مرة وحدة): انشال {n0 - len(track['trades'])} توصية")
     trades = track["trades"]
     new_events = []
-    # 🎯 الجاهزة: أي (رادار، سهم) اختاره رادار الجاهزة اليوم → بس هذي ترسل تيليجرام من الرادارات المرتبة (قرار المستخدم)
-    rp = load(ROOT / "output" / "ready_picks.json", None)
-    ready_ok = rp is not None
-    ready_pick = {}
-    for p in (rp or {}).get("picks", []):
-        ready_pick.setdefault((p["radar"], p["symbol"]), {"flavors": [], "tier": 0})
-        ready_pick[(p["radar"], p["symbol"])]["flavors"].append(p["flavor"])
-        ready_pick[(p["radar"], p["symbol"])]["tier"] = max(ready_pick[(p["radar"], p["symbol"])]["tier"], p.get("tier", 0))
-    if ready_ok:
-        log(f"🎯 الجاهزة: {len(ready_pick)} اختيار يرسل تيليجرام (الباقي من فيصل/عبدالله يبقى بالسجل)")
     migrated = migrate_stops(track)
     if migrated:
         new_events.append(f"🔁 أعدت حساب {migrated} توصية (فيصل المطوّر وعبدالله) بالوقف الجديد: "
@@ -420,11 +439,6 @@ def run():
             t = {"id": f"{key}:{s['symbol']}:{s['date']}", "radar": key, "radar_name": name, "sub1": s["entry"] < 1,
                  "opened_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "result": "open",
                  "horizon": HORIZON.get(key, MAX_SESSIONS), **s}
-            if key in GATED and ready_ok:         # من الرادارات المرتبة: ترسل تيليجرام بس إذا اختارها رادار الجاهزة
-                rpk = ready_pick.get((key, s["symbol"]))
-                t["tg"] = rpk is not None
-                if rpk:
-                    t["ready_flavor"], t["ready_tier"] = rpk["flavors"], rpk["tier"]
             if any(x["id"] == t["id"] for x in trades):
                 continue
             twins = t.pop("twins", None) or []
@@ -463,11 +477,7 @@ def run():
                           f"لما ما تنجح {miss * 100:.0f}% · المدة {t.get('horizon', 20)} جلسات") \
                     if sim.get("hit") is not None and sim.get("avg_win") is not None and miss is not None else ""
                 warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}{simtxt}" + warn
-            TIER_AR = {1: "أعلى 20%", 2: "أعلى 10%", 3: "أعلى 5%", 4: "أعلى 2%"}
-            head = f"🔔 توصية جديدة — {name}"
-            if t.get("ready_flavor"):
-                fl = " + ".join({"steady": "🎯 ثبات", "runner": "🚀 طيران"}[x] for x in t["ready_flavor"])
-                head = f"🎯 جاهزة ({fl}) — {name}" + (f" · {TIER_AR.get(t.get('ready_tier'), '')}" if t.get("ready_tier") else "")
+            head = ("🎯 جاهزة — فيصل المدمج" if key == "merged" else f"🔔 توصية جديدة — {name}")
             new_events.append(
                 f"{head}\n{s['label']} {s.get('flag') or ''} <b>{s['symbol']}</b> ({s.get('name') or ''})"
                 + (f" · {s['country_ar']}" if s.get("country_ar") else "") + "\n"
