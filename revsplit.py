@@ -20,6 +20,7 @@ import pandas as pd
 MAX_DAYS_AGO = 260       # التقسيم خلال ~سنة
 DROP_TO = 0.65           # نزل لـ ≤65% من سعر ما بعد التقسيم (≈ 60%)
 BASE_MIN = 10            # جلسات القاعدة بدون كسر القاع
+MAX_RISE = 0.50          # قرار أبوفرح: ارتفع ≥50% من القاع = انطلق، يُحذف من الرادار
 
 STATUS_AR = {"ready": "🎯 جاهز", "near": "🟡 يتجمّع", "watch": "👀 مبكر"}
 
@@ -69,6 +70,9 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     support = float(ls[low_i:].min()) if low_i < len(ls) else low
     ceiling = float(hs[low_i:].max()) if low_i < len(hs) else price
     age = len(cs) - low_i - 1                              # جلسات من القاع
+    # قرار أبوفرح: لو ارتفع ≥50% من قاع القاعدة = انطلق، فات وقت التجميع ← احذفه
+    if support > 0 and price >= support * (1 + MAX_RISE):
+        return None
     held = bool(l[max(rj + 1 + low_i, t - 2):t + 1].min() >= support * 0.97)   # ما كسر قاعه آخر 3ج
     lo20 = float(l[max(0, t - 19):t + 1].min())
     above_lo20 = bool(price >= lo20 * 0.995)
