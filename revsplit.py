@@ -92,7 +92,12 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     accum = bool(upv_ratio >= 1.0 or obv_up)
     pos = (price - support) / max(ceiling - support, 1e-9)
 
-    dropped = bool(drop_from_p0 <= (DROP_TO - 1))         # نزل لـ ≤65%
+    # عمق النزول من سعر ما بعد التقسيم (0..1). دراسة العمق (diag/revsplit_depth.py، 979 حدث):
+    # نزول <35% انفجاره 4-7% (أسوأ من العشوائي) · 50-80% = المنطقة الذهبية (~20%) · 90%+ أغلبه يموت.
+    dd = max(0.0, 1 - price / p0)
+    dropped = bool(dd >= (1 - DROP_TO))                   # نزل ≥35% (المرشح)
+    golden = bool(0.50 <= dd <= 0.85)                     # المنطقة الذهبية (أعلى انفجار)
+    deep_ok = bool(dd >= 0.45)                            # عمق كافٍ لـ«جاهز»
     base_ok = bool(age >= BASE_MIN and held and above_lo20)
     # هبوط طرح سابق (≥30% بيوم) بعد التقسيم — إشارة خطر/أو واشر
     dd1 = cs / np.r_[c[rj], cs[:-1]] - 1
@@ -100,22 +105,23 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
 
     if not dropped:
         status = "watch"                                  # قسّم بس ما نزل كفاية بعد
-    elif base_ok and contract and accum:
-        status = "ready"
+    elif base_ok and deep_ok and contract and accum:
+        status = "ready"                                  # المنطقة الذهبية + قاعدة مؤكدة
     elif base_ok and accum:
         status = "near"
     else:
         status = "watch"
 
     score = 0.0
-    score += min(abs(drop_from_p0), 0.6) * 40             # كل ما نزل أكثر (حتى 60%)
+    score += min(dd, 0.80) * 45                           # كل ما نزل أعمق (حتى 80%) أفضل
+    score += 10 if golden else 0                          # مكافأة المنطقة الذهبية 50-80%
+    score -= 8 if dd >= 0.90 else 0                       # 90%+ خطر موت
     score += 15 if base_ok else 0
     score += 12 if accum else 0
-    score += 10 if contract else 0
-    score += 10 if (20 <= rsi_now <= 50) else 0
-    score += 8 if ratio <= 0.1 else (4 if ratio <= 0.2 else 0)   # التقسيم الكبير (1:10+) أفضل بالدراسة
-    score += 5 * max(0, min(1, pos))
-    score = round(min(100.0, score), 1)
+    score += 8 if contract else 0
+    score += 8 if (20 <= rsi_now <= 50) else 0
+    score += 6 if ratio <= 0.1 else (3 if ratio <= 0.2 else 0)   # التقسيم الكبير (1:10+) أفضل
+    score = round(max(0.0, min(100.0, score)), 1)
 
     flt = info.get("floatShares")
     if flt is not None and flt < 50_000:
@@ -127,6 +133,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     why = [
         f"🔄 تقسيم عكسي 1:{round(1/ratio)} قبل {days_ago} جلسة · سعر ما بعد التقسيم {p0:.3g}",
         f"نزل {drop_from_p0*100:.0f}% منه (الحين {price:.3g}" + (" — داخل منطقة التجميع ≤65% ✓" if dropped else " — ما نزل كفاية بعد") + ")",
+        (f"🟢 المنطقة الذهبية: نزل {dd*100:.0f}% (50-80% = أعلى انفجار ~20% بالدراسة)" if golden else f"نزل {dd*100:.0f}% من سعر ما بعد التقسيم"),
         f"قاع ما بعد التقسيم {support:.3g} (بعد {days_to_bottom} جلسة من التقسيم) وجالس فوقه {age} جلسة" + (" بدون كسر ✓" if held else ""),
         f"التذبذب " + ("انكمش ✓ (زنبرك)" if contract else "ما انكمش") + f" · بصمة تجميع فوليوم صعود/هبوط {upv_ratio:.1f}x" + (" · OBV يطلع" if obv_up else ""),
         f"RSI {rsi_now:.0f}",
@@ -138,7 +145,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
         "status": status, "status_ar": STATUS_AR[status], "score": score,
         "revsplit": {"ratio": f"1:{round(1/ratio)}", "days_ago": int(days_ago), "p0": _r(p0),
                      "drop_from_p0_pct": _r(drop_from_p0 * 100, 1)},
-        "dropped": dropped, "post_split": bool(dropped and base_ok),
+        "dropped": dropped, "post_split": bool(dropped and base_ok), "golden": golden, "drop_depth_pct": _r(dd * 100, 0),
         "support": _r(support), "ceiling": _r(ceiling), "age": int(age), "days_to_bottom": int(days_to_bottom),
         "pos_in_base_pct": _r(pos * 100, 0), "held": held, "contract": contract, "accum": accum,
         "upv_ratio": _r(upv_ratio, 2), "obv_up": obv_up, "rsi": _r(rsi_now, 1),
