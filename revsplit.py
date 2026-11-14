@@ -70,6 +70,10 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     support = float(ls[low_i:].min()) if low_i < len(ls) else low
     ceiling = float(hs[low_i:].max()) if low_i < len(hs) else price
     age = len(cs) - low_i - 1                              # جلسات من القاع
+    # أعلى سعر وصله بعد التقسيم + نسبة الارتفاع من قاع القاعدة (طلب أبوفرح)
+    peak_after = float(hs.max()); peak_after_i = int(np.argmax(hs))
+    peak_date = str(dates[rj + 1 + peak_after_i])[:10]
+    peak_rise_pct = (peak_after / support - 1) * 100 if support > 0 else 0.0
     # قرار أبوفرح: لو ارتفع ≥50% من قاع القاعدة = انطلق، فات وقت التجميع ← احذفه
     if support > 0 and price >= support * (1 + MAX_RISE):
         return None
@@ -135,6 +139,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
         f"نزل {drop_from_p0*100:.0f}% منه (الحين {price:.3g}" + (" — داخل منطقة التجميع ≤65% ✓" if dropped else " — ما نزل كفاية بعد") + ")",
         (f"🟢 المنطقة الذهبية: نزل {dd*100:.0f}% (50-80% = أعلى انفجار ~20% بالدراسة)" if golden else f"نزل {dd*100:.0f}% من سعر ما بعد التقسيم"),
         f"قاع ما بعد التقسيم {support:.3g} (بعد {days_to_bottom} جلسة من التقسيم) وجالس فوقه {age} جلسة" + (" بدون كسر ✓" if held else ""),
+        f"📈 أعلى سعر وصله بعد التقسيم {peak_after:.3g} ({peak_date})",
         f"التذبذب " + ("انكمش ✓ (زنبرك)" if contract else "ما انكمش") + f" · بصمة تجميع فوليوم صعود/هبوط {upv_ratio:.1f}x" + (" · OBV يطلع" if obv_up else ""),
         f"RSI {rsi_now:.0f}",
     ]
@@ -146,6 +151,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
         "revsplit": {"ratio": f"1:{round(1/ratio)}", "days_ago": int(days_ago), "p0": _r(p0),
                      "drop_from_p0_pct": _r(drop_from_p0 * 100, 1)},
         "dropped": dropped, "post_split": bool(dropped and base_ok), "golden": golden, "drop_depth_pct": _r(dd * 100, 0),
+        "peak_after": _r(peak_after), "peak_date": peak_date, "peak_rise_pct": _r(peak_rise_pct, 0),
         "support": _r(support), "ceiling": _r(ceiling), "age": int(age), "days_to_bottom": int(days_to_bottom),
         "pos_in_base_pct": _r(pos * 100, 0), "held": held, "contract": contract, "accum": accum,
         "upv_ratio": _r(upv_ratio, 2), "obv_up": obv_up, "rsi": _r(rsi_now, 1),

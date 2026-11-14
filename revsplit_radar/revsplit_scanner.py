@@ -88,12 +88,17 @@ def run(cfg, tickers=None) -> dict:
 
     syms = [t for t, _, _ in cands]
     infos = data.get_info(syms, cfg) if syms else {}
+    try:
+        ib = data.load_ib_short()
+    except Exception:
+        ib = {}
     rows = []
     for t, d, _ in cands:
         inf = infos.get(t) or {}
         r = RS.detect(d, inf)
         if not r:
             continue
+        sv, short_src = data.short_of(t, ib, inf)   # المتاح للاقتراض من IB
         F = HR.features(d)
         try:
             dl = DL.assess(d)
@@ -104,7 +109,8 @@ def run(cfg, tickers=None) -> dict:
         rows.append({
             "symbol": t, "name": inf.get("shortName") or inf.get("longName") or HS.NAMES.get(t) or t,
             "country": inf.get("country"), "price": _r(c.iloc[-1]), "change_pct": _r((c.iloc[-1] / c.iloc[-2] - 1) * 100, 2),
-            "market_cap": inf.get("marketCap"), "vol20": int(d["Volume"].tail(20).mean()), "date": str(d.index[-1])[:10],
+            "market_cap": inf.get("marketCap"), "short": sv, "short_src": short_src,
+            "vol20": int(d["Volume"].tail(20).mean()), "date": str(d.index[-1])[:10],
             "bleed": _r(bleed_of(F), 3), "delist": dl, "flags": [], "news": [], **r,
             "chart": {"d": [str(i)[:10] for i in tail.index], "o": [_r(x) for x in tail["Open"]],
                       "h": [_r(x) for x in tail["High"]], "l": [_r(x) for x in tail["Low"]],

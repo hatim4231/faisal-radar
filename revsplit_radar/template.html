@@ -222,8 +222,9 @@ function render(){
       <div class="facts" style="margin-top:8px">
         <span>قاع ما بعد التقسيم: <b class="num">${fp(s.support)}</b> (بعد <span class="num">${s.days_to_bottom}</span>ج)</span>
         <span>عمر القاعدة: <b class="num">${s.age}</b>ج ${s.held?"✓":""}</span>
-        <span>سقف القاعدة: <b class="num">${fp(s.ceiling)}</b></span>
+        <span>📈 أعلى سعر بعد التقسيم: <b class="num" style="color:var(--good)">${fp(s.peak_after)}</b></span>
         <span>RSI: <b class="num">${s.rsi}</b></span><span>فلووت: <b class="num">${fM(s.float)}</b>${s.tiny_float?" 🔥":""}</span>
+        <span>الشورت: <b class="num">${s.short!=null?fM(s.short):"؟"}</b></span>
       </div>
       <div class="facts" style="margin-top:6px">
         <span>منطقة التجميع: <b class="num">${fp(p.accumulate_zone[0])} – ${fp(p.accumulate_zone[1])}</b></span>
