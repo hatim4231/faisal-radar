@@ -133,9 +133,12 @@ for i in range(0, len(syms), BATCH):
             if r: entry_hit["d20"][0] += int(r[0]); entry_hit["d20"][1] += 1; entry_ret["d20"].append(r[1])
             # (ج) تأكد القاعدة: أول يوم بعد التقسيم فيه 10 جلسات بدون قاع 20ج جديد
             be = None
-            for k in range(j + 11, j + W):
-                lo20 = lo[k - 19:k + 1].min()
-                if lo[k - 9:k + 1].min() > lo20 * 1.0 and c[k] > lo20 * 1.03:
+            for k in range(j + 11, min(j + W, n)):
+                w20, w10 = lo[max(0, k - 19):k + 1], lo[max(0, k - 9):k + 1]
+                if not len(w20) or not len(w10):
+                    continue
+                lo20 = w20.min()
+                if w10.min() > lo20 and c[k] > lo20 * 1.03:
                     be = k; break
             if be is not None:
                 base_days_list.append(be - j)
