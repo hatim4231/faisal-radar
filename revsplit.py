@@ -42,7 +42,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     info = info or {}
     if d is None or len(d) < 40 or "Stock Splits" not in d.columns:
         return None
-    c, h, l, v = (d[k].to_numpy(float) for k in ("Close", "High", "Low", "Volume"))
+    o, c, h, l, v = (d[k].to_numpy(float) for k in ("Open", "Close", "High", "Low", "Volume"))
     dates = d.index
     t = len(c) - 1
     price = float(c[t])
@@ -56,7 +56,8 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     if days_ago < 3 or days_ago > MAX_DAYS_AGO:
         return None
     ratio = sp[rj]
-    split_high = float(h[rj])                             # أعلى سعر يوم التقسيم (طلب أبوفرح)
+    split_open = float(o[rj])                             # افتتاح يوم التقسيم (طلب أبوفرح)
+    split_high = float(h[rj])                             # أعلى سعر يوم التقسيم
     p0 = float(h[rj:min(rj + 4, len(h))].max())          # سعر ما بعد التقسيم
     if p0 <= 0:
         return None
@@ -141,7 +142,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     stop = support * 0.90
     stop_pct = (1 - stop / price) * 100 if price else None
     why = [
-        f"🔄 تقسيم عكسي 1:{round(1/ratio)} قبل {days_ago} جلسة · أعلى سعر يوم التقسيم {split_high:.3g} · سعر ما بعد التقسيم {p0:.3g}",
+        f"🔄 تقسيم عكسي 1:{round(1/ratio)} قبل {days_ago} جلسة · افتتاح يوم التقسيم {split_open:.3g} · أعلى سعر يومه {split_high:.3g} · سعر ما بعد التقسيم {p0:.3g}",
         f"نزل {drop_from_p0*100:.0f}% منه (الحين {price:.3g}" + (" — داخل منطقة التجميع ≤65% ✓" if dropped else " — ما نزل كفاية بعد") + ")",
         (f"🟢 المنطقة الذهبية: نزل {dd*100:.0f}% (50-80% = أعلى انفجار ~20% بالدراسة)" if golden else f"نزل {dd*100:.0f}% من سعر ما بعد التقسيم"),
         f"قاع ما بعد التقسيم {support:.3g} (بعد {days_to_bottom} جلسة من التقسيم) وجالس فوقه {age} جلسة" + (" بدون كسر ✓" if held else ""),
@@ -155,7 +156,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     return {
         "status": status, "status_ar": STATUS_AR[status], "score": score,
         "revsplit": {"ratio": f"1:{round(1/ratio)}", "days_ago": int(days_ago), "p0": _r(p0),
-                     "split_high": _r(split_high), "drop_from_p0_pct": _r(drop_from_p0 * 100, 1)},
+                     "split_open": _r(split_open), "split_high": _r(split_high), "drop_from_p0_pct": _r(drop_from_p0 * 100, 1)},
         "dropped": dropped, "post_split": bool(dropped and base_ok), "golden": golden, "drop_depth_pct": _r(dd * 100, 0),
         "peak_after": _r(peak_after), "peak_date": peak_date, "peak_rise_pct": _r(peak_rise_pct, 0),
         "support": _r(support), "ceiling": _r(ceiling), "age": int(age), "days_to_bottom": int(days_to_bottom),
