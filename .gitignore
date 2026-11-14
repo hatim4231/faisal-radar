@@ -4,3 +4,6 @@ cache/
 output/
 site/
 trackdata/
+
+# سكربتات التشخيص فرعها diag-flye فقط
+diag/
