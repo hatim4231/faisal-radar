@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار الصيد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --info:#5b5bd6; --info-bg:#ececfd;
+  --up:#16a36a; --down:#e04848; --ma20:#e39a1c; --ma50:#7c5cd6; --zone:rgba(19,149,92,.13);
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+    --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+  --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Twemoji Country Flags","IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{outline:2px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
+.list{display:flex;flex-direction:column;gap:8px}
+.sym{font-weight:700;font-size:17px}
+.name{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up{color:var(--up)} .down{color:var(--down)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:600}
+.left{font-size:13px;margin-top:5px}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.badge.ready{background:var(--good-bg);color:var(--good)}
+.badge.near{background:var(--warn-bg);color:var(--warn)}
+.badge.watch{background:var(--info-bg);color:var(--info)}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.note{font-size:12.5px;color:var(--muted)}
+.disc{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+ul.clean{margin:0;padding-right:18px}
+.redban{background:var(--bad-bg);color:var(--bad);border:1px solid var(--bad);border-radius:9px;padding:7px 10px;margin-top:8px;font-weight:600;font-size:13px}
+.orgban{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:9px;padding:7px 10px;margin-top:8px;font-weight:600;font-size:13px}
+.setupbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px}
+.setupbox .t{font-weight:700;font-size:14px}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.pbox{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.pbox span{display:block;color:var(--muted);font-size:12px}
+.pbox b{font-size:15px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.newsitem{padding:9px 0;border-bottom:1px solid var(--line)} .newsitem:last-of-type{border-bottom:0}
+.newsitem .nt{font-weight:600;font-size:14px}
+.newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:360px;overflow-y:auto}
+.sent{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px}
+.sent.positive{background:var(--good-bg);color:var(--good)} .sent.negative{background:var(--bad-bg);color:var(--bad)} .sent.neutral{background:var(--panel2);color:var(--muted)}
+.chk{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:6px}
+.chk span{font-size:11.5px;padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
+.chk .y{background:var(--good-bg);color:var(--good);border-color:transparent} .chk .n{background:var(--panel2);color:var(--muted)}
+.rules{margin:6px 0 0;padding-right:18px;font-size:13.5px;line-height:1.75}
+.bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+@media (max-width:820px){ .tiles{grid-template-columns:repeat(3,1fr)} .plan{grid-template-columns:repeat(3,1fr)} }
+</style>
+<script>
+/* أعلام الدول: ويندوز يعرض العلم حرفين ← خط أعلام Twemoji يتحمّل بس على الأجهزة اللي ما تعرض الأعلام. */
+(function(){try{
+  var F='"Twemoji Mozilla","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","EmojiOne Color","Android Emoji",sans-serif';
+  function px(t,s,c){t.clearRect(0,0,100,100);t.fillStyle=c;t.fillText(s,0,0);return t.getImageData(0,0,1,1).data.join(",");}
+  function ok(s){var c=document.createElement("canvas");c.width=c.height=1;var t=c.getContext("2d",{willReadFrequently:true});
+    t.textBaseline="top";t.font="100px "+F;t.scale(.01,.01);var w=px(t,s,"#fff"),b=px(t,s,"#000");return b===w&&b.indexOf("0,0,0,")!==0;}
+  if(window.FORCE_FLAG_FONT||(ok("😊")&&!ok("🇨🇭"))){
+    var p="../",st=document.createElement("style");
+    st.textContent='@font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E0063,U+E0065,U+E0067,U+E006C,U+E006E,U+E0073-E0074,U+E0077,U+E007F;'+
+      'src:url("'+p+'assets/TwemojiCountryFlags.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.10/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}';
+    document.head.appendChild(st);
+  }
+}catch(e){}})();
+</script>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>🏹 رادار الصيد</h1><div class="sub" id="meta"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <a class="btn primary" href="../ready/" style="text-decoration:none">🎯 الجاهزة</a>
+      <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
+      <a class="btn" href="../runners/" style="text-decoration:none">🚀 الطيارات</a>
+      <a class="btn" href="../highrisk/" style="text-decoration:none">🧨 عالي مخاطرة</a>
+      <a class="btn" href="../track/" style="text-decoration:none">📈 السجل</a>
+      <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
+      <button class="btn" id="theme">🌓</button>
+    </div>
+  </header>
+
+  <div class="card" style="margin-bottom:12px;border-color:var(--warn)">🏹 <b>طريقة الصيد:</b> جمّع في القاعدة <b>قبل</b> الانطلاق، والسهم يطير خلال أيام.
+    القائمة مرتّبة الأقرب للانطلاق. <b>البيع عليك إنت</b> — القائمة تعطيك أرض الصيد، وإنت تنفّذ بعينك.
+    <div class="note" style="margin-top:6px" id="histnote"></div></div>
+
+  <details class="card" style="margin-bottom:12px" open><summary style="cursor:pointer;font-weight:700">📋 كيف تصيد وتجمّع (مبني على بصمة مثبتة ×3.3)</summary>
+    <ol class="rules">
+      <li><b>الصيد (وش تدوّر):</b> سهم سبق طار +100% بيوم خلال سنة (طيّار متكرر) · منهار 70%+ من قمته · بنى قاعدة 10+ جلسات
+        · التذبذب انكمش · فوليوم الصعود ≥ الهبوط (تجميع) · RSI 20–45 · فلووت صغير (تحت 5M، الأفضل تحت مليون).</li>
+      <li><b>التجميع:</b> 3 دفعات <b>داخل القاعدة قرب الدعم</b> — قبل الاختراق مو بعده. حجم صغير على كل تذكرة ووزّع على عدة أسهم.</li>
+      <li><b>الدخول النهائي:</b> لحظة أول اندفاع فوليوم يكسر <b>سقف القاعدة</b> (هنا عينك).</li>
+      <li><b>الوقف:</b> إغلاق تحت <b>قاع القاعدة</b> −10% (مو وقف أعمى يطلّعك قبل الانطلاق).</li>
+      <li><b>الاحتفاظ:</b> 3–7 أيام. ما انطلق؟ اطلع وبدّل.</li>
+    </ol>
+    <div class="note">⚠ الصدق: اختبار 3 سنين — البصمة ترفع فرصة الطيران ×3.3 (13.5% مقابل 4.1%)، <b>بس 46% تلمس −30%</b>.
+      الشراء الآلي يخسر؛ الكسب من اختيارك + بيعك بالقفزة + حجم صغير. 🩸 خطر النزيف والشطب أحمر بكل بطاقة. ليس توصية شراء أو بيع.</div>
+  </details>
+
+  <div class="tiles" id="tiles"></div>
+  <div class="toolbar">
+    <select id="sort" class="btn"><option value="score">الترتيب: الأقرب للانطلاق</option>
+      <option value="jumps">الأكثر طيران سابق</option><option value="crash">الأعنف انهياراً</option>
+      <option value="float">الأقل فلووت</option><option value="bleed">الأقل خطر نزيف</option></select>
+    <input type="search" id="q" placeholder="بحث عن رمز…">
+  </div>
+  <div class="list" id="list"></div>
+  <div class="disc">الصيد = قائمة مراقبة مرتّبة على بصمة مثبتة، مو توصية شراء. 46% من أمثال هذه الأسهم تنزف −30% — ولذلك البيع والتوقيت عليك.
+    ليس توصية شراء أو بيع؛ أنت مسؤول عن قرارك.</div>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const fM = n => n == null ? "-" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n >= 1e3 ? (n/1e3).toFixed(0)+"K" : String(Math.round(n));
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const SENT = {positive:["✅","إيجابي"], negative:["❌","سلبي"], neutral:["➖","محايد"]};
+function sentBadge(n){ const s = SENT[n.sentiment] || SENT.neutral; return `<span class="sent ${n.sentiment||"neutral"}">${s[0]} ${s[1]}</span>`; }
+function newsHTML(list){
+  if (!(list||[]).length) return `<div class="note">لا توجد أخبار حديثة</div>`;
+  return list.map(n => `<div class="newsitem"><div class="nt">${sentBadge(n)} ${esc(n.title_ar || n.title)}</div>
+      ${(n.text_ar || n.summary_ar || n.summary) ? `<div class="newsfull">${esc(n.text_ar || n.summary_ar || n.summary)}</div>` : ""}
+      <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span></div></div>`).join("");
+}
+const ST = {ready:"🎯 جاهز للصيد", near:"🟡 يتجمّع", watch:"👀 مبكر"};
+const stocks = (DATA && DATA.stocks) || [];
+let filt = null;
+$("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx) }catch(e){} render(); };
+$("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.generated_at)}</span> · فحص <span class="num">${DATA.scanned}</span> سهم · ${esc(DATA.source||"")}` : "";
+if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
+if (DATA && DATA.hist){ const H = DATA.hist;
+  $("#histnote").innerHTML = `📊 <b>مختبر 3 سنين (مع المشطوبة):</b> سهم بهالبصمة يطير ×2 خلال 20 جلسة في <b class="num">${H.jump2}%</b> من المرات مقابل <b class="num">${H.rand2}%</b> للعشوائي (<b class="num">×${H.lift}</b>) — بس <b class="num" style="color:var(--bad)">${H.bleed30}%</b> تلمس −30%. قائمة صيد، مو ضمان.`; }
+
+function delistBan(s){
+  const d = s.delist || {}; if (!d.level) return "";
+  const cls = d.level === 2 ? "redban" : "orgban", ic = d.level === 2 ? "⛔ خطر شطب عالي" : "⚠ خطر شطب متوسط";
+  return `<div class="${cls}">${ic}: ${esc((d.reasons||[]).join(" · ") || "راقب قواعد ناسداك")}</div>`;
+}
+function bleedBan(s){
+  if (s.bleed == null) return "";
+  const p = Math.round(s.bleed*100), cls = s.bleed>=0.40?"redban":s.bleed>=0.25?"orgban":"note";
+  return `<div class="${cls}">🩸 خطر النزيف: احتمال يلمس −30% خلال 20 جلسة ≈ <span class="num">${p}%</span>${s.bleed>=0.40?" (عالي — حجم صغير)":""}</div>`;
+}
+function tiles(){
+  const n = k => stocks.filter(s => s.status === k).length;
+  $("#tiles").innerHTML = Object.entries(ST).map(([k,l]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${n(k)}</b><span>${l}</span></div>`).join("");
+  document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = filt === el.dataset.k ? null : el.dataset.k; render(); });
+}
+function chart(s){
+  const c = s.chart, n = c.c.length, W = 800, H = 300, VH = 46, pad = {l:8, r:58, t:10, b:22}, p = s.plan;
+  let lo = Math.min(...c.l.filter(x=>x!=null), p.stop), hi = Math.max(...c.h.filter(x=>x!=null), p.launch_trigger); lo *= 0.97; hi *= 1.04;
+  const ph = H - VH - pad.t - pad.b, y = v => pad.t + (hi - v) / (hi - lo) * ph;
+  const cw = (W - pad.l - pad.r) / n, x = i => pad.l + i * cw + cw / 2;
+  const up = cssv("--up"), dn = cssv("--down"), line = cssv("--line"), muted = cssv("--muted");
+  let g = "";
+  for (let k = 0; k <= 4; k++){ const v = lo + (hi-lo)*k/4; g += `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${line}"/><text x="${W-pad.r+4}" y="${y(v)+4}" fill="${muted}" font-size="11">${fp(v)}</text>`; }
+  const z = p.accumulate_zone || [];
+  if (z[0] && z[1]) g += `<rect x="${pad.l}" width="${W-pad.l-pad.r}" y="${y(z[1])}" height="${Math.max(2, y(z[0])-y(z[1]))}" fill="${cssv("--zone")}"/>`;
+  const hl = (v, col, label, dash) => v == null || v > hi || v < lo ? "" : `<line x1="${pad.l}" x2="${W-pad.r}" y1="${y(v)}" y2="${y(v)}" stroke="${col}" stroke-width="1.3" ${dash?'stroke-dasharray="5 4"':""}/><text x="${pad.l+4}" y="${y(v)-3}" fill="${col}" font-size="11">${label}</text>`;
+  const mal = (arr, col) => { let d = ""; arr.forEach((v,i) => { if (v != null) d += (d ? "L" : "M") + x(i) + " " + y(v); }); return d ? `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.2" opacity=".8"/>` : ""; };
+  g += mal(c.ma20, cssv("--ma20")) + mal(c.ma50, cssv("--ma50"));
+  g += hl(s.support, cssv("--info"), "قاع القاعدة", false) + hl(p.launch_trigger, cssv("--warn"), "سقف القاعدة (الانطلاق)", true) + hl(p.stop, cssv("--bad"), "الوقف", true);
+  const vmax = Math.max(...c.v);
+  for (let i = 0; i < n; i++){ const o = c.o[i], h = c.h[i], l = c.l[i], cl = c.c[i]; if (cl == null) continue;
+    const col = cl >= o ? up : dn, bw = Math.max(1, cw * 0.62);
+    g += `<line x1="${x(i)}" x2="${x(i)}" y1="${y(h)}" y2="${y(l)}" stroke="${col}"/><rect x="${x(i)-bw/2}" width="${bw}" y="${y(Math.max(o,cl))}" height="${Math.max(1,Math.abs(y(o)-y(cl)))}" fill="${col}"/>`;
+    const vh = c.v[i] / vmax * (VH - 6); g += `<rect x="${x(i)-bw/2}" width="${bw}" y="${H-pad.b-vh}" height="${vh}" fill="${col}" opacity=".45"/>`; }
+  [[0,"start"],[Math.floor(n/2),"middle"],[n-1,"end"]].forEach(([i,a]) => g += `<text x="${x(i)}" y="${H-6}" fill="${muted}" font-size="11" text-anchor="${a}">${c.d[i]}</text>`);
+  return `<svg style="direction:ltr;width:100%;height:auto" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+}
+function render(){
+  tiles();
+  const key = $("#sort").value, q = ($("#q").value||"").trim().toUpperCase(), order = {ready:0, near:1, watch:2};
+  let L = stocks.filter(s => (!filt || s.status === filt) && (!q || s.symbol.includes(q)));
+  const S = {score:(a,b) => (order[a.status]-order[b.status]) || (b.score-a.score),
+             jumps:(a,b) => (b.n_jumps||0)-(a.n_jumps||0), crash:(a,b) => (b.crash_pct||0)-(a.crash_pct||0),
+             float:(a,b) => (a.float ?? 1e12)-(b.float ?? 1e12), bleed:(a,b) => (a.bleed ?? 1)-(b.bleed ?? 1)};
+  L.sort(S[key]);
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">ما فيه أسهم بهذا الفلتر حالياً.</div>`; return; }
+  $("#list").innerHTML = L.map(s => { const p = s.plan, n0 = (s.news||[])[0], hi = (s.delist||{}).level===2 || (s.bleed>=0.40);
+    return `<div class="card" style="cursor:pointer" data-s="${esc(s.symbol)}">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center">
+        <div><span class="sym ltr">${s.flag ? `<span title="${esc(s.country_ar||s.country||"")}">${s.flag}</span> ` : ""}${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span> <span class="num ${s.change_pct>=0?"up":"down"}">${s.change_pct>0?"+":""}${s.change_pct}%</span>
+          <div class="name" style="max-width:none">${esc(s.name)}</div></div>
+        <div style="text-align:left"><span class="badge ${s.status}">${esc(s.status_ar)}</span> <span class="note">نقاط <b class="num">${s.score}</b></span></div>
+      </div>
+      <div class="bar"><i style="width:${Math.max(3,Math.min(100,s.pos_in_base_pct||0))}%;background:${s.coiling?'var(--good)':'var(--accent)'}"></i></div>
+      <div class="note" style="margin-top:3px">موقع السعر في القاعدة: <b class="num">${s.pos_in_base_pct}%</b> ${s.coiling?"— متقوقع قرب السقف، قرب الانطلاق 🎯":""}</div>
+      <div class="facts" style="margin-top:8px">
+        <span>انهار: <b class="num">${s.crash_pct}%</b></span><span>طار سابق: <b class="num">${s.n_jumps}</b> مرة/سنة</span>
+        <span>قاعدة: <b class="num">${fp(s.support)} – ${fp(s.ceiling)}</b> (<span class="num">${s.age}</span>ج)</span>
+        <span>RSI: <b class="num">${s.rsi}</b></span><span>فلووت: <b class="num">${fM(s.float)}</b>${s.tiny_float?" 🔥":""}</span>
+        <span>شورت: <b class="num">${s.short!=null?fM(s.short):"؟"}</b></span>
+      </div>
+      <div class="facts" style="margin-top:6px">
+        <span>منطقة التجميع: <b class="num">${fp(p.accumulate_zone[0])} – ${fp(p.accumulate_zone[1])}</b></span>
+        <span>الانطلاق فوق: <b class="num" style="color:var(--warn)">${fp(p.launch_trigger)}</b></span>
+        <span>الوقف: <b class="num" style="color:var(--bad)">${fp(p.stop)}</b> (−${p.stop_pct}%)</span>
+        <span>حجم الصفقة: <b class="num">${p.size_pct}%</b></span>
+      </div>
+      ${hi ? (((s.delist||{}).level===2?delistBan(s):"") + ((s.bleed>=0.40)?bleedBan(s):"")) : ""}
+      ${(s.flags||[]).filter(f=>/HRT/.test(f)).map(f => `<div class="left" style="color:var(--warn)">${esc(f)}</div>`).join("")}
+      ${n0 ? `<div class="left">${sentBadge(n0)} ${esc(n0.title_ar || n0.title)}</div>` : ""}
+      <div class="note" style="margin-top:4px">اضغط للتفاصيل ▾</div>
+    </div>`; }).join("");
+  document.querySelectorAll("#list .card").forEach(el => el.onclick = () => toggle(el));
+}
+function toggle(el){
+  const s = stocks.find(x => x.symbol === el.dataset.s); const ex = el.querySelector(".more");
+  if (ex){ ex.remove(); return; }
+  const p = s.plan;
+  const d = document.createElement("div"); d.className = "more"; d.style.marginTop = "10px"; d.onclick = e => e.stopPropagation();
+  d.innerHTML = `${chart(s)}
+    <div class="legend"><span><i style="background:var(--info)"></i>قاع القاعدة</span><span><i style="background:var(--warn)"></i>سقف القاعدة</span><span><i style="background:var(--bad)"></i>الوقف</span><span><i style="background:var(--zone);height:9px"></i>منطقة التجميع</span><span><i style="background:var(--ma20)"></i>MA20</span><span><i style="background:var(--ma50)"></i>MA50</span></div>
+    ${delistBan(s)}${bleedBan(s)}
+    <div class="plan">
+      <div class="pbox"><span>منطقة التجميع</span><b class="num">${fp(p.accumulate_zone[0])}–${fp(p.accumulate_zone[1])}</b></div>
+      <div class="pbox"><span>سقف الانطلاق</span><b class="num">${fp(p.launch_trigger)}</b></div>
+      <div class="pbox"><span>الوقف (إغلاق)</span><b class="num" style="color:var(--bad)">${fp(p.stop)}</b></div>
+    </div>
+    <div class="note" style="margin-top:6px">دفعات التجميع المقترحة: <b class="num">${(p.tranches||[]).map(fp).join(" · ")}</b> · ${esc(p.stop_note)} · الاحتفاظ: ${esc(p.hold)}</div>
+    <div class="setupbox"><div class="t">ليش هو هدف صيد؟</div><ul class="clean note" style="margin-top:4px">${(s.why||[]).map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>
+    ${(s.jumps||[]).length ? `<div class="setupbox"><div class="t">أيام الطيران خلال سنة</div><div class="note num" style="margin-top:4px">${s.jumps.map(j => `${esc(j.date)}: +${j.pct}%`).join(" · ")}</div></div>` : ""}
+    ${s.weekly_lows ? `<div class="note" style="margin-top:6px">قيعان كل 10 جلسات: <span class="num">${s.weekly_lows.map(fp).join(" → ")}</span></div>` : ""}
+    ${s.dilution ? `<div style="margin-top:8px;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: ${(s.dilution.hits||[]).slice(0,4).map(h => esc(h.form+" "+h.date+" — "+h.label)).join(" · ") || "ما لقى الفحص الآلي ملفات طرح — تأكد بنفسك"}</div>` : ""}
+    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}`;
+  el.appendChild(d);
+}
+$("#sort").onchange = render;
+$("#q").oninput = render;
+render();
+</script>
+</body>
+</html>

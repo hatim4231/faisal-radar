@@ -90,6 +90,11 @@ jobs:
       - name: رادار الجاهزة (يرتب فيصل + عبدالله ← تيليجرام يرسل بس الجاهزة)
         run: python ready_radar/ready_scanner.py --out site/ready/index.html || echo "رادار الجاهزة تعطل — نكمل"
 
+      - name: رادار الصيد (تجريبي صامت — قائمة مراقبة التجميع، بدون فلاتر)
+        run: python hunt_radar/hunt_scanner.py --out site/hunt/index.html || echo "رادار الصيد تعطل — نكمل"
+        continue-on-error: true
+        timeout-minutes: 12
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -116,6 +121,9 @@ jobs:
           npx --yes staticrypt@3.5.4 site/index.html "${OPTS[@]}" --template-title "📡 رادار فيصل" -d site
           if [ -f site/ready/index.html ]; then
             npx --yes staticrypt@3.5.4 site/ready/index.html "${OPTS[@]}" --template-title "🎯 الجاهزة" -d site/ready
+          fi
+          if [ -f site/hunt/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/hunt/index.html "${OPTS[@]}" --template-title "🏹 رادار الصيد" -d site/hunt
           fi
           npx --yes staticrypt@3.5.4 site/abdullah/index.html "${OPTS[@]}" --template-title "🌊 رادار عبدالله" -d site/abdullah
           npx --yes staticrypt@3.5.4 site/original/index.html "${OPTS[@]}" --template-title "📜 فيصل الأصلي" -d site/original
