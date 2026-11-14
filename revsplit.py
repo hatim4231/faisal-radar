@@ -20,7 +20,8 @@ import pandas as pd
 MAX_DAYS_AGO = 260       # التقسيم خلال ~سنة
 DROP_TO = 0.65           # نزل لـ ≤65% من سعر ما بعد التقسيم (≈ 60%)
 BASE_MIN = 10            # جلسات القاعدة بدون كسر القاع
-MAX_RISE = 0.50          # قرار أبوفرح: ارتفع ≥50% من القاع = انطلق، يُحذف من الرادار
+MAX_RISE = 0.50          # قرار أبوفرح: ارتفع ≥50% (من القاع، أو في أول 14 يوم) = انطلق، يُحذف
+EARLY_WIN = 14           # نافذة «أول 14 يوم بعد التقسيم»
 
 STATUS_AR = {"ready": "🎯 جاهز", "near": "🟡 يتجمّع", "watch": "👀 مبكر"}
 
@@ -55,10 +56,15 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     if days_ago < 3 or days_ago > MAX_DAYS_AGO:
         return None
     ratio = sp[rj]
+    split_high = float(h[rj])                             # أعلى سعر يوم التقسيم (طلب أبوفرح)
     p0 = float(h[rj:min(rj + 4, len(h))].max())          # سعر ما بعد التقسيم
     if p0 <= 0:
         return None
     drop_from_p0 = price / p0 - 1                          # كم نزل من سعر ما بعد التقسيم
+    # قرار أبوفرح: لو ارتفع >50% في أول 14 يوم بعد التقسيم = انطلق مبكر ← احذفه
+    early = h[rj + 1: rj + 1 + EARLY_WIN]
+    if split_high > 0 and len(early) and float(early.max()) >= split_high * (1 + MAX_RISE):
+        return None
 
     # القاعدة بعد الهبوط
     seg = slice(rj + 1, t + 1)
@@ -135,7 +141,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     stop = support * 0.90
     stop_pct = (1 - stop / price) * 100 if price else None
     why = [
-        f"🔄 تقسيم عكسي 1:{round(1/ratio)} قبل {days_ago} جلسة · سعر ما بعد التقسيم {p0:.3g}",
+        f"🔄 تقسيم عكسي 1:{round(1/ratio)} قبل {days_ago} جلسة · أعلى سعر يوم التقسيم {split_high:.3g} · سعر ما بعد التقسيم {p0:.3g}",
         f"نزل {drop_from_p0*100:.0f}% منه (الحين {price:.3g}" + (" — داخل منطقة التجميع ≤65% ✓" if dropped else " — ما نزل كفاية بعد") + ")",
         (f"🟢 المنطقة الذهبية: نزل {dd*100:.0f}% (50-80% = أعلى انفجار ~20% بالدراسة)" if golden else f"نزل {dd*100:.0f}% من سعر ما بعد التقسيم"),
         f"قاع ما بعد التقسيم {support:.3g} (بعد {days_to_bottom} جلسة من التقسيم) وجالس فوقه {age} جلسة" + (" بدون كسر ✓" if held else ""),
@@ -149,7 +155,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     return {
         "status": status, "status_ar": STATUS_AR[status], "score": score,
         "revsplit": {"ratio": f"1:{round(1/ratio)}", "days_ago": int(days_ago), "p0": _r(p0),
-                     "drop_from_p0_pct": _r(drop_from_p0 * 100, 1)},
+                     "split_high": _r(split_high), "drop_from_p0_pct": _r(drop_from_p0 * 100, 1)},
         "dropped": dropped, "post_split": bool(dropped and base_ok), "golden": golden, "drop_depth_pct": _r(dd * 100, 0),
         "peak_after": _r(peak_after), "peak_date": peak_date, "peak_rise_pct": _r(peak_rise_pct, 0),
         "support": _r(support), "ceiling": _r(ceiling), "age": int(age), "days_to_bottom": int(days_to_bottom),
