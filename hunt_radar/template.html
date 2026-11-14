@@ -116,8 +116,8 @@ ul.clean{margin:0;padding-right:18px}
   </header>
 
   <div class="card" style="margin-bottom:12px;border-color:var(--warn)">🏹 <b>طريقة الصيد:</b> جمّع في القاعدة <b>قبل</b> الانطلاق، والسهم يطير خلال أيام.
-    القائمة مرتّبة الأقرب للانطلاق. <b>البيع عليك إنت</b> — القائمة تعطيك أرض الصيد، وإنت تنفّذ بعينك.
-    <div class="note" style="margin-top:6px" id="histnote"></div></div>
+    قائمة قصيرة (الجاهز 🎯 + المتجمّع 🟡 بس). <b>تيليجرام يرسل بس «🎯 جاهز للصيد»</b>. <b>البيع عليك إنت</b> — القائمة أرض الصيد، وإنت تصطاد بعينك.
+    <div class="note" style="margin-top:6px" id="histnote"></div><div class="note" id="hiddennote" style="margin-top:4px"></div></div>
 
   <details class="card" style="margin-bottom:12px" open><summary style="cursor:pointer;font-weight:700">📋 كيف تصيد وتجمّع (مبني على بصمة مثبتة ×3.3)</summary>
     <ol class="rules">
@@ -159,7 +159,7 @@ function newsHTML(list){
       ${(n.text_ar || n.summary_ar || n.summary) ? `<div class="newsfull">${esc(n.text_ar || n.summary_ar || n.summary)}</div>` : ""}
       <div class="note">${esc(n.source||"")} · <span class="num">${esc((n.time||"").slice(0,16).replace("T"," "))}</span></div></div>`).join("");
 }
-const ST = {ready:"🎯 جاهز للصيد", near:"🟡 يتجمّع", watch:"👀 مبكر"};
+const ST = {ready:"🎯 جاهز للصيد", near:"🟡 يتجمّع"};
 const stocks = (DATA && DATA.stocks) || [];
 let filt = null;
 $("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
@@ -168,6 +168,7 @@ $("#meta").innerHTML = DATA ? `آخر تحديث: <span class="num">${esc(DATA.g
 if (DATA && DATA.actions_url){ const a = $("#ghrun"); a.href = DATA.actions_url; a.style.display = ""; }
 if (DATA && DATA.hist){ const H = DATA.hist;
   $("#histnote").innerHTML = `📊 <b>مختبر 3 سنين (مع المشطوبة):</b> سهم بهالبصمة يطير ×2 خلال 20 جلسة في <b class="num">${H.jump2}%</b> من المرات مقابل <b class="num">${H.rand2}%</b> للعشوائي (<b class="num">×${H.lift}</b>) — بس <b class="num" style="color:var(--bad)">${H.bleed30}%</b> تلمس −30%. قائمة صيد، مو ضمان.`; }
+if (DATA && DATA.watch_hidden){ $("#hiddennote").innerHTML = `👀 ضيّقنا القائمة: <b class="num">${DATA.watch_hidden}</b> سهم «مبكر» (القاعدة ما تأكدت بعد) مخفيين — نعرض الجاهز والمتجمّع بس.`; }
 
 function delistBan(s){
   const d = s.delist || {}; if (!d.level) return "";

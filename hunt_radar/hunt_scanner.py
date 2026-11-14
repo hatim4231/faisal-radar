@@ -132,6 +132,9 @@ def run(cfg, tickers=None) -> dict:
 
     order = {"ready": 0, "near": 1, "watch": 2}
     rows.sort(key=lambda r: (order.get(r["status"], 3), -r["score"]))
+    # تضييق القائمة (قرار المستخدم): الجاهز للصيد 🎯 + يتجمّع 🟡 بس — نشيل «مبكر» 👀 (نخليه عدّاد)
+    watch_hidden = sum(1 for r in rows if r["status"] == "watch")
+    rows = [r for r in rows if r["status"] in ("ready", "near")]
 
     # إثراء الأعلى: أخبار + SEC (تنبيه فقط) + أعلام + HRT (تنبيه فقط، ما نستبعد)
     top = rows[:N_ENRICH]
@@ -176,7 +179,7 @@ def run(cfg, tickers=None) -> dict:
     cnt = Counter(r["status"] for r in rows)
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "الأسعار: Alpaca + الشركة: Yahoo + SEC", "scanned": len(daily),
-               "seconds": round(time.time() - t0), "stocks": rows, "hist": HIST,
+               "seconds": round(time.time() - t0), "stocks": rows, "hist": HIST, "watch_hidden": watch_hidden,
                "price_range": [pmin, pmax], "liquidity": {"vol20": min_vol20, "dv20": min_dv20}}
     log(f"## رادار الصيد: جاهز {cnt['ready']} · يتجمّع {cnt['near']} · مبكر {cnt['watch']} · خلص في {payload['seconds']}ث")
     for r in rows[:15]:

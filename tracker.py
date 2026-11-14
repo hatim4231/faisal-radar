@@ -33,10 +33,10 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 MAX_SESSIONS = 20
 # قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
 # إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
-HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60, "highrisk": 3, "merged": 10}
+HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60, "highrisk": 3, "merged": 10, "hunt": 7}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
 # (+ التجميع والمدارس: نفس قواعد اختبارهم التاريخي — الهدف يُفحص أول، والوقف بإغلاق اليوم تحته)
-NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners", "highrisk", "merged"}
+NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners", "highrisk", "merged", "hunt"}
 # قرار المستخدم: رادار التجميع والمدارس والطيارات نراقب نتايجهم بالسجل بدون رسائل تيليجرام
 # + «⚠ طرح متكرر» (الخيار 2، 2026-11-10 بعد RUBI): شركات الطرح المتكرر تنعرض بقسم مخاطرة عالية بصفحة فيصل المطوّر
 #   وتنحفظ هنا صامتة بنفس قواعد فيصل المطوّر — عشان نعرف بالأرقام هل قاعدة «ما تترشح» صح
@@ -84,6 +84,7 @@ RADARS = {
     "runners": ("🚀 الطيارات", ROOT / "output" / "sig_runners.json"),
     "highrisk": ("🧨 عالي مخاطرة", ROOT / "output" / "sig_highrisk.json"),
     "merged": ("🎯 الجاهزة (فيصل المدمج)", ROOT / "output" / "sig_ready.json"),
+    "hunt": ("🏹 الصيد", ROOT / "output" / "sig_hunt.json"),
 }
 STATUS_AR = {"ready": "✅ مطابق", "near": "🟡 قريب"}
 STATUS_AR_ABD = {"ready": "🎯 متماسك", "near": "🟡 بدأ يتماسك"}
@@ -93,6 +94,7 @@ STATUS_AR_SCH = {"ready": "🎯 قوي", "near": "🟡 جيد"}
 STATUS_AR_RUN = {"ready": "🚀 جاهز", "near": "🟡 قريب"}
 STATUS_AR_HR = {"ready": "🧨 مرشح قوي", "near": "🟠 مرشح"}
 STATUS_AR_MERGED = {"ready": "✅ مطابق", "near": "🟡 قريب"}
+STATUS_AR_HUNT = {"ready": "🎯 جاهز للصيد", "near": "🟡 يتجمّع"}
 SCH_AR = {"classic": "📐 الكلاسيكية", "wyckoff": "⚖️ وايكوف", "elliott": "〰️ إليوت"}
 
 
@@ -109,6 +111,12 @@ def load(p, default):
 
 def fp(x):
     return "-" if x is None else (f"{x:.3f}" if x < 1 else f"{x:.2f}")
+
+
+def fM(n):
+    if n is None:
+        return "؟"
+    return f"{n/1e6:.2f}M" if n >= 1e6 else (f"{n/1e3:.0f}K" if n >= 1e3 else str(int(n)))
 
 
 # ----------------------------------------------------------------------------
@@ -158,6 +166,29 @@ def signals(key: str, payload: dict) -> list[dict]:
                         "why": f"احتمال انفجار خلال 10 جلسات {round((s.get('e10') or 0) * 100)}% (الأساس {round((s.get('base_e10') or 0) * 100, 1)}%)"
                                f" · انفجر {s.get('n_year')} مرة بسنة · شراء Stop {fp(p['trigger'])} باليوم التالي",
                         "dilution": (s.get("dilution") or {}).get("level"), "twins": s.get("twins")})
+            continue
+        if key == "hunt":
+            # 🏹 الصيد: يرسل تيليجرام **بس الجاهز للصيد** (🎯) — قائمة قصيرة. البيع على المتداول.
+            if s.get("status") != "ready":
+                continue
+            p = s.get("plan") or {}
+            entry = s.get("price")
+            if not entry or not p.get("stop"):
+                continue
+            az = p.get("accumulate_zone") or [None, None]
+            why = (f"🏹 جمّع بالمنطقة {fp(az[0])}–{fp(az[1])} · الانطلاق فوق {fp(p.get('launch_trigger'))} · "
+                   f"انهار {s.get('crash_pct')}% · طار {s.get('n_jumps')}× · فلووت {fM(s.get('float'))}"
+                   + (" 🔥 ذري" if s.get("tiny_float") else ""))
+            dl = s.get("delist") or {}
+            if dl.get("level") == 2:
+                why += "\n⛔ <b>تحذير شطب عالي</b>: " + "، ".join((dl.get("reasons") or [])[:2])
+            if s.get("bleed") is not None and s["bleed"] >= 0.40:
+                why += f"\n🩸 <b>خطر نزيف عالي</b> ({round(s['bleed']*100)}% يلمس −30%) — حجم صغير"
+            why += "\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام"
+            out.append({"symbol": s["symbol"], "status": "ready", "label": STATUS_AR_HUNT["ready"],
+                        "entry": entry, "stop": p["stop"], "t1": round(entry * 1.20, 4), "t2": round(entry * 1.50, 4),
+                        "zone": az, "score": s.get("score"), "date": s.get("date"), "name": s.get("name"),
+                        "flag": s.get("flag"), "country_ar": s.get("country_ar"), "why": why})
             continue
         if key == "runners":
             st = s.get("status") if s.get("status") in ("ready", "near") else None
@@ -477,7 +508,9 @@ def run():
                           f"لما ما تنجح {miss * 100:.0f}% · المدة {t.get('horizon', 20)} جلسات") \
                     if sim.get("hit") is not None and sim.get("avg_win") is not None and miss is not None else ""
                 warn = f"\n🎯 ثقة النجاح {s['conf'] * 100:.0f}% ({s.get('conf_label')}){base}{simtxt}" + warn
-            head = ("🎯 جاهزة — فيصل المدمج" if key == "merged" else f"🔔 توصية جديدة — {name}")
+            head = ("🎯 جاهزة — فيصل المدمج" if key == "merged"
+                    else "🏹 جاهز للصيد — جمّع قبل الانطلاق" if key == "hunt"
+                    else f"🔔 توصية جديدة — {name}")
             new_events.append(
                 f"{head}\n{s['label']} {s.get('flag') or ''} <b>{s['symbol']}</b> ({s.get('name') or ''})"
                 + (f" · {s['country_ar']}" if s.get("country_ar") else "") + "\n"
