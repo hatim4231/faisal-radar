@@ -95,6 +95,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 12
 
+      - name: رادار ما بعد التقسيم العكسي (تجريبي صامت — نمط أبوفرح)
+        run: python revsplit_radar/revsplit_scanner.py --out site/revsplit/index.html || echo "رادار التقسيم تعطل — نكمل"
+        continue-on-error: true
+        timeout-minutes: 12
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -124,6 +129,9 @@ jobs:
           fi
           if [ -f site/hunt/index.html ]; then
             npx --yes staticrypt@3.5.4 site/hunt/index.html "${OPTS[@]}" --template-title "🏹 رادار الصيد" -d site/hunt
+          fi
+          if [ -f site/revsplit/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/revsplit/index.html "${OPTS[@]}" --template-title "🔄 رادار التقسيم العكسي" -d site/revsplit
           fi
           npx --yes staticrypt@3.5.4 site/abdullah/index.html "${OPTS[@]}" --template-title "🌊 رادار عبدالله" -d site/abdullah
           npx --yes staticrypt@3.5.4 site/original/index.html "${OPTS[@]}" --template-title "📜 فيصل الأصلي" -d site/original
