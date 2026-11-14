@@ -417,6 +417,54 @@
    "r10": "hit",
    "r15": "hit",
    "result": "t2"
+  },
+  {
+   "symbol": "AKAN",
+   "D": "2026-11-13",
+   "close": 1.37,
+   "ah_high": 1.8686,
+   "ah_last": 1.8686,
+   "ah_vwap": 1.5626,
+   "jump_pct": 36.4,
+   "hold_pct": 100,
+   "ah_vol": 17710594,
+   "rth_vol": 67860845,
+   "limit": 1.5626,
+   "name": "Akanda Corp.",
+   "price": 1.8686,
+   "float": 709911,
+   "short": 0,
+   "short_src": "غير متاح للشورت عند IB",
+   "flags": [
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "Canada",
+   "flag": "🇨🇦",
+   "country_ar": "كندا",
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-10-01",
+     "what": "SEC F-1"
+    },
+    {
+     "date": "2026-10-19",
+     "what": "SEC F-1/A"
+    },
+    {
+     "date": "2026-11-06",
+     "what": "SEC F-1/A"
+    }
+   ],
+   "dilution_level": "medium",
+   "eligible": false,
+   "t1": 1.7189,
+   "t2": 1.797,
+   "stop": 1.4063,
+   "pm_min_vol": 1239741
   }
  ],
  "fire_sent": []
