@@ -102,6 +102,20 @@
     "_max_short_help": "قرار أبوفرح 2026-11-15: الشورت المتاح ≥ 20 ألف يُستبعد",
     "max_rows": 120
   },
+  "rahib": {
+    "_ملاحظة": "رادار «فيصل الرهيب» 🔥 — نظرية الارتكاز البحتة من دليل فيصل (ص6 الفلتر). مستقل صامت.",
+    "min_price": 0.1,
+    "max_price": 5.0,
+    "max_market_cap": 300000000,
+    "max_float": 20000000,
+    "min_avg_volume": 100000,
+    "support_near": 8,
+    "support_watch": 15,
+    "entry_zone_pct": 8,
+    "min_upside": 10,
+    "stop_below_pct": 10,
+    "max_rows": 120
+  },
   "accumulation": {
     "_ملاحظة": "رادار التجميع: بصمات تجميع المضارب داخل قاعدة عرضية",
     "base_min": 10,

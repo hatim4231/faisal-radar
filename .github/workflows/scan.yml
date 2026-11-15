@@ -100,6 +100,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 12
 
+      - name: رادار فيصل الرهيب (تجريبي صامت — نظرية الارتكاز البحتة)
+        run: python rahib_radar/rahib_scanner.py --out site/rahib/index.html || echo "رادار الرهيب تعطل — نكمل"
+        continue-on-error: true
+        timeout-minutes: 12
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -132,6 +137,9 @@ jobs:
           fi
           if [ -f site/revsplit/index.html ]; then
             npx --yes staticrypt@3.5.4 site/revsplit/index.html "${OPTS[@]}" --template-title "🔄 رادار التقسيم العكسي" -d site/revsplit
+          fi
+          if [ -f site/rahib/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/rahib/index.html "${OPTS[@]}" --template-title "🔥 فيصل الرهيب" -d site/rahib
           fi
           npx --yes staticrypt@3.5.4 site/abdullah/index.html "${OPTS[@]}" --template-title "🌊 رادار عبدالله" -d site/abdullah
           npx --yes staticrypt@3.5.4 site/original/index.html "${OPTS[@]}" --template-title "📜 فيصل الأصلي" -d site/original
