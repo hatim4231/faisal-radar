@@ -111,8 +111,8 @@ ul.clean{margin:0;padding-right:18px}
     </div>
   </header>
 
-  <div class="card" style="margin-bottom:12px;border-color:var(--warn)">🔄 <b>النمط:</b> سهم سوّى تقسيم عكسي ← نزل لـ≤60% من سعره ← يبني قاعدة ويجمّع بدون ما يكسر قاعه ← ينفجر مضاربياً ويصرّف نفس اليوم.
-    تشتري <b>وقت التجميع</b>، وتبيع <b>بالقفزة</b> (على المتداول). الميزة: بعد التقسيم فوق 1$ فمؤقتاً بعيد عن الشطب.
+  <div class="card" style="margin-bottom:12px;border-color:var(--warn)">🔄 <b>النمط (شروط أبوفرح):</b> تقسيم عكسي <b>حديث (10–40 جلسة)</b> ← نزل من سعره ← يبني قاعدة <b>وما ارتفع بعد</b> ← ينفجر مضاربياً ويصرّف نفس اليوم.
+    <b>شورت أقل من 20 ألف</b>. تشتري <b>وقت التجميع قريب القاع</b>، وتبيع <b>بالقفزة</b> (على المتداول). الميزة: بعد التقسيم فوق 1$ فمؤقتاً بعيد عن الشطب.
     <div class="note" style="margin-top:6px" id="histnote"></div><div class="note" id="hiddennote" style="margin-top:4px"></div></div>
 
   <details class="card" style="margin-bottom:12px" open><summary style="cursor:pointer;font-weight:700">📋 الطريقة + الصدق (مختبر 3 سنين مع المشطوبة)</summary>
@@ -222,7 +222,8 @@ function render(){
       <div class="facts" style="margin-top:8px">
         <span>قاع ما بعد التقسيم: <b class="num">${fp(s.support)}</b> (بعد <span class="num">${s.days_to_bottom}</span>ج)</span>
         <span>عمر القاعدة: <b class="num">${s.age}</b>ج ${s.held?"✓":""}</span>
-        <span>📈 أعلى سعر بعد التقسيم: <b class="num" style="color:var(--good)">${fp(s.peak_after)}</b></span>
+        <span>ارتفع من القاع: <b class="num" style="color:${s.not_risen?'var(--good)':'var(--warn)'}">+${s.rise_from_low_pct}%</b>${s.not_risen?" (ما ارتفع ✓)":""}</span>
+        <span>📈 أعلى سعر بعد التقسيم: <b class="num">${fp(s.peak_after)}</b></span>
         <span>RSI: <b class="num">${s.rsi}</b></span><span>فلووت: <b class="num">${fM(s.float)}</b>${s.tiny_float?" 🔥":""}</span>
         <span>الشورت: <b class="num">${s.short!=null?fM(s.short):"؟"}</b></span>
       </div>

@@ -60,6 +60,7 @@ def run(cfg, tickers=None) -> dict:
     RC = cfg.get("revsplit") or {}
     pmin, pmax = RC.get("min_price", 0.3), RC.get("max_price", 20.0)
     min_dv20 = RC.get("min_dv20", 30_000)
+    max_short = RC.get("max_short", 20_000)   # قرار أبوفرح: شورت < 20 ألف
     explicit = tickers is not None
     if tickers is None:
         tickers = HS.alpaca_universe()
@@ -99,6 +100,8 @@ def run(cfg, tickers=None) -> dict:
         if not r:
             continue
         sv, short_src = data.short_of(t, ib, inf)   # المتاح للاقتراض من IB
+        if not explicit and max_short and sv is not None and sv >= max_short:
+            continue                                  # شورت ≥ 20 ألف ← يُستبعد (قرار أبوفرح)
         F = HR.features(d)
         try:
             dl = DL.assess(d)

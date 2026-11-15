@@ -17,10 +17,13 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-MAX_DAYS_AGO = 260       # التقسيم خلال ~سنة
-DROP_TO = 0.65           # نزل لـ ≤65% من سعر ما بعد التقسيم (≈ 60%)
-BASE_MIN = 10            # جلسات القاعدة بدون كسر القاع
-MAX_RISE = 0.50          # قرار أبوفرح: ارتفع ≥50% (من القاع، أو في أول 14 يوم) = انطلق، يُحذف
+# قرار أبوفرح (2026-11-15): تقسيم حديث 10–40 جلسة بس (مو سنة!) + ما ارتفعت + شورت < 20 ألف
+MIN_DAYS_AGO = 10        # على الأقل 10 جلسات من التقسيم
+MAX_DAYS_AGO = 40        # على الأكثر 40 جلسة (تقسيم حديث، قبل ما يطير)
+DROP_TO = 0.65           # نزل لـ ≤65% من سعر ما بعد التقسيم (نزل ≥35%)
+BASE_MIN = 5             # جلسات القاعدة بدون كسر القاع (نافذة قصيرة)
+MAX_RISE = 0.50          # ارتفع ≥50% (من القاع، أو في أول 14 يوم) = انطلق، يُحذف
+NOT_RISEN = 0.25         # «ما ارتفعت» = قريبة القاع (ارتفاع من القاع ≤ 25% لـ«جاهز»)
 EARLY_WIN = 14           # نافذة «أول 14 يوم بعد التقسيم»
 
 STATUS_AR = {"ready": "🎯 جاهز", "near": "🟡 يتجمّع", "watch": "👀 مبكر"}
@@ -53,7 +56,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
         return None
     rj = int(ri[-1])
     days_ago = t - rj
-    if days_ago < 3 or days_ago > MAX_DAYS_AGO:
+    if days_ago < MIN_DAYS_AGO or days_ago > MAX_DAYS_AGO:   # 10–40 جلسة بس (تقسيم حديث)
         return None
     ratio = sp[rj]
     split_open = float(o[rj])                             # افتتاح يوم التقسيم (طلب أبوفرح)
@@ -108,7 +111,8 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     dd = max(0.0, 1 - price / p0)
     dropped = bool(dd >= (1 - DROP_TO))                   # نزل ≥35% (المرشح)
     golden = bool(0.50 <= dd <= 0.85)                     # المنطقة الذهبية (أعلى انفجار)
-    deep_ok = bool(dd >= 0.45)                            # عمق كافٍ لـ«جاهز»
+    rise_from_low = price / support - 1 if support > 0 else 0.0   # كم ارتفع من القاع
+    not_risen = bool(rise_from_low <= NOT_RISEN)          # «ما ارتفعت» = قريبة القاع
     base_ok = bool(age >= BASE_MIN and held and above_lo20)
     # هبوط طرح سابق (≥30% بيوم) بعد التقسيم — إشارة خطر/أو واشر
     dd1 = cs / np.r_[c[rj], cs[:-1]] - 1
@@ -116,9 +120,9 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
 
     if not dropped:
         status = "watch"                                  # قسّم بس ما نزل كفاية بعد
-    elif base_ok and deep_ok and contract and accum:
-        status = "ready"                                  # المنطقة الذهبية + قاعدة مؤكدة
-    elif base_ok and accum:
+    elif base_ok and not_risen and accum:
+        status = "ready"                                  # نزل + قاعدة + ما ارتفع من القاع
+    elif base_ok and rise_from_low <= 0.40 and accum:
         status = "near"
     else:
         status = "watch"
@@ -131,6 +135,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
     score += 12 if accum else 0
     score += 8 if contract else 0
     score += 8 if (20 <= rsi_now <= 50) else 0
+    score += 10 if not_risen else 0                       # ما ارتفعت من القاع (نمط أبوفرح)
     score += 6 if ratio <= 0.1 else (3 if ratio <= 0.2 else 0)   # التقسيم الكبير (1:10+) أفضل
     score = round(max(0.0, min(100.0, score)), 1)
 
@@ -158,6 +163,7 @@ def detect(d: pd.DataFrame, info: dict | None = None) -> dict | None:
         "revsplit": {"ratio": f"1:{round(1/ratio)}", "days_ago": int(days_ago), "p0": _r(p0),
                      "split_open": _r(split_open), "split_high": _r(split_high), "drop_from_p0_pct": _r(drop_from_p0 * 100, 1)},
         "dropped": dropped, "post_split": bool(dropped and base_ok), "golden": golden, "drop_depth_pct": _r(dd * 100, 0),
+        "rise_from_low_pct": _r(rise_from_low * 100, 0), "not_risen": not_risen,
         "peak_after": _r(peak_after), "peak_date": peak_date, "peak_rise_pct": _r(peak_rise_pct, 0),
         "support": _r(support), "ceiling": _r(ceiling), "age": int(age), "days_to_bottom": int(days_to_bottom),
         "pos_in_base_pct": _r(pos * 100, 0), "held": held, "contract": contract, "accum": accum,
