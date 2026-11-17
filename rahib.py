@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 
 import faisal_rules as FR   # نعيد استخدام أدوات فيصل (الدعم، المقاومات، القيعان الأعلى، الفوليوم، سحب السيولة، W...)
+import prior_rise           # شرط أبوفرح: تاريخ ارتفاع سابق ≥50% خلال 6 شهور
 
 STATUS_AR = {"ready": "🔥 جاهز للارتكاز", "near": "🟡 يتجمّع", "watch": "👀 مراقبة"}
 
@@ -59,6 +60,11 @@ def detect(d: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
     down = bool(perf_month < 0 or perf_quarter < 0)
     if not down:
         return None   # فيصل يرفض المطاردة بعد الصعود — يبحث عن القيعان
+    # شرط أبوفرح: تاريخ ارتفاع سابق ≥50% خلال 6 شهور (سلوك يثبت إنه يتحرك)
+    pr_holder = {}
+    if not prior_rise.apply_gate(pr_holder, d, cfg):
+        return None
+    prior = pr_holder.get("prior_rise")
 
     # ===== الإعداد: دعم حقيقي + تجميع + ثبات + مساحة + مو ضخ =====
     sup = FR.find_support(d); support = sup["level"]; touches = int(sup["touches"])
@@ -163,6 +169,8 @@ def detect(d: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
         (f"مساحة صعود: أول مقاومة {FR.fmt_price(t1)} (+{upside_pct:.0f}%)" if has_upside else "ما فيه هدف واضح فوق"),
         f"RSI {rsi_now}",
     ]
+    if prior:
+        why.append(f"📈 تاريخ ارتفاع سابق: +{prior['max_rise_pct']:.0f}% ({prior['from_date']}→{prior['date']}) — سلوك يثبت إنه يتحرك")
     if sweep:
         why.append(f"سحب سيولة إلى {FR.fmt_price(sweep['sweep_low'])} ثم رجع فوق الدعم ✓ (ادخل بعد الاسترداد)")
     if w and not w.get("broken"):
@@ -185,7 +193,7 @@ def detect(d: pd.DataFrame, info: dict | None, cfg: dict) -> dict | None:
         "rsi": rsi_now, "sweep": bool(sweep), "w": bool(w and not w.get("broken")),
         "former_runner_pct": _r(fr_run["max_pct"], 0), "reverse_split": last_rs,
         "float": flt, "market_cap": mcap, "upside_pct": _r(upside_pct, 0), "has_upside": has_upside,
-        "checklist": checklist,
+        "prior_rise": prior, "checklist": checklist,
         "plan": {
             "demand_zone": [_r(support), _r(zone_hi)],
             "tranches": [_r(x) for x in tranches],

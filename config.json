@@ -57,7 +57,11 @@
     "short_penalty_shares": 100000,
     "_short_penalty_help": "طريقة فيصل: الشورت المتاح فوق هالرقم = خصم 8 نقاط (تقييم بس، مو استبعاد)",
     "exclude_hrt": true,
-    "_exclude_hrt_help": "قرار المستخدم: الأسهم اللي HRT Financial LP (Hudson River Trading) من ملاكها ما تترشح (تقرير 13F)"
+    "_exclude_hrt_help": "قرار المستخدم: الأسهم اللي HRT Financial LP (Hudson River Trading) من ملاكها ما تترشح (تقرير 13F)",
+    "require_prior_rise": true,
+    "prior_rise_pct": 50,
+    "prior_rise_months": 6,
+    "_prior_rise_help": "قرار أبوفرح 2026-11-17: أي سهم في رادارات فيصل (المطوّر/الأصلي/المدمج/الرهيب) وعبدالله لازم عنده ارتفاع سابق ≥50% خلال 6 شهور"
   },
   "scan": {
     "history_period": "2y",
@@ -66,7 +70,11 @@
     "deep_scan_min_score": 45,
     "deep_scan_max": 100,
     "report_min_score": 40,
-    "dev_page_statuses": ["ready", "near", "radar"],
+    "dev_page_statuses": [
+      "ready",
+      "near",
+      "radar"
+    ],
     "_dev_page_statuses_help": "قرار المستخدم: صفحة فيصل المطوّر تعرض ✅ مطابق ثم 🟡 قريب ثم 👀 تحت الرادار (بالترتيب)، بدون «غير مطابق». شيل radar = تنطوي تحت. null = يعرض الكل",
     "data_source": "alpaca",
     "_data_source_help": "alpaca = أسعار Alpaca (كل البورصات، فوليوم البري والأفتر صحيح) وياهو احتياط · yahoo = ياهو فقط"

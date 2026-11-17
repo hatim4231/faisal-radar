@@ -32,6 +32,7 @@ sys.path.insert(0, str(HERE))
 
 import scanner as data  # noqa: E402  (أدوات جلب البيانات فقط)
 import abdullah_rules as ar  # noqa: E402
+import prior_rise  # noqa: E402
 import news_tools  # noqa: E402
 import sec_tools  # noqa: E402
 import compliance_rule  # noqa: E402
@@ -107,6 +108,9 @@ def run(cfg, tickers=None, deep=True) -> dict:
             log(f"  خطأ في {t}:", traceback.format_exc(limit=1).splitlines()[-1])
             continue
         if not a:
+            continue
+        # شرط أبوفرح: تاريخ ارتفاع سابق ≥50% خلال 6 شهور
+        if not prior_rise.apply_gate(a, d, cfg) and not explicit:
             continue
         mcap, flt = inf.get("marketCap"), inf.get("floatShares")
         if flt is not None and flt < 50_000:

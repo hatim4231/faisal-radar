@@ -34,6 +34,7 @@ import news_tools
 import split_rule
 import new_low_rule
 import compliance_rule
+import prior_rise
 import sec_tools
 import report
 
@@ -535,6 +536,9 @@ def run_scan(cfg, tickers: list[str] | None = None, deep: bool = True) -> dict:
         split_rule.apply(a, d)  # منطقة التقسيم (عبدالإله): وسم ومعلومات فقط
         new_low_rule.apply(a, d)  # قاع جديد: ما يترشح لين يتماسك عند الدعم الثاني ويختبره
         compliance_rule.apply_faisal(a, d)  # امتثال ناسداك للأسهم تحت 1$
+        # شرط أبوفرح: تاريخ ارتفاع سابق ≥50% خلال 6 شهور (سلوك يثبت إنه يتحرك)
+        if not prior_rise.apply_gate(a, d, cfg) and not explicit:
+            continue
         if a["gate_fail"] and not explicit:
             continue
         inf = infos.get(t) or {}

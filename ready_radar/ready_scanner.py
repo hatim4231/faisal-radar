@@ -46,6 +46,7 @@ import holders  # noqa: E402
 import highrisk as HR  # noqa: E402
 import ready as R  # noqa: E402
 import delist as DL  # noqa: E402
+import prior_rise  # noqa: E402
 
 log = data.log
 OUT = ROOT / "output"
@@ -124,6 +125,9 @@ def run(cfg, tickers=None) -> dict:
         so = b["irtikaz"]["status"] if b and not b.get("gate_fail") else None
         st = best_status(sd, so)
         if st not in ("ready", "near"):
+            continue
+        # شرط أبوفرح: تاريخ ارتفاع سابق ≥50% خلال 6 شهور
+        if not prior_rise.apply_gate(a or b or {}, d, cfg):
             continue
         # نستخدم خطة المحرّك اللي حالته أقوى (تعادل = المطوّر)
         use_dev = (sd == st) if (sd in ("ready", "near")) else False
