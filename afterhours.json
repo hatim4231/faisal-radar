@@ -541,7 +541,13 @@
     "t2_is_high": false
    },
    "fire_max_pct": -16.3,
-   "fire_result": "stop"
+   "fire_result": "stop",
+   "N": "2026-11-17",
+   "pm_high_pct": 8.5,
+   "close_next_pct": -24.4,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   },
   {
    "symbol": "SPAI",
@@ -571,7 +577,13 @@
    "t1": 3.2616,
    "t2": 3.4099,
    "stop": 2.6686,
-   "pm_min_vol": 217593
+   "pm_min_vol": 217593,
+   "N": "2026-11-17",
+   "pm_high_pct": 20.1,
+   "close_next_pct": 1.4,
+   "r10": "hit",
+   "r15": "hit",
+   "result": "t2"
   }
  ],
  "fire_sent": [
