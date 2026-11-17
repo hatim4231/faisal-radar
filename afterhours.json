@@ -469,6 +469,107 @@
    "pm_high_pct": 55.2,
    "close_next_pct": 18.0,
    "result": "nofill"
+  },
+  {
+   "symbol": "AKAN",
+   "D": "2026-11-16",
+   "close": 2.205,
+   "ah_high": 2.91,
+   "ah_last": 2.71,
+   "ah_vwap": 2.2881,
+   "jump_pct": 32.0,
+   "hold_pct": 72,
+   "ah_vol": 4604852,
+   "rth_vol": 51924373,
+   "limit": 2.2881,
+   "name": "Akanda Corp.",
+   "price": 2.71,
+   "float": 709911,
+   "short": 0,
+   "short_src": "غير متاح للشورت عند IB",
+   "flags": [
+    "⛔ HRT من الملاك (2026-09-30)",
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "Canada",
+   "flag": "🇨🇦",
+   "country_ar": "كندا",
+   "hrt": {
+    "shares": 33737,
+    "name13f": "AKANDA CORP",
+    "period": "2026-09-30",
+    "filed": "2026-11-13"
+   },
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-10-01",
+     "what": "SEC F-1"
+    },
+    {
+     "date": "2026-10-19",
+     "what": "SEC F-1/A"
+    },
+    {
+     "date": "2026-11-06",
+     "what": "SEC F-1/A"
+    }
+   ],
+   "dilution_level": "medium",
+   "eligible": false,
+   "t1": 2.5169,
+   "t2": 2.6313,
+   "stop": 2.0593,
+   "pm_min_vol": 322339,
+   "second_leg": {
+    "E": "2026-11-13",
+    "k": 1,
+    "jump_E": 153,
+    "hiE": 1.7,
+    "pre": 0.6717,
+    "above_base": 3.29,
+    "n_exp": 5
+   },
+   "fire": true,
+   "fire_plan": {
+    "t1": 2.6313,
+    "t2": 2.9745,
+    "stop": 2.0593,
+    "t2_is_high": false
+   }
+  },
+  {
+   "symbol": "SPAI",
+   "D": "2026-11-16",
+   "close": 2.46,
+   "ah_high": 3.2,
+   "ah_last": 2.9885,
+   "ah_vwap": 2.9651,
+   "jump_pct": 30.1,
+   "hold_pct": 71,
+   "ah_vol": 3108474,
+   "rth_vol": 234028,
+   "limit": 2.9651,
+   "name": "Safe Pro Group Inc.",
+   "price": 2.9885,
+   "float": 11556739,
+   "short": 0,
+   "short_src": "غير متاح للشورت عند IB",
+   "flags": [],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": true,
+   "t1": 3.2616,
+   "t2": 3.4099,
+   "stop": 2.6686,
+   "pm_min_vol": 217593
   }
  ],
  "fire_sent": [
