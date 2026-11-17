@@ -539,7 +539,9 @@
     "t2": 2.9745,
     "stop": 2.0593,
     "t2_is_high": false
-   }
+   },
+   "fire_max_pct": -16.3,
+   "fire_result": "stop"
   },
   {
    "symbol": "SPAI",
