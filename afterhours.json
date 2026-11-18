@@ -584,6 +584,121 @@
    "r10": "hit",
    "r15": "hit",
    "result": "t2"
+  },
+  {
+   "symbol": "AMCI",
+   "D": "2026-11-17",
+   "close": 1.0601,
+   "ah_high": 1.2408,
+   "ah_last": 1.23,
+   "ah_vwap": 1.0503,
+   "jump_pct": 17.0,
+   "hold_pct": 94,
+   "ah_vol": 79914,
+   "rth_vol": 210924,
+   "limit": 1.0503,
+   "name": "AMC Robotics Corporation",
+   "price": 1.23,
+   "float": 3670299,
+   "short": 15000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "⛔ HRT من الملاك (2026-09-30)",
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "hrt": {
+    "shares": 15202,
+    "name13f": "AMC ROBOTICS CORP",
+    "period": "2026-09-30",
+    "filed": "2026-11-13"
+   },
+   "tags": [
+    "⛔ تخفيف SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-08-20",
+     "what": "SEC 424B3 + SEC 424B3"
+    },
+    {
+     "date": "2026-09-18",
+     "what": "SEC 424B3"
+    },
+    {
+     "date": "2026-10-01",
+     "what": "SEC 424B3"
+    },
+    {
+     "date": "2026-10-22",
+     "what": "SEC S-1"
+    },
+    {
+     "date": "2026-11-02",
+     "what": "SEC EFFECT + SEC 424B3"
+    },
+    {
+     "date": "2026-11-16",
+     "what": "SEC 424B3"
+    }
+   ],
+   "dilution_level": "high",
+   "eligible": false,
+   "t1": 1.1553,
+   "t2": 1.2078,
+   "stop": 0.9453,
+   "pm_min_vol": 5593
+  },
+  {
+   "symbol": "AZI",
+   "D": "2026-11-17",
+   "close": 0.736,
+   "ah_high": 1.25,
+   "ah_last": 1.2301,
+   "ah_vwap": 1.0293,
+   "jump_pct": 69.8,
+   "hold_pct": 96,
+   "ah_vol": 11933457,
+   "rth_vol": 25087171,
+   "limit": 1.0293,
+   "name": "Autozi Internet Technology (Glo",
+   "price": 1.2301,
+   "float": 3827958,
+   "short": 0,
+   "short_src": "غير متاح للشورت عند IB",
+   "flags": [
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "China",
+   "flag": "🇨🇳",
+   "country_ar": "الصين",
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-08-20",
+     "what": "SEC 6-K/A EX-99.1"
+    },
+    {
+     "date": "2026-10-09",
+     "what": "SEC F-3"
+    },
+    {
+     "date": "2026-10-16",
+     "what": "SEC EFFECT"
+    }
+   ],
+   "dilution_level": "medium",
+   "eligible": false,
+   "t1": 1.1322,
+   "t2": 1.1837,
+   "stop": 0.9264,
+   "pm_min_vol": 835341
   }
  ],
  "fire_sent": [
