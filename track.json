@@ -265,12 +265,12 @@
    "name": "PN Smart Energy Limited",
    "why": "موجة 2.71→15.40 · دعم 2.14 · اختبر 5 مرات · تماسك 23 جلسة",
    "dilution": "medium",
-   "sessions": 8,
-   "last": 2.26,
-   "last_date": "2026-11-17",
+   "sessions": 9,
+   "last": 2.3,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.4,
    "max_dd_pct": -6.8,
-   "ret_pct": -5.0,
+   "ret_pct": -3.4,
    "stop_old": 2.1186,
    "closed": null,
    "t1_date": null,
@@ -294,12 +294,12 @@
    "name": "SPRINGVIEW HOLDINGS LTD",
    "why": "موجة 2.02→5.94 · دعم 2.25 · اختبر 3 مرات · تماسك 6 جلسة",
    "dilution": "none",
-   "sessions": 8,
-   "last": 2.42,
-   "last_date": "2026-11-17",
+   "sessions": 9,
+   "last": 2.33,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.4,
    "max_dd_pct": -2.6,
-   "ret_pct": 4.8,
+   "ret_pct": 0.9,
    "stop_old": 2.2275,
    "closed": null,
    "t1_date": null,
@@ -323,12 +323,12 @@
    "name": "CAMP4 THERAPEUTICS CORPORATION",
    "why": "موجة 2.90→6.00 · دعم 3.48 · اختبر 2 مرات · تماسك 7 جلسة",
    "dilution": "medium",
-   "sessions": 8,
-   "last": 4.0,
-   "last_date": "2026-11-17",
+   "sessions": 9,
+   "last": 3.94,
+   "last_date": "2026-11-18",
    "max_gain_pct": 33.6,
    "max_dd_pct": -3.8,
-   "ret_pct": 7.5,
+   "ret_pct": 5.9,
    "stop_old": 3.4452,
    "closed": null,
    "t1_date": "2026-11-09",
@@ -434,16 +434,16 @@
    "name": "Yunji Inc. - American Depositor",
    "why": "موجة 1.18→6.00 · دعم 1.10 · اختبر 3 مرات · تماسك 11 جلسة",
    "dilution": "none",
-   "sessions": 7,
-   "last": 1.25,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.26,
+   "last_date": "2026-11-18",
    "stop_old": 1.089,
    "closed": null,
    "t1_date": "2026-11-12",
    "sweeps": [],
    "max_gain_pct": 21.6,
    "max_dd_pct": -3.1,
-   "ret_pct": 10.1
+   "ret_pct": 11.0
   },
   {
    "id": "abdullah:LONA:2026-11-06",
@@ -607,16 +607,16 @@
    "name": "Firefly Neuroscience, Inc.",
    "why": "موجة 0.930→2.13 · دعم 0.900 · اختبر 2 مرات · تماسك 15 جلسة",
    "dilution": "none",
-   "sessions": 7,
-   "last": 0.9126,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8874,
+   "last_date": "2026-11-18",
    "stop_old": 0.891,
    "closed": null,
    "t1_date": null,
    "sweeps": [],
    "max_gain_pct": 13.5,
    "max_dd_pct": -8.0,
-   "ret_pct": -1.3
+   "ret_pct": -4.1
   },
   {
    "id": "abdullah:NUCL:2026-11-06",
@@ -907,12 +907,12 @@
    "name": "Jiuzi Holdings, Inc.",
    "why": "موجة 0.928→2.37 · دعم 1.00 · اختبر 4 مرات · تماسك 37 جلسة",
    "dilution": "none",
-   "sessions": 7,
-   "last": 1.07,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.06,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.1,
    "max_dd_pct": -17.8,
-   "ret_pct": -0.0,
+   "ret_pct": -0.9,
    "sweeps": [
     "2026-11-16",
     "2026-11-16",
@@ -928,6 +928,8 @@
     "2026-11-16",
     "2026-11-16",
     "2026-11-16",
+    "2026-11-16",
+    "2026-11-17",
     "2026-11-16",
     "2026-11-17",
     "2026-11-16",
@@ -1006,12 +1008,12 @@
    "name": "Veea Inc.",
    "why": "موجة 1.34→6.25 · دعم 4.18 · اختبر 3 مرات · تماسك 6 جلسة",
    "dilution": "medium",
-   "sessions": 7,
-   "last": 4.67,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.5709,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.3,
    "max_dd_pct": -18.7,
-   "ret_pct": -5.1
+   "ret_pct": -7.1
   },
   {
    "id": "abdullah:RAIN:2026-11-06",
@@ -1032,12 +1034,12 @@
    "name": "Rain Enhancement Technologies H",
    "why": "موجة 0.649→1.54 · دعم 0.500 · اختبر 2 مرات · تماسك 11 جلسة",
    "dilution": "none",
-   "sessions": 7,
-   "last": 1.06,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.07,
+   "last_date": "2026-11-18",
    "max_gain_pct": 134.0,
    "max_dd_pct": -8.0,
-   "ret_pct": 112.0,
+   "ret_pct": 114.0,
    "stop_warned": "2026-11-12",
    "t1_date": "2026-11-13"
   },
@@ -1087,12 +1089,12 @@
    "name": "Jianzhi Education Technology Gr",
    "why": "موجة 0.370→2.14 · دعم 0.970 · اختبر 3 مرات · تماسك 4 جلسة",
    "dilution": "medium",
-   "sessions": 7,
-   "last": 1.55,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 74.5,
    "max_dd_pct": -2.0,
-   "ret_pct": 52.0,
+   "ret_pct": 43.1,
    "t1_date": "2026-11-09"
   },
   {
@@ -1251,12 +1253,12 @@
    "name": "Orangekloud Technology Inc.",
    "why": "RSI 53.3 · دعم 0.887 (عنه 14.4%) · منطقة الطلب 0.887–0.976",
    "dilution": "none",
-   "sessions": 7,
-   "last": 0.995,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.9651,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.5,
    "max_dd_pct": -6.4,
-   "ret_pct": -2.0
+   "ret_pct": -4.9
   },
   {
    "id": "abdullah:DAIC:2026-11-06",
@@ -1384,12 +1386,12 @@
    "name": "Cre8 Enterprise Limited",
    "why": "قاعدة 48 جلسة بين 2.49 و 3.11",
    "dilution": "none",
-   "sessions": 7,
-   "last": 2.37,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.2,
    "max_dd_pct": -6.0,
-   "ret_pct": -5.2,
+   "ret_pct": -1.6,
    "t1_date": "2026-11-12"
   },
   {
@@ -1437,12 +1439,12 @@
    "name": "Citius Pharmaceuticals, Inc.",
    "why": "قاعدة 10 جلسة بين 0.433 و 0.614",
    "dilution": "none",
-   "sessions": 7,
-   "last": 0.5188,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.53,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.0,
    "max_dd_pct": -15.4,
-   "ret_pct": -4.8
+   "ret_pct": -2.8
   },
   {
    "id": "accumulation:DAIC:2026-11-06",
@@ -1463,12 +1465,15 @@
    "name": "CID HoldCo, Inc.",
    "why": "قاعدة 17 جلسة بين 0.994 و 1.39",
    "dilution": "none",
-   "sessions": 7,
-   "last": 0.8021,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8001,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.9,
-   "max_dd_pct": -24.8,
-   "ret_pct": -20.6
+   "max_dd_pct": -25.7,
+   "ret_pct": -20.8,
+   "sweeps": [
+    "2026-11-18"
+   ]
   },
   {
    "id": "faisal_dev:BEEM:2026-11-06",
@@ -1624,12 +1629,12 @@
    },
    "flag": "🇸🇪",
    "country_ar": "السويد",
-   "sessions": 7,
-   "last": 7.275,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 7.25,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.8,
    "max_dd_pct": -10.1,
-   "ret_pct": -7.4,
+   "ret_pct": -7.8,
    "zone_alerted": "2026-11-09",
    "t1_date": "2026-11-10"
   },
@@ -1672,9 +1677,9 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
+   "sessions": 8,
    "last": 8.77,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 5.7,
    "max_dd_pct": -4.1,
@@ -1719,13 +1724,13 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 3.86,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.835,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 2.5,
    "max_dd_pct": -8.2,
-   "ret_pct": -7.0
+   "ret_pct": -7.6
   },
   {
    "id": "faisal_dev:ASTI:2026-11-06",
@@ -1836,13 +1841,13 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.7481,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.775,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 13.0,
    "max_dd_pct": -8.6,
-   "ret_pct": 1.3
+   "ret_pct": 4.9
   },
   {
    "id": "faisal_orig:ONEN:2026-11-06",
@@ -2078,13 +2083,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.01,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.1,
+   "last_date": "2026-11-18",
    "stop_warned": "2026-11-06",
    "max_gain_pct": 68.1,
    "max_dd_pct": -0.0,
-   "ret_pct": 5.4,
+   "ret_pct": 14.8,
    "zone_alerted": "2026-11-09",
    "t1_date": "2026-11-09"
   },
@@ -2243,13 +2248,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.84,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8701,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 46.5,
    "max_dd_pct": -3.6,
-   "ret_pct": 2.5,
+   "ret_pct": 6.2,
    "t1_date": "2026-11-09"
   },
   {
@@ -2406,12 +2411,12 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.34,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.31,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.0,
-   "max_dd_pct": -9.6,
-   "ret_pct": -8.2
+   "max_dd_pct": -13.7,
+   "ret_pct": -10.3
   },
   {
    "id": "faisal_orig:RDZN:2026-11-06",
@@ -2485,13 +2490,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.7481,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.775,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 13.0,
    "max_dd_pct": -8.6,
-   "ret_pct": 1.3
+   "ret_pct": 4.9
   },
   {
    "id": "faisal_orig:FHTX:2026-11-06",
@@ -2648,13 +2653,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 4.71,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.69,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 6.8,
    "max_dd_pct": -1.5,
-   "ret_pct": 2.6,
+   "ret_pct": 2.2,
    "stop_warned": "2026-11-10"
   },
   {
@@ -2728,9 +2733,9 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
+   "sessions": 8,
    "last": 8.77,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 5.7,
    "max_dd_pct": -4.1,
@@ -2767,13 +2772,13 @@
    "conf_similar": null,
    "flag": "🇲🇾",
    "country_ar": "ماليزيا",
-   "sessions": 7,
-   "last": 1.1,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.09,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 28.5,
    "max_dd_pct": -1.6,
-   "ret_pct": 14.0,
+   "ret_pct": 13.0,
    "t1_date": "2026-11-13"
   },
   {
@@ -2847,13 +2852,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.98,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.945,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 7.9,
    "max_dd_pct": -4.5,
-   "ret_pct": 0.5
+   "ret_pct": -0.1
   },
   {
    "id": "faisal_orig:ANGI:2026-11-06",
@@ -3206,12 +3211,12 @@
    "conf_similar": null,
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 7,
-   "last": 2.49,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.539,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.3,
    "max_dd_pct": -17.9,
-   "ret_pct": -5.3,
+   "ret_pct": -3.5,
    "t1_date": "2026-11-10"
   },
   {
@@ -3245,13 +3250,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 8.015,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.02,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 0.1,
    "max_dd_pct": -6.3,
-   "ret_pct": -4.5
+   "ret_pct": -4.4
   },
   {
    "id": "abdullah:LSTA:2026-11-06",
@@ -3280,12 +3285,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.04,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.0383,
+   "last_date": "2026-11-18",
    "max_gain_pct": 38.8,
    "max_dd_pct": -4.4,
-   "ret_pct": 1.0,
+   "ret_pct": 0.8,
    "zone_alerted": "2026-11-09",
    "t1_date": "2026-11-09"
   },
@@ -3429,6 +3434,9 @@
     "2026-11-17",
     "2026-11-12",
     "2026-11-16",
+    "2026-11-17",
+    "2026-11-12",
+    "2026-11-16",
     "2026-11-17"
    ]
   },
@@ -3459,9 +3467,9 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
+   "sessions": 8,
    "last": 3.595,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 18.8,
    "max_dd_pct": -9.8,
    "ret_pct": -6.1,
@@ -3473,7 +3481,7 @@
    "radar_name": "🌊 عبدالله",
    "sub1": false,
    "opened_at": "2026-11-08 04:50",
-   "result": "open",
+   "result": "stop",
    "horizon": 20,
    "symbol": "KMRK",
    "status": "ready",
@@ -3494,12 +3502,12 @@
    "accum": null,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 7,
-   "last": 1.24,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": -0.3,
-   "max_dd_pct": -21.0,
-   "ret_pct": -20.0,
+   "max_dd_pct": -22.6,
+   "ret_pct": -22.6,
    "zone_alerted": "2026-11-11",
    "sweeps": [
     "2026-11-17",
@@ -3509,8 +3517,10 @@
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
+    "2026-11-17",
     "2026-11-17"
-   ]
+   ],
+   "closed": "2026-11-18"
   },
   {
    "id": "abdullah:MNOV:2026-11-06",
@@ -3539,12 +3549,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.34,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.31,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.0,
-   "max_dd_pct": -9.6,
-   "ret_pct": -8.2,
+   "max_dd_pct": -13.7,
+   "ret_pct": -10.3,
    "zone_alerted": "2026-11-10"
   },
   {
@@ -3574,13 +3584,13 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 2.14,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.2,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 4.2,
    "max_dd_pct": -4.2,
-   "ret_pct": 0.9
+   "ret_pct": 3.8
   },
   {
    "id": "abdullah:AVX:2026-11-06",
@@ -3624,7 +3634,7 @@
    "radar_name": "🌊 عبدالله",
    "sub1": false,
    "opened_at": "2026-11-08 04:50",
-   "result": "open",
+   "result": "stop",
    "horizon": 20,
    "symbol": "BOLT",
    "status": "ready",
@@ -3645,13 +3655,14 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.65,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.37,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.8,
-   "max_dd_pct": -14.8,
-   "ret_pct": -13.6,
-   "zone_alerted": "2026-11-09"
+   "max_dd_pct": -18.0,
+   "ret_pct": -17.9,
+   "zone_alerted": "2026-11-09",
+   "closed": "2026-11-18"
   },
   {
    "id": "abdullah:CAST:2026-11-06",
@@ -3717,12 +3728,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.9791,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.9805,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.2,
    "max_dd_pct": -20.0,
-   "ret_pct": -17.0,
+   "ret_pct": -16.9,
    "t1_date": "2026-11-09"
   },
   {
@@ -3752,14 +3763,15 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.7621,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.76,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.6,
    "max_dd_pct": -19.5,
-   "ret_pct": -7.1,
+   "ret_pct": -7.3,
    "zone_alerted": "2026-11-10",
    "sweeps": [
+    "2026-11-11",
     "2026-11-11",
     "2026-11-11",
     "2026-11-11",
@@ -3905,13 +3917,13 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.66,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.62,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 6.9,
    "max_dd_pct": -13.2,
-   "ret_pct": -4.6
+   "ret_pct": -6.9
   },
   {
    "id": "abdullah:HUIZ:2026-11-06",
@@ -3940,12 +3952,12 @@
    "accum": null,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 2.27,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.28,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.7,
    "max_dd_pct": -7.5,
-   "ret_pct": -0.4
+   "ret_pct": 0.0
   },
   {
    "id": "abdullah:RRGB:2026-11-06",
@@ -3974,12 +3986,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 8.16,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.02,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.5,
-   "max_dd_pct": -5.6,
-   "ret_pct": -5.3
+   "max_dd_pct": -9.8,
+   "ret_pct": -7.0
   },
   {
    "id": "abdullah:SORA:2026-11-06",
@@ -4042,12 +4054,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.9497,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 12.6,
+   "sessions": 8,
+   "last": 0.96,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 13.2,
    "max_dd_pct": -8.3,
-   "ret_pct": 11.4,
+   "ret_pct": 12.6,
    "t1_date": "2026-11-09"
   },
   {
@@ -4112,13 +4124,13 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 3.07,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.105,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-06",
    "max_gain_pct": 17.5,
    "max_dd_pct": -8.8,
-   "ret_pct": -6.4
+   "ret_pct": -5.3
   },
   {
    "id": "abdullah:GOSS:2026-11-06",
@@ -4147,12 +4159,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 11.04,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 10.95,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.4,
    "max_dd_pct": -2.3,
-   "ret_pct": 13.0,
+   "ret_pct": 12.1,
    "t1_date": "2026-11-09"
   },
   {
@@ -4280,12 +4292,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 6.51,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.45,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.7,
    "max_dd_pct": -4.5,
-   "ret_pct": -1.8
+   "ret_pct": -2.7
   },
   {
    "id": "insiders:QTEX:2026-11-06",
@@ -4310,9 +4322,9 @@
    "accum": null,
    "flag": "🇮🇱",
    "country_ar": "إسرائيل",
-   "sessions": 7,
+   "sessions": 8,
    "last": 1.09,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 31.1,
    "max_dd_pct": -6.8,
    "ret_pct": 5.8,
@@ -4341,12 +4353,12 @@
    "accum": null,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 3.36,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.355,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.3,
    "max_dd_pct": -7.5,
-   "ret_pct": -2.9
+   "ret_pct": -3.0
   },
   {
    "id": "insiders:DUOT:2026-11-06",
@@ -4493,12 +4505,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 2.73,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.75,
+   "last_date": "2026-11-18",
    "max_gain_pct": 14.4,
    "max_dd_pct": -14.4,
-   "ret_pct": -11.9,
+   "ret_pct": -11.3,
    "t1_date": "2026-11-10"
   },
   {
@@ -4523,12 +4535,12 @@
    "dilution": "none",
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 7,
-   "last": 6.86,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.85,
+   "last_date": "2026-11-18",
    "max_gain_pct": 14.7,
    "max_dd_pct": -0.7,
-   "ret_pct": 12.6,
+   "ret_pct": 12.5,
    "t1_date": "2026-11-09"
   },
   {
@@ -4584,12 +4596,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.98,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.945,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.9,
    "max_dd_pct": -4.5,
-   "ret_pct": 0.5,
+   "ret_pct": -0.1,
    "t1_date": "2026-11-09"
   },
   {
@@ -4645,12 +4657,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 2.64,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.66,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.2,
    "max_dd_pct": -2.7,
-   "ret_pct": 1.5
+   "ret_pct": 2.3
   },
   {
    "id": "accumulation:NTWK:2026-11-06",
@@ -4736,12 +4748,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 3.32,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.28,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.9,
    "max_dd_pct": -9.4,
-   "ret_pct": -7.8
+   "ret_pct": -8.9
   },
   {
    "id": "accumulation:CMCT:2026-11-06",
@@ -4765,12 +4777,12 @@
    "dilution": "low",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.43,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.26,
+   "last_date": "2026-11-18",
    "max_gain_pct": 49.1,
    "max_dd_pct": -6.2,
-   "ret_pct": 47.2,
+   "ret_pct": 42.5,
    "t1_date": "2026-11-09"
   },
   {
@@ -4795,12 +4807,12 @@
    "dilution": "low",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.8539,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.819,
+   "last_date": "2026-11-18",
    "max_gain_pct": 14.6,
    "max_dd_pct": -6.0,
-   "ret_pct": 2.0,
+   "ret_pct": -2.2,
    "t1_date": "2026-11-10"
   },
   {
@@ -4825,12 +4837,12 @@
    "dilution": "none",
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 2.27,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.28,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.7,
    "max_dd_pct": -7.5,
-   "ret_pct": -0.4
+   "ret_pct": 0.0
   },
   {
    "id": "accumulation:ICG:2026-11-06",
@@ -4854,12 +4866,12 @@
    "dilution": "none",
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 1.31,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.42,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.9,
    "max_dd_pct": -10.6,
-   "ret_pct": -7.7,
+   "ret_pct": 0.0,
    "t1_date": "2026-11-09"
   },
   {
@@ -4884,12 +4896,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.8,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.82,
+   "last_date": "2026-11-18",
    "max_gain_pct": 41.6,
    "max_dd_pct": -2.4,
-   "ret_pct": 11.1,
+   "ret_pct": 11.5,
    "t1_date": "2026-11-10"
   },
   {
@@ -4898,7 +4910,7 @@
    "radar_name": "🔍 التجميع",
    "sub1": false,
    "opened_at": "2026-11-08 04:50",
-   "result": "open",
+   "result": "stop",
    "horizon": 20,
    "symbol": "BOLT",
    "status": "near",
@@ -4914,12 +4926,13 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.65,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.37,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.8,
-   "max_dd_pct": -14.8,
-   "ret_pct": -13.6
+   "max_dd_pct": -18.0,
+   "ret_pct": -17.9,
+   "closed": "2026-11-18"
   },
   {
    "id": "accumulation:TCRT:2026-11-06",
@@ -4943,12 +4956,12 @@
    "dilution": "medium",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.66,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.62,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.9,
    "max_dd_pct": -13.2,
-   "ret_pct": -4.6
+   "ret_pct": -6.9
   },
   {
    "id": "schools:BYAH:2026-11-06",
@@ -5038,12 +5051,12 @@
    "rand_p": 0.107,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.01,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.1,
+   "last_date": "2026-11-18",
    "max_gain_pct": 68.1,
    "max_dd_pct": -0.0,
-   "ret_pct": 5.4,
+   "ret_pct": 14.8,
    "t1_date": "2026-11-09"
   },
   {
@@ -5100,9 +5113,9 @@
    "rand_p": 0.539,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
+   "sessions": 8,
    "last": 3.595,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 18.8,
    "max_dd_pct": -9.8,
    "ret_pct": -6.1,
@@ -5162,12 +5175,12 @@
    "rand_p": 0.314,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.09,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.115,
+   "last_date": "2026-11-18",
    "max_gain_pct": 22.9,
    "max_dd_pct": -15.8,
-   "ret_pct": -7.6,
+   "ret_pct": -5.5,
    "t1_date": "2026-11-13"
   },
   {
@@ -5292,12 +5305,12 @@
    "rand_p": 0.375,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 3.7,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.68,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.6,
    "max_dd_pct": -1.4,
-   "ret_pct": 4.2
+   "ret_pct": 3.7
   },
   {
    "id": "schools:GNSS:2026-11-06",
@@ -5322,12 +5335,12 @@
    "rand_p": 0.305,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.37,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.4294,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.5,
    "max_dd_pct": -4.4,
-   "ret_pct": -1.8
+   "ret_pct": 2.5
   },
   {
    "id": "schools:JZXN:2026-11-06",
@@ -5442,12 +5455,12 @@
    "rand_p": 0.207,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 7.04,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.82,
+   "last_date": "2026-11-18",
    "max_gain_pct": 16.9,
    "max_dd_pct": 0.9,
-   "ret_pct": 9.3
+   "ret_pct": 5.9
   },
   {
    "id": "schools:DH:2026-11-06",
@@ -5472,12 +5485,12 @@
    "rand_p": 0.475,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.31,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.33,
+   "last_date": "2026-11-18",
    "max_gain_pct": 23.5,
    "max_dd_pct": -5.2,
-   "ret_pct": 13.9,
+   "ret_pct": 15.7,
    "t1_date": "2026-11-11"
   },
   {
@@ -5534,12 +5547,12 @@
    "rand_p": 0.705,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 1.31,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.42,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.9,
    "max_dd_pct": -10.6,
-   "ret_pct": -7.7
+   "ret_pct": 0.0
   },
   {
    "id": "schools:IMRX:2026-11-06",
@@ -5564,12 +5577,12 @@
    "rand_p": 0.31,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 3.46,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.515,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.3,
    "max_dd_pct": -10.1,
-   "ret_pct": -6.0
+   "ret_pct": -4.5
   },
   {
    "id": "schools:SVCO:2026-11-06",
@@ -5594,12 +5607,12 @@
    "rand_p": 0.603,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 6.9,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.93,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.4,
    "max_dd_pct": -5.4,
-   "ret_pct": -1.8,
+   "ret_pct": -1.4,
    "t1_date": "2026-11-11"
   },
   {
@@ -5625,12 +5638,12 @@
    "rand_p": 0.302,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 3.36,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.355,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.3,
    "max_dd_pct": -7.5,
-   "ret_pct": -2.9
+   "ret_pct": -3.0
   },
   {
    "id": "schools:HYFT:2026-11-06",
@@ -5723,12 +5736,12 @@
    "rand_p": 0.087,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 7,
-   "last": 2.37,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.2,
    "max_dd_pct": -6.0,
-   "ret_pct": -5.2,
+   "ret_pct": -1.6,
    "t1_date": "2026-11-12"
   },
   {
@@ -5754,12 +5767,12 @@
    "rand_p": 0.179,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 2.06,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.0,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.3,
    "max_dd_pct": -6.7,
-   "ret_pct": 6.2
+   "ret_pct": 3.1
   },
   {
    "id": "schools:BIVI:2026-11-06",
@@ -5845,12 +5858,12 @@
    "rand_p": 0.056,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 8.55,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.43,
+   "last_date": "2026-11-18",
    "max_gain_pct": 17.9,
    "max_dd_pct": -14.7,
-   "ret_pct": -9.8
+   "ret_pct": -11.1
   },
   {
    "id": "schools:QTEX:2026-11-06",
@@ -5875,9 +5888,9 @@
    "rand_p": 0.041,
    "flag": "🇮🇱",
    "country_ar": "إسرائيل",
-   "sessions": 7,
+   "sessions": 8,
    "last": 1.09,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 31.1,
    "max_dd_pct": -6.8,
    "ret_pct": 5.8
@@ -5905,12 +5918,12 @@
    "rand_p": 0.075,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.84,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8701,
+   "last_date": "2026-11-18",
    "max_gain_pct": 46.5,
    "max_dd_pct": -3.6,
-   "ret_pct": 2.5
+   "ret_pct": 6.2
   },
   {
    "id": "schools:TNMG:2026-11-06",
@@ -6003,12 +6016,12 @@
    "rand_p": 0.074,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.8,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.81,
+   "last_date": "2026-11-18",
    "max_gain_pct": 54.1,
    "max_dd_pct": -1.5,
-   "ret_pct": 35.3
+   "ret_pct": 36.1
   },
   {
    "id": "schools:ATGL:2026-11-06",
@@ -6187,12 +6200,12 @@
    "rand_p": 0.403,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 3.5,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.52,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.9,
    "max_dd_pct": -2.9,
-   "ret_pct": 0.0,
+   "ret_pct": 0.6,
    "t1_date": "2026-11-09"
   },
   {
@@ -6494,12 +6507,12 @@
    "rand_p": 0.584,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 2.67,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.73,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.9,
    "max_dd_pct": -20.0,
-   "ret_pct": -15.9
+   "ret_pct": -14.0
   },
   {
    "id": "schools:ATOM:2026-11-06",
@@ -6560,13 +6573,14 @@
    "rand_p": 0.02,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.46,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.42,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.1,
    "max_dd_pct": -8.2,
-   "ret_pct": -5.2,
+   "ret_pct": -5.9,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -6605,12 +6619,12 @@
    "rand_p": 0.121,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 2.14,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.2,
    "max_dd_pct": -4.2,
-   "ret_pct": 0.9
+   "ret_pct": 3.8
   },
   {
    "id": "schools:ORIO:2026-11-06",
@@ -6635,12 +6649,12 @@
    "rand_p": 0.929,
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 7,
-   "last": 1.07,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.1,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.3,
    "max_dd_pct": -11.9,
-   "ret_pct": -1.8,
+   "ret_pct": 0.9,
    "t1_date": "2026-11-09"
   },
   {
@@ -6700,12 +6714,12 @@
    "rand_p": 0.423,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 0.8539,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.819,
+   "last_date": "2026-11-18",
    "max_gain_pct": 14.6,
    "max_dd_pct": -6.0,
-   "ret_pct": 2.0,
+   "ret_pct": -2.2,
    "t1_date": "2026-11-11"
   },
   {
@@ -6765,12 +6779,12 @@
    "rand_p": 0.285,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.25,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.23,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.2,
    "max_dd_pct": -17.1,
-   "ret_pct": -12.6
+   "ret_pct": -14.0
   },
   {
    "id": "schools:RUBI:2026-11-06",
@@ -6857,12 +6871,12 @@
    "rand_p": 0.092,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 1.3,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.26,
+   "last_date": "2026-11-18",
    "max_gain_pct": 26.1,
    "max_dd_pct": -2.7,
-   "ret_pct": 17.1
+   "ret_pct": 13.5
   },
   {
    "id": "schools:CLRO:2026-11-06",
@@ -7045,12 +7059,12 @@
    "rand_p": 0.253,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 5.98,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.945,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.9,
    "max_dd_pct": -4.5,
-   "ret_pct": 0.5
+   "ret_pct": -0.1
   },
   {
    "id": "schools:HUIZ:2026-11-06",
@@ -7075,12 +7089,12 @@
    "rand_p": 0.446,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 2.27,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.28,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.7,
    "max_dd_pct": -7.5,
-   "ret_pct": -0.4
+   "ret_pct": 0.0
   },
   {
    "id": "schools:SXTC:2026-11-06",
@@ -7214,12 +7228,12 @@
    "rand_p": 0.049,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 11.04,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 10.95,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.4,
    "max_dd_pct": -2.3,
-   "ret_pct": 13.0
+   "ret_pct": 12.1
   },
   {
    "id": "schools:HSDT:2026-11-06",
@@ -7453,6 +7467,9 @@
     "2026-11-17",
     "2026-11-09",
     "2026-11-13",
+    "2026-11-17",
+    "2026-11-09",
+    "2026-11-13",
     "2026-11-17"
    ]
   },
@@ -7479,12 +7496,12 @@
    "rand_p": 0.278,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 7,
-   "last": 4.71,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.69,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.8,
    "max_dd_pct": -1.5,
-   "ret_pct": 2.6
+   "ret_pct": 2.2
   },
   {
    "id": "accumulation:JZXN:2026-11-06",
@@ -7508,12 +7525,12 @@
    "dilution": "none",
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 7,
-   "last": 1.07,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.06,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.1,
    "max_dd_pct": -17.0,
-   "ret_pct": 0.9,
+   "ret_pct": 0.0,
    "sweeps": [
     "2026-11-16",
     "2026-11-16",
@@ -7529,6 +7546,8 @@
     "2026-11-16",
     "2026-11-16",
     "2026-11-16",
+    "2026-11-16",
+    "2026-11-17",
     "2026-11-16",
     "2026-11-17",
     "2026-11-16",
@@ -7608,13 +7627,14 @@
    "dilution": "none",
    "flag": "🇬🇧",
    "country_ar": "بريطانيا",
-   "sessions": 7,
-   "last": 1.06,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.045,
+   "last_date": "2026-11-18",
    "max_gain_pct": 11.9,
    "max_dd_pct": -15.3,
-   "ret_pct": -10.2,
+   "ret_pct": -11.4,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -7667,6 +7687,7 @@
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
+    "2026-11-17",
     "2026-11-17"
    ]
   },
@@ -7692,12 +7713,12 @@
    "dilution": "medium",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 6,
-   "last": 4.0,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 3.94,
+   "last_date": "2026-11-18",
    "max_gain_pct": 11.2,
    "max_dd_pct": -14.0,
-   "ret_pct": -4.0,
+   "ret_pct": -5.4,
    "t1_date": "2026-11-10"
   },
   {
@@ -7722,12 +7743,12 @@
    "dilution": "none",
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 6,
-   "last": 2.34,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 2.3,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.7,
    "max_dd_pct": -6.9,
-   "ret_pct": -2.3
+   "ret_pct": -4.0
   },
   {
    "id": "schools:YJ:2026-11-09",
@@ -7752,12 +7773,12 @@
    "rand_p": 0.033,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 6,
-   "last": 1.25,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.26,
+   "last_date": "2026-11-18",
    "max_gain_pct": 20.5,
    "max_dd_pct": 1.3,
-   "ret_pct": 9.2
+   "ret_pct": 10.0
   },
   {
    "id": "schools:INSG:2026-11-09",
@@ -7820,12 +7841,12 @@
    "rand_p": 0.214,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 6,
-   "last": 4.79,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 4.76,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.4,
-   "max_dd_pct": -18.0,
-   "ret_pct": -17.9
+   "max_dd_pct": -18.4,
+   "ret_pct": -18.4
   },
   {
    "id": "faisal_orig:IPST:2026-11-09",
@@ -8231,12 +8252,12 @@
    "dilution": "none",
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 6,
-   "last": 1.82,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.78,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.3,
    "max_dd_pct": -14.9,
-   "ret_pct": -12.5,
+   "ret_pct": -14.4,
    "t1_date": "2026-11-13"
   },
   {
@@ -8262,12 +8283,12 @@
    "rand_p": 0.101,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 6,
-   "last": 1.82,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.78,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.3,
    "max_dd_pct": -14.9,
-   "ret_pct": -12.5
+   "ret_pct": -14.4
   },
   {
    "id": "faisal_dev:MEDS:2026-11-09",
@@ -8383,12 +8404,12 @@
    "rand_p": 0.215,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 6,
-   "last": 1.24,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.0,
-   "max_dd_pct": -18.9,
-   "ret_pct": -17.9
+   "max_dd_pct": -20.5,
+   "ret_pct": -20.5
   },
   {
    "id": "accumulation:UPLD:2026-11-09",
@@ -8493,13 +8514,13 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 5,
-   "last": 2.33,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 2.29,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-10",
    "max_gain_pct": 50.8,
    "max_dd_pct": -19.5,
-   "ret_pct": -9.0,
+   "ret_pct": -10.6,
    "stop_warned": "2026-11-11",
    "t1_date": "2026-11-16"
   },
@@ -8657,15 +8678,16 @@
    "accum": null,
    "flag": "🇬🇧",
    "country_ar": "بريطانيا",
-   "sessions": 5,
-   "last": 1.06,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 1.045,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-10",
    "max_gain_pct": 12.0,
    "max_dd_pct": -15.2,
-   "ret_pct": -10.1,
+   "ret_pct": -11.4,
    "t1_date": "2026-11-12",
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -8776,12 +8798,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 5,
-   "last": 2.7,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 20.2,
+   "sessions": 6,
+   "last": 2.77,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 24.6,
    "max_dd_pct": -16.2,
-   "ret_pct": 18.4
+   "ret_pct": 21.5
   },
   {
    "id": "faisal_orig:FISN:2026-11-10",
@@ -8863,12 +8885,12 @@
    },
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 5,
-   "last": 2.52,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 2.5,
+   "last_date": "2026-11-18",
    "max_gain_pct": 18.0,
    "max_dd_pct": -2.8,
-   "ret_pct": 5.1
+   "ret_pct": 4.3
   },
   {
    "id": "faisal_dev:HCTI:2026-11-10",
@@ -8909,12 +8931,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 5,
-   "last": 3.38,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 3.29,
+   "last_date": "2026-11-18",
    "max_gain_pct": 15.5,
    "max_dd_pct": -21.8,
-   "ret_pct": -18.9,
+   "ret_pct": -21.1,
    "t1_date": "2026-11-11",
    "zone_alerted": "2026-11-12"
   },
@@ -8943,12 +8965,12 @@
    "why": "موجة 5.55→19.78 · دعم 6.26 · اختبر 3 مرات · تماسك 5 جلسة",
    "dilution": "none",
    "accum": null,
-   "sessions": 5,
-   "last": 5.89,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 5.9643,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.7,
    "max_dd_pct": -12.4,
-   "ret_pct": -11.0,
+   "ret_pct": -9.9,
    "zone_alerted": "2026-11-12"
   },
   {
@@ -9025,12 +9047,12 @@
    "rand_p": 0.079,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 5,
-   "last": 13.56,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 13.98,
+   "last_date": "2026-11-18",
    "max_gain_pct": 11.6,
    "max_dd_pct": -9.2,
-   "ret_pct": -8.9
+   "ret_pct": -6.1
   },
   {
    "id": "highrisk:HKIT:2026-11-10",
@@ -9506,12 +9528,12 @@
    "conf_similar": null,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 5,
-   "last": 1.19,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.8,
    "max_dd_pct": -9.3,
-   "ret_pct": -7.8
+   "ret_pct": -7.0
   },
   {
    "id": "abdullah:CHR:2026-11-10",
@@ -9540,12 +9562,12 @@
    "accum": null,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 5,
-   "last": 1.19,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.8,
    "max_dd_pct": -9.3,
-   "ret_pct": -7.8
+   "ret_pct": -7.0
   },
   {
    "id": "accumulation:USGO:2026-11-10",
@@ -9569,12 +9591,12 @@
    "dilution": "high",
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 5,
-   "last": 4.62,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 4.38,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.4,
    "max_dd_pct": -13.8,
-   "ret_pct": -8.7
+   "ret_pct": -13.4
   },
   {
    "id": "schools:RFIL:2026-11-10",
@@ -9599,12 +9621,12 @@
    "rand_p": 0.297,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 5,
-   "last": 6.765,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 6.855,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.2,
    "max_dd_pct": -11.2,
-   "ret_pct": -6.4
+   "ret_pct": -5.2
   },
   {
    "id": "schools:CHR:2026-11-10",
@@ -9629,12 +9651,12 @@
    "rand_p": 0.126,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 5,
-   "last": 1.19,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.8,
    "max_dd_pct": -9.3,
-   "ret_pct": -7.8
+   "ret_pct": -7.0
   },
   {
    "id": "schools:XCUR:2026-11-10",
@@ -9695,13 +9717,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 4,
-   "last": 4.33,
-   "last_date": "2026-11-17",
+   "sessions": 5,
+   "last": 4.26,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-11",
    "max_gain_pct": 19.6,
-   "max_dd_pct": -5.7,
-   "ret_pct": -4.8,
+   "max_dd_pct": -7.0,
+   "ret_pct": -6.4,
    "t1_date": "2026-11-12"
   },
   {
@@ -10029,12 +10051,12 @@
    },
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 4,
-   "last": 1.72,
-   "last_date": "2026-11-17",
+   "sessions": 5,
+   "last": 1.69,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.6,
    "max_dd_pct": -19.8,
-   "ret_pct": -10.4
+   "ret_pct": -12.0
   },
   {
    "id": "faisal_orig:TDIC:2026-11-11",
@@ -10273,12 +10295,12 @@
    "accum": null,
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 4,
-   "last": 2.34,
-   "last_date": "2026-11-17",
+   "sessions": 5,
+   "last": 2.3,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.3,
    "max_dd_pct": -14.0,
-   "ret_pct": -11.0
+   "ret_pct": -12.5
   },
   {
    "id": "schools:EVAX:2026-11-11",
@@ -10286,7 +10308,7 @@
    "radar_name": "🧭 المدارس",
    "sub1": false,
    "opened_at": "2026-11-12 13:52",
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "symbol": "EVAX",
    "status": "near",
@@ -10303,12 +10325,13 @@
    "rand_p": 0.28,
    "flag": "🇩🇰",
    "country_ar": "الدنمارك",
-   "sessions": 4,
-   "last": 2.78,
-   "last_date": "2026-11-17",
+   "sessions": 5,
+   "last": 2.59,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.5,
-   "max_dd_pct": -8.9,
-   "ret_pct": -4.5
+   "max_dd_pct": -11.0,
+   "ret_pct": -11.0,
+   "closed": "2026-11-18"
   },
   {
    "id": "accumulation:CRVO:2026-11-11",
@@ -10332,12 +10355,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 4,
-   "last": 1.5,
-   "last_date": "2026-11-17",
+   "sessions": 5,
+   "last": 1.53,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.3,
    "max_dd_pct": -15.3,
-   "ret_pct": -15.3,
+   "ret_pct": -13.6,
    "t1_date": "2026-11-12"
   },
   {
@@ -10379,14 +10402,15 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 3,
-   "last": 1.895,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.835,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-12",
    "max_gain_pct": 6.7,
    "max_dd_pct": -12.1,
-   "ret_pct": -7.4,
+   "ret_pct": -10.4,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -10441,12 +10465,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 3,
-   "last": 1.5,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.42,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.5,
    "max_dd_pct": -8.2,
-   "ret_pct": 2.0
+   "ret_pct": -3.4
   },
   {
    "id": "faisal_orig:FISN:2026-11-12",
@@ -10520,13 +10544,13 @@
    "conf_similar": null,
    "flag": "🇩🇰",
    "country_ar": "الدنمارك",
-   "sessions": 3,
-   "last": 2.78,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 2.59,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-12",
    "max_gain_pct": -1.3,
-   "max_dd_pct": -9.4,
-   "ret_pct": -5.0
+   "max_dd_pct": -11.5,
+   "ret_pct": -11.5
   },
   {
    "id": "faisal_orig:ICMB:2026-11-12",
@@ -10599,13 +10623,13 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 3,
-   "last": 0.9005,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 0.862,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-12",
    "max_gain_pct": 4.0,
-   "max_dd_pct": -11.0,
-   "ret_pct": -10.0,
+   "max_dd_pct": -13.8,
+   "ret_pct": -13.8,
    "t1_date": "2026-11-13"
   },
   {
@@ -10675,12 +10699,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 3,
-   "last": 0.9005,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 0.862,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.0,
-   "max_dd_pct": -11.0,
-   "ret_pct": -10.0,
+   "max_dd_pct": -13.8,
+   "ret_pct": -13.8,
    "t1_date": "2026-11-13"
   },
   {
@@ -10710,13 +10734,13 @@
    "accum": null,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 3,
-   "last": 4.79,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 4.76,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-12",
    "max_gain_pct": 4.3,
-   "max_dd_pct": -11.0,
-   "ret_pct": -10.8
+   "max_dd_pct": -11.4,
+   "ret_pct": -11.4
   },
   {
    "id": "abdullah:SUPX:2026-11-12",
@@ -10745,12 +10769,12 @@
    "accum": null,
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 3,
-   "last": 4.9,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 4.97,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.2,
    "max_dd_pct": -9.3,
-   "ret_pct": 1.0
+   "ret_pct": 2.4
   },
   {
    "id": "abdullah:XCH:2026-11-12",
@@ -10983,12 +11007,12 @@
    "why": "〰️ إليوت · نهاية تصحيح ABC (إليوت) · توافق 1/3",
    "dilution": "none",
    "rand_p": 0.083,
-   "sessions": 3,
-   "last": 0.8193,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 0.7978,
+   "last_date": "2026-11-18",
    "max_gain_pct": 16.6,
    "max_dd_pct": -14.4,
-   "ret_pct": -9.9
+   "ret_pct": -12.3
   },
   {
    "id": "abdullah:CRE:2026-11-12",
@@ -11017,12 +11041,12 @@
    "accum": null,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 3,
-   "last": 2.37,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 2.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": -5.8,
    "max_dd_pct": -21.4,
-   "ret_pct": -20.7
+   "ret_pct": -17.7
   },
   {
    "id": "abdullah:YHC:2026-11-12",
@@ -11114,12 +11138,12 @@
    "rand_p": 0.201,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 3,
-   "last": 0.6122,
-   "last_date": "2026-11-17",
-   "max_gain_pct": -10.9,
+   "sessions": 4,
+   "last": 0.6403,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -10.5,
    "max_dd_pct": -23.3,
-   "ret_pct": -14.8
+   "ret_pct": -10.9
   },
   {
    "id": "schools:SNAL:2026-11-12",
@@ -11144,12 +11168,12 @@
    "rand_p": 0.465,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 3,
-   "last": 2.08,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 2.26,
+   "last_date": "2026-11-18",
    "max_gain_pct": 29.8,
    "max_dd_pct": -20.6,
-   "ret_pct": -8.8,
+   "ret_pct": -0.9,
    "t1_date": "2026-11-13"
   },
   {
@@ -11192,12 +11216,12 @@
    "flag": "🇨🇳",
    "country_ar": "الصين",
    "tg": false,
-   "sessions": 3,
-   "last": 1.75,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.7,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.9,
    "max_dd_pct": -10.2,
-   "ret_pct": -6.4
+   "ret_pct": -9.1
   },
   {
    "id": "faisal_orig:OTLY:2026-11-12",
@@ -11316,12 +11340,12 @@
    "flag": "🇨🇳",
    "country_ar": "الصين",
    "tg": false,
-   "sessions": 3,
-   "last": 1.75,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.7,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.9,
    "max_dd_pct": -10.2,
-   "ret_pct": -6.4
+   "ret_pct": -9.1
   },
   {
    "id": "schools:BDAI:2026-11-12",
@@ -11346,12 +11370,12 @@
    "rand_p": 0.231,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 3,
-   "last": 1.75,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.7,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.9,
    "max_dd_pct": -10.2,
-   "ret_pct": -6.4
+   "ret_pct": -9.1
   },
   {
    "id": "merged:TELA:2026-11-13",
@@ -11386,13 +11410,13 @@
     "تحت 1$ من 15 جلسة (الإنذار بعد 30 جلسة متتالية)"
    ],
    "why": "🎯 ثبات · أعلى 2% · RSI 45.0 · دعم 0.774 (عنه 11.1%) · منطقة الطلب 0.774–0.8514 · ارتكاز، Former Runner، Gap Fill، سحب سيولة\n⚠ خطر شطب متوسط: تحت 1$ من 15 جلسة (الإنذار بعد 30 جلسة متتالية)",
-   "sessions": 2,
-   "last": 0.7621,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 0.76,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-13",
    "max_gain_pct": -4.5,
    "max_dd_pct": -12.3,
-   "ret_pct": -11.4,
+   "ret_pct": -11.6,
    "stop_warned": "2026-11-16"
   },
   {
@@ -11426,13 +11450,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 10% · RSI 51.9 · دعم 2.1101 (عنه 12.8%) · منطقة الطلب 2.1101–2.3211 · ارتكاز، Former Runner، Gap Fill، W، سحب سيولة",
-   "sessions": 2,
-   "last": 2.36,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 2.35,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-13",
    "max_gain_pct": 2.7,
    "max_dd_pct": -11.8,
-   "ret_pct": -0.8,
+   "ret_pct": -1.3,
    "stop_warned": "2026-11-16"
   },
   {
@@ -11507,13 +11531,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🚀 طيران · أعلى 5% · RSI 36.1 · دعم 1.98 (عنه 18.7%) · منطقة الطلب 1.98–2.178 · ارتكاز، Gap Fill، استنفد النزول",
-   "sessions": 2,
-   "last": 1.94,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.88,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-13",
    "max_gain_pct": -5.3,
-   "max_dd_pct": -18.3,
-   "ret_pct": -17.4
+   "max_dd_pct": -20.4,
+   "ret_pct": -20.0
   },
   {
    "id": "merged:DGNX:2026-11-13",
@@ -11549,12 +11573,12 @@
     "✂️ تقسيم عكسي 1:8 قبل 198 يوم"
    ],
    "why": "🚀 طيران · أعلى 10% · RSI 48.8 · دعم 1.0601 (عنه 19.8%) · منطقة الطلب 1.0601–1.1661 · ارتكاز، Former Runner، Gap Fill، W، استنفد النزول\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 99% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:8 قبل 198 يوم",
-   "sessions": 2,
-   "last": 1.06,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.045,
+   "last_date": "2026-11-18",
    "max_gain_pct": -0.2,
    "max_dd_pct": -21.3,
-   "ret_pct": -16.5,
+   "ret_pct": -17.7,
    "zone_alerted": "2026-11-16",
    "sweeps": [
     "2026-11-17",
@@ -11564,8 +11588,10 @@
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
+    "2026-11-17",
     "2026-11-17"
-   ]
+   ],
+   "stop_warned": "2026-11-18"
   },
   {
    "id": "merged:YHC:2026-11-13",
@@ -11633,12 +11659,12 @@
    "rand_p": 0.827,
    "flag": "🇮🇱",
    "country_ar": "إسرائيل",
-   "sessions": 2,
-   "last": 1.255,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.25,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.0,
    "max_dd_pct": -1.6,
-   "ret_pct": -0.4
+   "ret_pct": -0.8
   },
   {
    "id": "merged:MWYN:2026-11-13",
@@ -11671,16 +11697,17 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 10% · RSI 44.5 · دعم 1.35 (عنه 2.2%) · منطقة الطلب 1.35–1.485 · ارتكاز، Former Runner، Gap Fill، سحب سيولة",
-   "sessions": 2,
-   "last": 1.33,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.36,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-13",
    "stop_warned": "2026-11-13",
    "max_gain_pct": 12.3,
    "max_dd_pct": -5.8,
-   "ret_pct": -3.6,
+   "ret_pct": -1.4,
    "t1_date": "2026-11-16",
    "sweeps": [
+    "2026-11-16",
     "2026-11-16",
     "2026-11-16",
     "2026-11-16",
@@ -11837,12 +11864,12 @@
    },
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 2,
-   "last": 2.51,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 2.475,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.4,
    "max_dd_pct": -11.0,
-   "ret_pct": -9.2
+   "ret_pct": -10.4
   },
   {
    "id": "faisal_orig:DPRO:2026-11-13",
@@ -11910,12 +11937,12 @@
    "accum": null,
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 2,
-   "last": 2.66,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 2.6,
+   "sessions": 3,
+   "last": 2.85,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 5.2,
    "max_dd_pct": -7.7,
-   "ret_pct": -1.8
+   "ret_pct": 5.2
   },
   {
    "id": "accumulation:BDAI:2026-11-13",
@@ -11939,12 +11966,12 @@
    "dilution": "medium",
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 2,
-   "last": 1.75,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.7,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.8,
    "max_dd_pct": -7.7,
-   "ret_pct": -3.8
+   "ret_pct": -6.6
   },
   {
    "id": "schools:CIIT:2026-11-13",
@@ -11969,12 +11996,12 @@
    "rand_p": 0.186,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 2,
-   "last": 1.72,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.655,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.1,
    "max_dd_pct": -14.6,
-   "ret_pct": -11.0
+   "ret_pct": -14.3
   },
   {
    "id": "schools:VSA:2026-11-13",
@@ -12038,12 +12065,12 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 5% · RSI 54.7 · دعم 0.9604 (عنه 27.0%) · منطقة الطلب 0.9604–1.0564 · ارتكاز، Former Runner، Gap Fill، W، استنفد النزول",
-   "sessions": 2,
-   "last": 1.04,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.0383,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.0,
    "max_dd_pct": -18.0,
-   "ret_pct": -14.8,
+   "ret_pct": -14.9,
    "zone_alerted": "2026-11-17"
   },
   {
@@ -12077,12 +12104,12 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 10% · RSI 73.6 · دعم 1.89 (عنه 15.4%) · منطقة الطلب 1.89–2.079 · ارتكاز، Former Runner، W، زخم",
-   "sessions": 2,
-   "last": 2.11,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 2.04,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.4,
    "max_dd_pct": -9.3,
-   "ret_pct": -3.2,
+   "ret_pct": -6.4,
    "t1_date": "2026-11-16",
    "zone_alerted": "2026-11-17"
   },
@@ -12163,13 +12190,13 @@
     "تحت 1$ من 1 جلسة (الإنذار بعد 30 جلسة متتالية)"
    ],
    "why": "🚀 طيران · أعلى 10% · RSI 31.4 · دعم 0.9068 (عنه 9.2%) · منطقة الطلب 0.9068–0.9975 · ارتكاز، Former Runner، Gap Fill\n⚠ خطر شطب متوسط: تحت 1$ من 1 جلسة (الإنذار بعد 30 جلسة متتالية)",
-   "sessions": 2,
-   "last": 0.9814,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 0.99,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-13",
    "max_gain_pct": 16.1,
    "max_dd_pct": -4.7,
-   "ret_pct": -0.9
+   "ret_pct": -0.0
   },
   {
    "id": "faisal_orig:GP:2026-11-13",
@@ -12277,12 +12304,12 @@
    "accum": null,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 2,
-   "last": 1.61,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.51,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.5,
    "max_dd_pct": -11.0,
-   "ret_pct": 0.2
+   "ret_pct": -6.0
   },
   {
    "id": "abdullah:INHD:2026-11-13",
@@ -12311,12 +12338,12 @@
    "accum": null,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 2,
-   "last": 2.35,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 2.3,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.0,
-   "max_dd_pct": -13.1,
-   "ret_pct": -12.0
+   "max_dd_pct": -13.9,
+   "ret_pct": -13.9
   },
   {
    "id": "schools:INHD:2026-11-13",
@@ -12379,12 +12406,12 @@
    "rand_p": 0.134,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 2,
-   "last": 1.69,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.71,
+   "last_date": "2026-11-18",
    "max_gain_pct": 61.5,
    "max_dd_pct": 23.0,
-   "ret_pct": 38.5
+   "ret_pct": 40.2
   },
   {
    "id": "merged:MEDS:2026-11-13",
@@ -12460,12 +12487,12 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 20% · RSI 49.7 · دعم 1.03 (عنه 14.1%) · منطقة الطلب 1.03–1.133 · ارتكاز، Former Runner، Gap Fill، سحب سيولة، استنفد النزول",
-   "sessions": 2,
-   "last": 1.16,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.15,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.1,
    "max_dd_pct": -4.7,
-   "ret_pct": -1.3,
+   "ret_pct": -2.1,
    "t1_date": "2026-11-16"
   },
   {
@@ -12581,9 +12608,9 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 5% · RSI 28.7 · دعم 1.33 (عنه 18.8%) · منطقة الطلب 1.33–1.463 · ارتكاز، Former Runner، Gap Fill، استنفد النزول",
-   "sessions": 2,
+   "sessions": 3,
    "last": 1.56,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.1,
    "max_dd_pct": -10.8,
    "ret_pct": -1.3
@@ -12621,12 +12648,12 @@
     "تحت 1$ من 7 جلسة (الإنذار بعد 30 جلسة متتالية)"
    ],
    "why": "🎯 ثبات · أعلى 10% · RSI 49.1 · دعم 0.8 (عنه 19.2%) · منطقة الطلب 0.8–0.88 · ارتكاز، Former Runner، Gap Fill، زخم\n⚠ خطر شطب متوسط: تحت 1$ من 7 جلسة (الإنذار بعد 30 جلسة متتالية)",
-   "sessions": 2,
-   "last": 0.841,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 0.84,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.7,
    "max_dd_pct": -14.8,
-   "ret_pct": -11.8,
+   "ret_pct": -11.9,
    "zone_alerted": "2026-11-16"
   },
   {
@@ -12709,12 +12736,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 2,
-   "last": 2.0,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 9.9,
+   "sessions": 3,
+   "last": 2.12,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 14.7,
    "max_dd_pct": -2.4,
-   "ret_pct": 7.2
+   "ret_pct": 13.7
   },
   {
    "id": "faisal_orig:PTLE:2026-11-12",
@@ -12782,12 +12809,12 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 2,
-   "last": 2.0,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 9.9,
+   "sessions": 3,
+   "last": 2.12,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 14.7,
    "max_dd_pct": -2.4,
-   "ret_pct": 7.2
+   "ret_pct": 13.7
   },
   {
    "id": "accumulation:GNLX:2026-11-13",
@@ -12811,12 +12838,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 2,
-   "last": 2.0,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 9.9,
+   "sessions": 3,
+   "last": 2.12,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 14.7,
    "max_dd_pct": -2.4,
-   "ret_pct": 7.2
+   "ret_pct": 13.7
   },
   {
    "id": "faisal_dev:CHW:2026-11-13",
@@ -12857,12 +12884,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 2,
-   "last": 7.22,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 7.18,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.7,
    "max_dd_pct": -3.9,
-   "ret_pct": -3.2
+   "ret_pct": -3.8
   },
   {
    "id": "faisal_orig:CHW:2026-11-13",
@@ -12895,12 +12922,12 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 2,
-   "last": 7.22,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 7.18,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.7,
    "max_dd_pct": -3.9,
-   "ret_pct": -3.2
+   "ret_pct": -3.8
   },
   {
    "id": "schools:LGCL:2026-11-13",
@@ -13006,12 +13033,12 @@
    "rand_p": 0.189,
    "flag": "🇪🇸",
    "country_ar": "إسبانيا",
-   "sessions": 2,
-   "last": 0.8009,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 0.8,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.1,
    "max_dd_pct": -8.5,
-   "ret_pct": -1.1
+   "ret_pct": -1.2
   },
   {
    "id": "hunt:CCTG:2026-11-13",
@@ -13038,9 +13065,9 @@
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
    "why": "🏹 جمّع بالمنطقة 0.170–0.244 · الانطلاق فوق 0.356 · انهار 94.2% · طار 4× · فلووت 3.39M 🔥 ذري\n⛔ <b>تحذير شطب عالي</b>: ⛔ سوّى تقسيم عكسي 1:10 (2026-01-23) خلال آخر سنة ورجع تحت 1$ — حسب قواعد ناسداك الجديدة ما له مهلة، معرّض للشطب. ما يترشح.، 💀 منهار 91% من قمة السنة — خطر موت/شطب عالي جداً\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
+   "sessions": 3,
    "last": 0.317,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.4,
    "max_dd_pct": -8.0,
    "ret_pct": -2.8
@@ -13070,12 +13097,12 @@
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
    "why": "🏹 جمّع بالمنطقة 0.209–0.280 · الانطلاق فوق 0.388 · انهار 94.4% · طار 2× · فلووت 11.68M\n⛔ <b>تحذير شطب عالي</b>: ⚠ تحت 1$ من 65 جلسة — غالباً عنده إنذار عدم امتثال، المهلة تقريباً لين 2027-03-24 (باقي 131 يوم)، 💀 منهار 93% من قمة السنة — خطر موت/شطب عالي جداً\n🩸 <b>خطر نزيف عالي</b> (54% يلمس −30%) — حجم صغير\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
-   "last": 0.325,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 0.3398,
+   "last_date": "2026-11-18",
    "max_gain_pct": -3.3,
    "max_dd_pct": -14.4,
-   "ret_pct": -14.4
+   "ret_pct": -10.5
   },
   {
    "id": "hunt:AXNX:2026-11-13",
@@ -13102,12 +13129,12 @@
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
    "why": "🏹 جمّع بالمنطقة 0.680–0.908 · الانطلاق فوق 1.25 · انهار 94.2% · طار 2× · فلووت 1.97M 🔥 ذري\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 93% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:2 قبل 22 يوم\n🩸 <b>خطر نزيف عالي</b> (46% يلمس −30%) — حجم صغير\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
-   "last": 0.9,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 0.9199,
+   "last_date": "2026-11-18",
    "max_gain_pct": -1.9,
    "max_dd_pct": -15.9,
-   "ret_pct": -15.9,
+   "ret_pct": -14.0,
    "zone_alerted": "2026-11-17"
   },
   {
@@ -13135,12 +13162,12 @@
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
    "why": "🏹 جمّع بالمنطقة 2.52–4.38 · الانطلاق فوق 7.15 · انهار 99.7% · طار 2× · فلووت 384K 🔥 ذري\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 100% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:9 قبل 17 يوم\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
-   "last": 4.1,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 4.12,
+   "last_date": "2026-11-18",
    "max_gain_pct": -1.2,
-   "max_dd_pct": -16.3,
-   "ret_pct": -16.3,
+   "max_dd_pct": -16.5,
+   "ret_pct": -15.9,
    "zone_alerted": "2026-11-17"
   },
   {
@@ -13168,12 +13195,12 @@
    "flag": "🇨🇳",
    "country_ar": "الصين",
    "why": "🏹 جمّع بالمنطقة 1.60–1.83 · الانطلاق فوق 2.17 · انهار 100.0% · طار 1× · فلووت 622K 🔥 ذري\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 100% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:20 قبل 91 يوم\n🩸 <b>خطر نزيف عالي</b> (50% يلمس −30%) — حجم صغير\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
-   "last": 1.82,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.78,
+   "last_date": "2026-11-18",
    "max_gain_pct": -3.8,
    "max_dd_pct": -14.4,
-   "ret_pct": -12.5,
+   "ret_pct": -14.4,
    "zone_alerted": "2026-11-17"
   },
   {
@@ -13201,12 +13228,12 @@
    "flag": "🇨🇳",
    "country_ar": "الصين",
    "why": "🏹 جمّع بالمنطقة 2.45–3.10 · الانطلاق فوق 4.08 · انهار 87.3% · طار 2× · فلووت 4.18M 🔥 ذري\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
-   "last": 2.71,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 3.1,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.5,
    "max_dd_pct": -18.9,
-   "ret_pct": -18.6,
+   "ret_pct": -6.9,
    "zone_alerted": "2026-11-16"
   },
   {
@@ -13234,12 +13261,12 @@
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
    "why": "🏹 جمّع بالمنطقة 0.776–1.15 · الانطلاق فوق 1.70 · انهار 79.4% · طار 1× · فلووت 4.60M 🔥 ذري\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
-   "last": 1.24,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.9,
-   "max_dd_pct": -9.9,
-   "ret_pct": -8.8
+   "max_dd_pct": -11.8,
+   "ret_pct": -11.8
   },
   {
    "id": "hunt:BRTX:2026-11-13",
@@ -13266,12 +13293,12 @@
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
    "why": "🏹 جمّع بالمنطقة 1.28–1.44 · الانطلاق فوق 1.67 · انهار 94.9% · طار 1× · فلووت 1.21M 🔥 ذري\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 95% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:20 قبل 66 يوم\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 2,
-   "last": 1.34,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.36,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.6,
    "max_dd_pct": -10.1,
-   "ret_pct": -10.1,
+   "ret_pct": -8.7,
    "zone_alerted": "2026-11-16"
   },
   {
@@ -13431,6 +13458,7 @@
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
+    "2026-11-17",
     "2026-11-17"
    ]
   },
@@ -13473,12 +13501,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 1,
-   "last": 1.48,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.3,
-   "max_dd_pct": -8.0,
-   "ret_pct": -6.1
+   "max_dd_pct": -9.9,
+   "ret_pct": -7.4
   },
   {
    "id": "faisal_dev:FGL:2026-11-16",
@@ -13686,12 +13714,12 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 1,
-   "last": 1.48,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.7,
-   "max_dd_pct": -7.7,
-   "ret_pct": -5.8
+   "max_dd_pct": -9.6,
+   "ret_pct": -7.0
   },
   {
    "id": "faisal_orig:FGL:2026-11-16",
@@ -13798,12 +13826,12 @@
    "accum": null,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 1,
-   "last": 6.86,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 6.85,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.5,
    "max_dd_pct": -0.6,
-   "ret_pct": 1.6,
+   "ret_pct": 1.5,
    "t1_date": "2026-11-17"
   },
   {
@@ -13862,12 +13890,12 @@
    "dilution": "none",
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 1,
-   "last": 1.48,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.4,
-   "max_dd_pct": -9.7,
-   "ret_pct": -7.8
+   "max_dd_pct": -11.5,
+   "ret_pct": -9.0
   },
   {
    "id": "accumulation:PCLA:2026-11-16",
@@ -13950,12 +13978,12 @@
    "rand_p": 0.096,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 1,
-   "last": 3.63,
-   "last_date": "2026-11-17",
-   "max_gain_pct": -8.0,
+   "sessions": 2,
+   "last": 4.0,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -6.1,
    "max_dd_pct": -17.8,
-   "ret_pct": -14.8
+   "ret_pct": -6.1
   },
   {
    "id": "merged:GUTS:2026-11-16",
@@ -13992,12 +14020,12 @@
     "✂️ تقسيم عكسي 1:12 قبل 42 يوم"
    ],
    "why": "🎯 ثبات + 🚀 طيران · أعلى 2% · RSI 27.9 · دعم 0.8001 (عنه 27.5%) · منطقة الطلب 0.8001–0.8801 · ارتكاز، Former Runner، Gap Fill، W، تقسيم عكسي، استنفد النزول\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 96% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:12 قبل 42 يوم",
-   "sessions": 1,
-   "last": 0.9654,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 0.9603,
+   "last_date": "2026-11-18",
    "max_gain_pct": -1.0,
    "max_dd_pct": -8.8,
-   "ret_pct": -5.4
+   "ret_pct": -5.9
   },
   {
    "id": "hunt:IVF:2026-11-16",
@@ -14024,12 +14052,12 @@
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
    "why": "🏹 جمّع بالمنطقة 1.59–2.06 · الانطلاق فوق 2.77 · انهار 97.4% · طار 3× · فلووت 626K 🔥 ذري\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 97% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:4 قبل 17 يوم\n🩸 <b>خطر نزيف عالي</b> (42% يلمس −30%) — حجم صغير\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 1,
-   "last": 2.18,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 2.17,
+   "last_date": "2026-11-18",
    "max_gain_pct": -1.9,
    "max_dd_pct": -11.1,
-   "ret_pct": -9.5
+   "ret_pct": -10.0
   },
   {
    "id": "hunt:XHLD:2026-11-16",
@@ -14056,12 +14084,12 @@
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
    "why": "🏹 جمّع بالمنطقة 0.380–0.652 · الانطلاق فوق 1.06 · انهار 94.9% · طار 3× · فلووت 12.03M\n⛔ <b>تحذير شطب عالي</b>: ⛔ سوّى تقسيم عكسي 1:15 (2025-12-02) خلال آخر سنة ورجع تحت 1$ — حسب قواعد ناسداك الجديدة ما له مهلة، معرّض للشطب. ما يترشح.، 💀 منهار 94% من قمة السنة — خطر موت/شطب عالي جداً\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 1,
-   "last": 0.6897,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 0.6693,
+   "last_date": "2026-11-18",
    "max_gain_pct": -8.8,
-   "max_dd_pct": -15.2,
-   "ret_pct": -12.7
+   "max_dd_pct": -15.3,
+   "ret_pct": -15.3
   },
   {
    "id": "hunt:CJMB:2026-11-16",
@@ -14088,12 +14116,12 @@
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
    "why": "🏹 جمّع بالمنطقة 0.260–0.330 · الانطلاق فوق 0.435 · انهار 92.8% · طار 1× · فلووت 2.77M 🔥 ذري\n⛔ <b>تحذير شطب عالي</b>: تحت 1$ من 20 جلسة (الإنذار بعد 30 جلسة متتالية)، 💀 منهار 90% من قمة السنة — خطر موت/شطب عالي جداً\n🩸 <b>خطر نزيف عالي</b> (50% يلمس −30%) — حجم صغير\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 1,
-   "last": 0.3602,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 0.3401,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.2,
-   "max_dd_pct": -15.7,
-   "ret_pct": -11.0
+   "max_dd_pct": -16.0,
+   "ret_pct": -16.0
   },
   {
    "id": "hunt:PCSA:2026-11-16",
@@ -14120,12 +14148,12 @@
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
    "why": "🏹 جمّع بالمنطقة 1.04–1.46 · الانطلاق فوق 2.10 · انهار 79.6% · طار 1× · فلووت 2.70M 🔥 ذري\n💡 البيع عليك: نص عند أول قفزة +15/+22% ثم trail · احتفاظ 3–7 أيام",
-   "sessions": 1,
-   "last": 1.73,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.7212,
+   "last_date": "2026-11-18",
    "max_gain_pct": -2.8,
    "max_dd_pct": -6.1,
-   "ret_pct": -4.4
+   "ret_pct": -4.9
   },
   {
    "id": "hunt:NNNN:2026-11-16",
@@ -14229,12 +14257,12 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 10% · RSI 46.1 · دعم 6.78 (عنه 14.2%) · منطقة الطلب 6.78–7.458 · ارتكاز، Gap Fill، استنفد النزول",
-   "sessions": 1,
-   "last": 7.51,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 7.59,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.0,
    "max_dd_pct": -8.4,
-   "ret_pct": -3.0,
+   "ret_pct": -1.9,
    "zone_alerted": "2026-11-17"
   },
   {
@@ -14268,13 +14296,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🚀 طيران · أعلى 20% · RSI 25.9 · دعم 1.595 (عنه 2.5%) · منطقة الطلب 1.595–1.7545 · ارتكاز، Gap Fill، استنفد النزول",
-   "sessions": 1,
-   "last": 1.78,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.755,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-16",
    "max_gain_pct": 22.3,
-   "max_dd_pct": 7.6,
-   "ret_pct": 8.9,
+   "max_dd_pct": 7.3,
+   "ret_pct": 7.3,
    "t1_date": "2026-11-17"
   },
   {
@@ -14316,12 +14344,12 @@
    },
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 1,
-   "last": 1.45,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.4504,
+   "last_date": "2026-11-18",
    "max_gain_pct": -0.6,
    "max_dd_pct": -12.5,
-   "ret_pct": -7.1
+   "ret_pct": -7.0
   },
   {
    "id": "faisal_orig:EHGO:2026-11-16",
@@ -14385,12 +14413,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 1,
-   "last": 2.295,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 2.27,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.8,
    "max_dd_pct": -2.3,
-   "ret_pct": 3.4
+   "ret_pct": 2.3
   },
   {
    "id": "accumulation:WYHG:2026-11-16",
@@ -14414,12 +14442,12 @@
    "dilution": "none",
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 1,
-   "last": 2.71,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 3.1,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.2,
    "max_dd_pct": -14.0,
-   "ret_pct": -13.7
+   "ret_pct": -1.3
   },
   {
    "id": "schools:NOMA:2026-11-16",
@@ -14444,12 +14472,12 @@
    "rand_p": 0.245,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 1,
-   "last": 1.13,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.11,
+   "last_date": "2026-11-18",
    "max_gain_pct": 20.0,
    "max_dd_pct": -12.8,
-   "ret_pct": 15.9
+   "ret_pct": 13.8
   },
   {
    "id": "merged:PDSB:2026-11-16",
@@ -14484,13 +14512,13 @@
     "تحت 1$ من 3 جلسة (الإنذار بعد 30 جلسة متتالية)"
    ],
    "why": "🎯 ثبات · أعلى 10% · RSI 41.2 · دعم 0.8657 (عنه 3.1%) · منطقة الطلب 0.8657–0.9523 · ارتكاز، Former Runner، Gap Fill، سحب سيولة\n⚠ خطر شطب متوسط: تحت 1$ من 3 جلسة (الإنذار بعد 30 جلسة متتالية)",
-   "sessions": 1,
-   "last": 0.8938,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 0.8754,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-16",
    "max_gain_pct": 9.8,
-   "max_dd_pct": -0.5,
-   "ret_pct": 0.1,
+   "max_dd_pct": -2.5,
+   "ret_pct": -1.9,
    "t1_date": "2026-11-17"
   },
   {
@@ -14535,6 +14563,7 @@
    "max_dd_pct": -14.9,
    "ret_pct": -10.4,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -14607,12 +14636,12 @@
    "rand_p": 0.215,
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 1,
-   "last": 4.53,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 4.97,
+   "last_date": "2026-11-18",
    "max_gain_pct": 56.8,
    "max_dd_pct": -19.5,
-   "ret_pct": 10.5
+   "ret_pct": 21.2
   },
   {
    "id": "merged:EXFY:2026-11-16",
@@ -14645,13 +14674,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 20% · RSI 29.4 · دعم 1.65 (عنه 3.3%) · منطقة الطلب 1.65–1.815 · ارتكاز، Gap Fill",
-   "sessions": 1,
-   "last": 1.63,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.69,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-16",
    "max_gain_pct": 1.5,
    "max_dd_pct": -5.0,
-   "ret_pct": -4.4
+   "ret_pct": -0.9
   },
   {
    "id": "hunt:GLE:2026-11-16",
@@ -14764,13 +14793,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 20% · RSI 32.3 · دعم 2.04 (عنه 3.9%) · منطقة الطلب 2.04–2.244 · ارتكاز، Former Runner، Gap Fill",
-   "sessions": 1,
-   "last": 2.06,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 2.13,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-16",
    "max_gain_pct": 3.3,
    "max_dd_pct": -3.3,
-   "ret_pct": -2.8
+   "ret_pct": 0.5
   },
   {
    "id": "merged:LGHL:2026-11-16",
@@ -14877,12 +14906,12 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 20% · RSI 64.2 · دعم 1.97 (عنه 19.8%) · منطقة الطلب 1.97–2.167 · ارتكاز، Former Runner، Gap Fill",
-   "sessions": 1,
-   "last": 2.27,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 2.28,
+   "last_date": "2026-11-18",
    "max_gain_pct": -2.5,
    "max_dd_pct": -5.5,
-   "ret_pct": -3.8
+   "ret_pct": -3.4
   },
   {
    "id": "merged:TCRT:2026-11-16",
@@ -14915,13 +14944,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 20% · RSI 44.2 · دعم 1.55 (عنه 3.2%) · منطقة الطلب 1.55–1.705 · ارتكاز، Former Runner، Gap Fill، قروبات ⚠",
-   "sessions": 1,
-   "last": 1.66,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.62,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-16",
    "max_gain_pct": 3.7,
    "max_dd_pct": -5.6,
-   "ret_pct": 3.7,
+   "ret_pct": 1.2,
    "stop_warned": "2026-11-17",
    "t1_date": "2026-11-17"
   },
@@ -15016,13 +15045,14 @@
    "rand_p": 0.079,
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 1,
-   "last": 4.53,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 4.97,
+   "last_date": "2026-11-18",
    "max_gain_pct": 61.6,
    "max_dd_pct": -17.1,
-   "ret_pct": 13.8,
+   "ret_pct": 24.9,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -15095,12 +15125,12 @@
    "rand_p": 0.17,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 1,
-   "last": 4.0,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 6.0,
-   "max_dd_pct": 0.3,
-   "ret_pct": 3.6
+   "sessions": 2,
+   "last": 3.94,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 6.2,
+   "max_dd_pct": -1.3,
+   "ret_pct": 2.1
   },
   {
    "id": "schools:ADXN:2026-11-17",
@@ -15125,9 +15155,12 @@
    "rand_p": 0.021,
    "flag": "🇨🇭",
    "country_ar": "سويسرا",
-   "sessions": 0,
-   "last": 3.5,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 3.52,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -7.9,
+   "max_dd_pct": -7.9,
+   "ret_pct": -7.9
   },
   {
    "id": "schools:EDHL:2026-11-17",
@@ -15135,7 +15168,7 @@
    "radar_name": "🧭 المدارس",
    "sub1": false,
    "opened_at": "2026-11-17 14:38",
-   "result": "open",
+   "result": "t1",
    "horizon": 10,
    "symbol": "EDHL",
    "status": "near",
@@ -15152,9 +15185,13 @@
    "rand_p": 0.756,
    "flag": "🇭🇰",
    "country_ar": "هونغ كونغ",
-   "sessions": 0,
-   "last": 6.86,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 6.85,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 2.6,
+   "max_dd_pct": 0.9,
+   "ret_pct": 1.5,
+   "t1_date": "2026-11-18"
   },
   {
    "id": "schools:NWTG:2026-11-17",
@@ -15179,9 +15216,12 @@
    "rand_p": 0.26,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 0,
-   "last": 0.7072,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.7239,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -8.5,
+   "max_dd_pct": -10.9,
+   "ret_pct": -10.9
   },
   {
    "id": "merged:IFRX:2026-11-17",
@@ -15214,10 +15254,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 20% · RSI 32.0 · دعم 1.15 (عنه 2.6%) · منطقة الطلب 1.15–1.265 · ارتكاز، Former Runner، Gap Fill",
-   "sessions": 0,
-   "last": 1.15,
-   "last_date": "2026-11-17",
-   "zone_alerted": "2026-11-17"
+   "sessions": 1,
+   "last": 1.165,
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-17",
+   "max_gain_pct": 0.0,
+   "max_dd_pct": -2.5,
+   "ret_pct": -1.3
   },
   {
    "id": "merged:SHIM:2026-11-17",
@@ -15225,7 +15268,7 @@
    "radar_name": "🎯 الجاهزة (فيصل المدمج)",
    "sub1": false,
    "opened_at": "2026-11-17 14:38",
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "symbol": "SHIM",
    "status": "near",
@@ -15250,11 +15293,15 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 20% · RSI 72.3 · دعم 3.325 (عنه 4.7%) · منطقة الطلب 3.325–3.6575 · ارتكاز، Former Runner، Gap Fill، W، سحب سيولة",
-   "sessions": 0,
-   "last": 3.25,
-   "last_date": "2026-11-17",
+   "sessions": 1,
+   "last": 3.13,
+   "last_date": "2026-11-18",
    "zone_alerted": "2026-11-17",
-   "stop_warned": "2026-11-17"
+   "stop_warned": "2026-11-17",
+   "max_gain_pct": -9.8,
+   "max_dd_pct": -10.1,
+   "ret_pct": -10.1,
+   "closed": "2026-11-18"
   },
   {
    "id": "merged:TDTH:2026-11-17",
@@ -15290,9 +15337,12 @@
     "✂️ تقسيم عكسي 1:30 قبل 207 يوم"
    ],
    "why": "🚀 طيران · أعلى 10% · RSI 60.0 · دعم 0.85 (عنه 22.9%) · منطقة الطلب 0.85–0.935 · ارتكاز، Former Runner، Gap Fill، استنفد النزول\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 94% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:30 قبل 207 يوم",
-   "sessions": 0,
-   "last": 1.16,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 1.05,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 5.3,
+   "max_dd_pct": -4.7,
+   "ret_pct": 0.5
   },
   {
    "id": "faisal_orig:SGRX:2026-11-17",
@@ -15325,9 +15375,12 @@
    "conf_similar": null,
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 0,
+   "sessions": 1,
    "last": 2.56,
-   "last_date": "2026-11-17"
+   "last_date": "2026-11-18",
+   "max_gain_pct": 2.0,
+   "max_dd_pct": -0.4,
+   "ret_pct": 2.0
   },
   {
    "id": "abdullah:CRMT:2026-11-17",
@@ -15356,9 +15409,12 @@
    "accum": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 0,
-   "last": 0.8711,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.9187,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -5.1,
+   "max_dd_pct": -5.1,
+   "ret_pct": -5.1
   },
   {
    "id": "abdullah:TC:2026-11-17",
@@ -15387,9 +15443,12 @@
    "accum": null,
    "flag": "🇨🇳",
    "country_ar": "الصين",
-   "sessions": 0,
-   "last": 0.7304,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.731,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -4.4,
+   "max_dd_pct": -4.4,
+   "ret_pct": -4.4
   },
   {
    "id": "merged:SGRX:2026-11-17",
@@ -15425,10 +15484,13 @@
     "✂️ تقسيم عكسي 1:8 قبل 1 يوم"
    ],
    "why": "🚀 طيران · أعلى 2% · RSI 31.6 · دعم 2.4 (عنه 3.8%) · منطقة الطلب 2.4–2.64 · ارتكاز، Former Runner، Gap Fill، قروبات ⚠، تقسيم عكسي، استنفد النزول\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 100% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:8 قبل 1 يوم",
-   "sessions": 0,
+   "sessions": 1,
    "last": 2.56,
-   "last_date": "2026-11-17",
-   "zone_alerted": "2026-11-17"
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-17",
+   "max_gain_pct": 2.8,
+   "max_dd_pct": 0.4,
+   "ret_pct": 2.8
   },
   {
    "id": "merged:OMH:2026-11-17",
@@ -15436,7 +15498,7 @@
    "radar_name": "🎯 الجاهزة (فيصل المدمج)",
    "sub1": false,
    "opened_at": "2026-11-17 15:50",
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "symbol": "OMH",
    "status": "near",
@@ -15464,9 +15526,13 @@
     "✂️ تقسيم عكسي 1:50 قبل 78 يوم"
    ],
    "why": "🚀 طيران · أعلى 10% · RSI 48.9 · دعم 5.255 (عنه 7.9%) · منطقة الطلب 5.255–5.7805 · ارتكاز، Former Runner، Gap Fill، W، قروبات ⚠، تقسيم عكسي، استنفد النزول، زخم\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 94% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:50 قبل 78 يوم",
-   "sessions": 0,
-   "last": 4.53,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 4.97,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -7.7,
+   "max_dd_pct": -18.7,
+   "ret_pct": -12.3,
+   "closed": "2026-11-18"
   },
   {
    "id": "merged:GLND:2026-11-17",
@@ -15499,10 +15565,13 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🚀 طيران · أعلى 20% · RSI 39.5 · دعم 2.03 (عنه -0.7%) · منطقة الطلب 2.03–2.233 · ارتكاز، Former Runner، Gap Fill، استنفد النزول",
-   "sessions": 0,
-   "last": 2.08,
-   "last_date": "2026-11-17",
-   "zone_alerted": "2026-11-17"
+   "sessions": 1,
+   "last": 1.94,
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-17",
+   "max_gain_pct": 3.2,
+   "max_dd_pct": -3.7,
+   "ret_pct": -3.7
   },
   {
    "id": "faisal_orig:SNAL:2026-11-17",
@@ -15535,9 +15604,12 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 0,
-   "last": 2.08,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 2.26,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 14.7,
+   "max_dd_pct": 11.7,
+   "ret_pct": 14.7
   },
   {
    "id": "merged:PNBK:2026-11-17",
@@ -15572,10 +15644,13 @@
     "⚠ تحت 1$ من 36 جلسة — غالباً عنده إنذار عدم امتثال، المهلة تقريباً لين 2027-05-08 (باقي 172 يوم)"
    ],
    "why": "🎯 ثبات · أعلى 20% · RSI 50.8 · دعم 0.8 (عنه 9.2%) · منطقة الطلب 0.8–0.88 · ارتكاز، Former Runner، Gap Fill، W، تحت 1$ (امتثال)، ⚠ امتثال ناسداك\n⛔ <b>تحذير شطب عالي</b>: ⚠ تحت 1$ من 36 جلسة — غالباً عنده إنذار عدم امتثال، المهلة تقريباً لين 2027-05-08 (باقي 172 يوم)",
-   "sessions": 0,
-   "last": 0.8726,
-   "last_date": "2026-11-17",
-   "zone_alerted": "2026-11-17"
+   "sessions": 1,
+   "last": 0.8682,
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-17",
+   "max_gain_pct": -0.6,
+   "max_dd_pct": -0.6,
+   "ret_pct": -0.6
   },
   {
    "id": "merged:SNAL:2026-11-17",
@@ -15610,10 +15685,13 @@
     "✂️ تقسيم عكسي 1:5 قبل 134 يوم"
    ],
    "why": "🚀 طيران · أعلى 20% · RSI 42.3 · دعم 1.8001 (عنه 7.2%) · منطقة الطلب 1.8001–1.9801 · ارتكاز، Former Runner، Gap Fill، استنفد النزول",
-   "sessions": 0,
-   "last": 2.08,
-   "last_date": "2026-11-17",
-   "zone_alerted": "2026-11-17"
+   "sessions": 1,
+   "last": 2.26,
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-17",
+   "max_gain_pct": 17.1,
+   "max_dd_pct": 14.0,
+   "ret_pct": 17.1
   },
   {
    "id": "faisal_orig:OMH:2026-11-17",
@@ -15646,9 +15724,12 @@
    "conf_similar": null,
    "flag": "🇸🇬",
    "country_ar": "سنغافورة",
-   "sessions": 0,
-   "last": 4.53,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 4.97,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 29.3,
+   "max_dd_pct": 13.9,
+   "ret_pct": 22.8
   },
   {
    "id": "schools:ELVA:2026-11-17",
@@ -15673,9 +15754,12 @@
    "rand_p": 0.064,
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 0,
-   "last": 3.86,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 3.865,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 4.2,
+   "max_dd_pct": 0.5,
+   "ret_pct": 0.9
   },
   {
    "id": "faisal_dil:CYCU:2026-11-17",
@@ -15716,9 +15800,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 0,
-   "last": 2.03,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 2.0778,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 3.4,
+   "max_dd_pct": 0.7,
+   "ret_pct": 2.4
   },
   {
    "id": "faisal_orig:GP:2026-11-17",
@@ -15751,9 +15838,12 @@
    "conf_similar": null,
    "flag": "🇨🇦",
    "country_ar": "كندا",
-   "sessions": 0,
-   "last": 2.62,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 2.74,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 13.7,
+   "max_dd_pct": 1.1,
+   "ret_pct": 4.6
   },
   {
    "id": "abdullah:LNKS:2026-11-17",
@@ -15782,9 +15872,12 @@
    "accum": null,
    "flag": "🇲🇾",
    "country_ar": "ماليزيا",
-   "sessions": 0,
-   "last": 1.01,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.9675,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -4.2,
+   "max_dd_pct": -6.9,
+   "ret_pct": -4.2
   },
   {
    "id": "merged:HOWL:2026-11-17",
@@ -15817,9 +15910,12 @@
    "delist_level": 0,
    "delist_reasons": [],
    "why": "🎯 ثبات · أعلى 10% · RSI 57.0 · دعم 0.88 (عنه 19.3%) · منطقة الطلب 0.88–0.968 · ارتكاز، Former Runner، W، زخم",
-   "sessions": 0,
+   "sessions": 1,
    "last": 1.05,
-   "last_date": "2026-11-17"
+   "last_date": "2026-11-18",
+   "max_gain_pct": 0.0,
+   "max_dd_pct": -4.8,
+   "ret_pct": 0.0
   },
   {
    "id": "merged:AVAT:2026-11-17",
@@ -15855,10 +15951,13 @@
     "💀 منهار 92% من قمة السنة — خطر موت/شطب عالي جداً"
    ],
    "why": "🚀 طيران · أعلى 2% · RSI 39.1 · دعم 0.7918 (عنه 6.1%) · منطقة الطلب 0.7918–0.871 · ارتكاز، Former Runner، Gap Fill، استنفد النزول، زخم\n⛔ <b>تحذير شطب عالي</b>: تحت 1$ من 1 جلسة (الإنذار بعد 30 جلسة متتالية)، 💀 منهار 92% من قمة السنة — خطر موت/شطب عالي جداً",
-   "sessions": 0,
-   "last": 0.84,
-   "last_date": "2026-11-17",
-   "zone_alerted": "2026-11-17"
+   "sessions": 1,
+   "last": 0.8701,
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-17",
+   "max_gain_pct": 15.0,
+   "max_dd_pct": -2.7,
+   "ret_pct": 3.6
   },
   {
    "id": "faisal_dev:CYCU:2026-11-17",
@@ -15899,9 +15998,12 @@
    },
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 0,
-   "last": 2.03,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 2.0778,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 3.4,
+   "max_dd_pct": 0.7,
+   "ret_pct": 2.4
   },
   {
    "id": "faisal_orig:CYCU:2026-11-17",
@@ -15934,9 +16036,12 @@
    "conf_similar": null,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 0,
-   "last": 2.03,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 2.0778,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 3.4,
+   "max_dd_pct": 0.7,
+   "ret_pct": 2.4
   },
   {
    "id": "abdullah:CLGN:2026-11-12",
@@ -15996,9 +16101,12 @@
    "accum": null,
    "flag": "🇲🇾",
    "country_ar": "ماليزيا",
-   "sessions": 0,
-   "last": 7.19,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 7.75,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 7.8,
+   "max_dd_pct": 7.8,
+   "ret_pct": 7.8
   },
   {
    "id": "accumulation:GRNQ:2026-11-17",
@@ -16022,9 +16130,12 @@
    "dilution": "none",
    "flag": "🇲🇾",
    "country_ar": "ماليزيا",
-   "sessions": 0,
-   "last": 7.19,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 7.75,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 7.8,
+   "max_dd_pct": 7.8,
+   "ret_pct": 7.8
   },
   {
    "id": "schools:AGRZ:2026-11-17",
@@ -16103,9 +16214,12 @@
    "rand_p": 0.125,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
-   "sessions": 0,
-   "last": 3.34,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 3.02,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 0.3,
+   "max_dd_pct": -9.6,
+   "ret_pct": -9.6
   },
   {
    "id": "schools:PAVS:2026-11-17",
@@ -16130,9 +16244,151 @@
    "rand_p": 0.206,
    "flag": "🇺🇸",
    "country_ar": "أمريكا",
+   "sessions": 1,
+   "last": 2.77,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 4.9,
+   "max_dd_pct": 1.1,
+   "ret_pct": 4.1
+  },
+  {
+   "id": "accumulation:AGRZ:2026-11-17",
+   "radar": "accumulation",
+   "radar_name": "🔍 التجميع",
+   "sub1": false,
+   "opened_at": "2026-11-18 14:37",
+   "result": "open",
+   "horizon": 20,
+   "symbol": "AGRZ",
+   "status": "near",
+   "label": "🟡 تجميع محتمل",
+   "entry": 1.89,
+   "stop": 1.431,
+   "t1": 2.19,
+   "t2": 6.598,
+   "score": 59.0,
+   "date": "2026-11-17",
+   "name": "Agroz Inc.",
+   "why": "قاعدة 12 جلسة بين 1.68 و 2.19",
+   "dilution": "none",
+   "flag": "🇲🇾",
+   "country_ar": "ماليزيا",
    "sessions": 0,
-   "last": 2.66,
+   "last": 1.89,
    "last_date": "2026-11-17"
+  },
+  {
+   "id": "merged:CNXU:2026-11-18",
+   "radar": "merged",
+   "radar_name": "🎯 الجاهزة (فيصل المدمج)",
+   "sub1": false,
+   "opened_at": "2026-11-18 14:37",
+   "result": "open",
+   "horizon": 10,
+   "symbol": "CNXU",
+   "status": "near",
+   "label": "🟡 قريب",
+   "entry": 2.09,
+   "stop": 1.7357,
+   "t1": 2.23,
+   "t2": 3.7525,
+   "zone": [
+    1.9286,
+    2.1215
+   ],
+   "score": null,
+   "date": "2026-11-18",
+   "name": "Conexeu Sciences Inc.",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "flavors": [
+    "steady"
+   ],
+   "tier": 1,
+   "delist_level": 0,
+   "delist_reasons": [],
+   "why": "🎯 ثبات · أعلى 20% · RSI 33.8 · دعم 1.9286 (عنه 8.4%) · منطقة الطلب 1.9286–2.1215 · ارتكاز، Gap Fill، استنفد النزول",
+   "sessions": 0,
+   "last": 2.055,
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-18"
+  },
+  {
+   "id": "merged:RCT:2026-11-18",
+   "radar": "merged",
+   "radar_name": "🎯 الجاهزة (فيصل المدمج)",
+   "sub1": false,
+   "opened_at": "2026-11-18 14:37",
+   "result": "open",
+   "horizon": 10,
+   "symbol": "RCT",
+   "status": "ready",
+   "label": "✅ مطابق",
+   "entry": 2.7,
+   "stop": 2.367,
+   "t1": 3.03,
+   "t2": 5.19,
+   "zone": [
+    2.63,
+    2.893
+   ],
+   "score": null,
+   "date": "2026-11-18",
+   "name": "RedCloud Holdings plc",
+   "flag": "🇬🇧",
+   "country_ar": "بريطانيا",
+   "flavors": [
+    "runner"
+   ],
+   "tier": 1,
+   "delist_level": 2,
+   "delist_reasons": [
+    "💀 منهار 98% من قمة السنة — خطر موت/شطب عالي جداً",
+    "✂️ تقسيم عكسي 1:100 قبل 1 يوم"
+   ],
+   "why": "🚀 طيران · أعلى 20% · RSI 24.8 · دعم 2.63 (عنه 2.7%) · منطقة الطلب 2.63–2.893 · ارتكاز، Former Runner، Gap Fill، قروبات ⚠، تقسيم عكسي، استنفد النزول\n⛔ <b>تحذير شطب عالي</b>: 💀 منهار 98% من قمة السنة — خطر موت/شطب عالي جداً، ✂️ تقسيم عكسي 1:100 قبل 1 يوم",
+   "sessions": 0,
+   "last": 2.73,
+   "last_date": "2026-11-18",
+   "zone_alerted": "2026-11-18"
+  },
+  {
+   "id": "merged:SAEN:2026-11-18",
+   "radar": "merged",
+   "radar_name": "🎯 الجاهزة (فيصل المدمج)",
+   "sub1": true,
+   "opened_at": "2026-11-18 14:37",
+   "result": "open",
+   "horizon": 10,
+   "symbol": "SAEN",
+   "status": "near",
+   "label": "🟡 قريب",
+   "entry": 0.577,
+   "stop": 0.5386,
+   "t1": 0.6925,
+   "t2": 1.1385,
+   "zone": [
+    0.5553,
+    0.6108
+   ],
+   "score": null,
+   "date": "2026-11-18",
+   "name": "SAEN",
+   "flag": null,
+   "country_ar": null,
+   "flavors": [
+    "runner"
+   ],
+   "tier": 1,
+   "delist_level": 2,
+   "delist_reasons": [
+    "⚠ تحت 1$ من 54 جلسة — غالباً عنده إنذار عدم امتثال، المهلة تقريباً لين 2027-04-12 (باقي 146 يوم)"
+   ],
+   "why": "🚀 طيران · أعلى 20% · RSI 41.5 · دعم 0.5553 (عنه 3.9%) · منطقة الطلب 0.5553–0.6108 · ارتكاز، Former Runner، Gap Fill، تحت 1$ (امتثال)، استنفد النزول، ⚠ امتثال ناسداك\n⛔ <b>تحذير شطب عالي</b>: ⚠ تحت 1$ من 54 جلسة — غالباً عنده إنذار عدم امتثال، المهلة تقريباً لين 2027-04-12 (باقي 146 يوم)",
+   "sessions": 0,
+   "last": 0.577,
+   "last_date": "2026-11-17",
+   "zone_alerted": "2026-11-17"
   }
  ],
  "stop_rule_version": 2,
@@ -16304,12 +16560,12 @@
    "stop": 1.5902,
    "t1": 2.8989,
    "t2": null,
-   "sessions": 7,
-   "last": 1.92,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.01,
+   "last_date": "2026-11-18",
    "max_gain_pct": 37.4,
    "max_dd_pct": -5.3,
-   "ret_pct": 1.1
+   "ret_pct": 5.8
   },
   {
    "id": "schools:NAMI:2026-11-06:r2",
@@ -16387,12 +16643,12 @@
    "stop": 1.728,
    "t1": 2.9527,
    "t2": null,
-   "sessions": 7,
-   "last": 1.9,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.87,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.0,
    "max_dd_pct": -14.6,
-   "ret_pct": -10.4
+   "ret_pct": -11.8
   },
   {
    "id": "schools:NMAD:2026-11-06:r0",
@@ -16407,12 +16663,12 @@
    "stop": 4.1193,
    "t1": 5.6894,
    "t2": null,
-   "sessions": 7,
-   "last": 4.9,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.97,
+   "last_date": "2026-11-18",
    "max_gain_pct": 19.0,
    "max_dd_pct": -10.2,
-   "ret_pct": 0.0,
+   "ret_pct": 1.4,
    "t1_date": "2026-11-09"
   },
   {
@@ -16449,12 +16705,12 @@
    "stop": 4.1109,
    "t1": 5.6778,
    "t2": null,
-   "sessions": 7,
-   "last": 4.96,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 5.115,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.3,
    "max_dd_pct": -7.1,
-   "ret_pct": 1.4
+   "ret_pct": 4.6
   },
   {
    "id": "schools:CPSH:2026-11-06:r0",
@@ -16490,9 +16746,9 @@
    "stop": 0.894,
    "t1": 1.1389,
    "t2": null,
-   "sessions": 7,
+   "sessions": 8,
    "last": 0.99,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.9,
    "max_dd_pct": -15.1,
    "ret_pct": -6.6
@@ -16510,12 +16766,12 @@
    "stop": 3.5759,
    "t1": 4.5555,
    "t2": null,
-   "sessions": 7,
-   "last": 4.62,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.605,
+   "last_date": "2026-11-18",
    "max_gain_pct": 29.2,
    "max_dd_pct": 0.7,
-   "ret_pct": 9.0,
+   "ret_pct": 8.6,
    "t1_date": "2026-11-10"
   },
   {
@@ -16531,12 +16787,12 @@
    "stop": 5.3837,
    "t1": 6.9212,
    "t2": null,
-   "sessions": 7,
-   "last": 6.02,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.0,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.8,
    "max_dd_pct": -0.9,
-   "ret_pct": 5.2
+   "ret_pct": 4.9
   },
   {
    "id": "schools:BNKK:2026-11-06:r1",
@@ -16597,12 +16853,12 @@
    "stop": 0.9506,
    "t1": 1.4,
    "t2": null,
-   "sessions": 7,
-   "last": 1.06,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.045,
+   "last_date": "2026-11-18",
    "max_gain_pct": 11.9,
    "max_dd_pct": -15.3,
-   "ret_pct": -10.2
+   "ret_pct": -11.4
   },
   {
    "id": "schools:WRAP:2026-11-06:r1",
@@ -16722,12 +16978,12 @@
    "stop": 4.1651,
    "t1": 5.1623,
    "t2": null,
-   "sessions": 7,
-   "last": 4.94,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.96,
+   "last_date": "2026-11-18",
    "max_gain_pct": 17.3,
    "max_dd_pct": -1.5,
-   "ret_pct": 7.6,
+   "ret_pct": 8.1,
    "t1_date": "2026-11-10"
   },
   {
@@ -16743,12 +16999,12 @@
    "stop": 2.3593,
    "t1": 2.9242,
    "t2": null,
-   "sessions": 7,
-   "last": 2.64,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.66,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.2,
    "max_dd_pct": -2.7,
-   "ret_pct": 1.5
+   "ret_pct": 2.3
   },
   {
    "id": "schools:SIGA:2026-11-06:r2",
@@ -16763,12 +17019,12 @@
    "stop": 6.0706,
    "t1": 7.5241,
    "t2": null,
-   "sessions": 7,
-   "last": 6.22,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.29,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.9,
    "max_dd_pct": -7.5,
-   "ret_pct": -7.0
+   "ret_pct": -6.0
   },
   {
    "id": "schools:PTLE:2026-11-06:r0",
@@ -16913,12 +17169,12 @@
    "stop": 8.6277,
    "t1": 11.3528,
    "t2": null,
-   "sessions": 7,
-   "last": 11.04,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 10.95,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.4,
    "max_dd_pct": -2.3,
-   "ret_pct": 13.0,
+   "ret_pct": 12.1,
    "t1_date": "2026-11-09"
   },
   {
@@ -16958,12 +17214,12 @@
    "stop": 2.8965,
    "t1": 3.8114,
    "t2": null,
-   "sessions": 7,
-   "last": 3.07,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.105,
+   "last_date": "2026-11-18",
    "max_gain_pct": 17.5,
    "max_dd_pct": -8.8,
-   "ret_pct": -6.4,
+   "ret_pct": -5.3,
    "t1_date": "2026-11-11"
   },
   {
@@ -16979,12 +17235,12 @@
    "stop": 1.7112,
    "t1": 2.1531,
    "t2": null,
-   "sessions": 7,
-   "last": 1.83,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.775,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.4,
    "max_dd_pct": -7.5,
-   "ret_pct": -2.1
+   "ret_pct": -5.1
   },
   {
    "id": "schools:JZXN:2026-11-06:r1",
@@ -16999,12 +17255,12 @@
    "stop": 3.4957,
    "t1": 4.3984,
    "t2": null,
-   "sessions": 7,
-   "last": 3.81,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.85,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.8,
    "max_dd_pct": -2.5,
-   "ret_pct": -0.3
+   "ret_pct": 0.8
   },
   {
    "id": "schools:JZXN:2026-11-06:r2",
@@ -17131,12 +17387,12 @@
    "stop": 7.7382,
    "t1": 10.1083,
    "t2": null,
-   "sessions": 7,
-   "last": 8.16,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.02,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.5,
-   "max_dd_pct": -5.6,
-   "ret_pct": -5.3
+   "max_dd_pct": -9.8,
+   "ret_pct": -7.0
   },
   {
    "id": "schools:KVHI:2026-11-06:r2",
@@ -17172,12 +17428,12 @@
    "stop": 6.8334,
    "t1": 8.7446,
    "t2": null,
-   "sessions": 7,
-   "last": 8.95,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 9.095,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.2,
    "max_dd_pct": -7.0,
-   "ret_pct": 11.2,
+   "ret_pct": 13.1,
    "t1_date": "2026-11-10"
   },
   {
@@ -17193,12 +17449,12 @@
    "stop": 1.8007,
    "t1": 2.3043,
    "t2": null,
-   "sessions": 7,
-   "last": 2.14,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.2,
    "max_dd_pct": -4.2,
-   "ret_pct": 0.9
+   "ret_pct": 3.8
   },
   {
    "id": "schools:DH:2026-11-06:r2",
@@ -17228,17 +17484,18 @@
    "symbol": "QTRX",
    "date": "2026-11-06",
    "entry": 2.895,
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "stop": 2.6395,
    "t1": 3.9683,
    "t2": null,
-   "sessions": 7,
-   "last": 2.86,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.43,
+   "last_date": "2026-11-18",
    "max_gain_pct": 21.9,
-   "max_dd_pct": -6.2,
-   "ret_pct": -1.2
+   "max_dd_pct": -18.5,
+   "ret_pct": -16.1,
+   "closed": "2026-11-18"
   },
   {
    "id": "schools:BYRN:2026-11-06:r1",
@@ -17253,12 +17510,12 @@
    "stop": 3.4829,
    "t1": 5.2363,
    "t2": null,
-   "sessions": 7,
-   "last": 3.81,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.85,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.8,
    "max_dd_pct": -2.5,
-   "ret_pct": -0.3
+   "ret_pct": 0.8
   },
   {
    "id": "schools:BYRN:2026-11-06:r2",
@@ -17273,12 +17530,12 @@
    "stop": 8.0507,
    "t1": 12.1038,
    "t2": null,
-   "sessions": 7,
-   "last": 8.84,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.94,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.8,
    "max_dd_pct": -6.2,
-   "ret_pct": 0.1
+   "ret_pct": 1.2
   },
   {
    "id": "schools:ICG:2026-11-06:r0",
@@ -17390,9 +17647,9 @@
    "stop": 0.8795,
    "t1": 1.088,
    "t2": null,
-   "sessions": 7,
+   "sessions": 8,
    "last": 1.09,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 31.1,
    "max_dd_pct": -6.8,
    "ret_pct": 5.8,
@@ -17431,9 +17688,9 @@
    "stop": 1.1537,
    "t1": 1.4622,
    "t2": null,
-   "sessions": 7,
+   "sessions": 8,
    "last": 1.26,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.2,
    "max_dd_pct": -5.0,
    "ret_pct": -2.7
@@ -17451,12 +17708,12 @@
    "stop": 1.8888,
    "t1": 2.3936,
    "t2": null,
-   "sessions": 7,
-   "last": 2.14,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 4.2,
    "max_dd_pct": -4.2,
-   "ret_pct": 0.9
+   "ret_pct": 3.8
   },
   {
    "id": "schools:SVCO:2026-11-06:r0",
@@ -17471,12 +17728,12 @@
    "stop": 1.5847,
    "t1": 2.1919,
    "t2": null,
-   "sessions": 7,
-   "last": 1.94,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.88,
+   "last_date": "2026-11-18",
    "max_gain_pct": 31.4,
-   "max_dd_pct": -5.9,
-   "ret_pct": -4.9,
+   "max_dd_pct": -8.3,
+   "ret_pct": -7.8,
    "t1_date": "2026-11-09"
   },
   {
@@ -17547,12 +17804,12 @@
    "stop": 1.5925,
    "t1": 2.2026,
    "t2": null,
-   "sessions": 7,
-   "last": 1.9,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.86,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.8,
    "max_dd_pct": -14.6,
-   "ret_pct": -7.3,
+   "ret_pct": -9.3,
    "t1_date": "2026-11-10"
   },
   {
@@ -17608,12 +17865,12 @@
    "stop": 1.9568,
    "t1": 2.5265,
    "t2": null,
-   "sessions": 7,
-   "last": 2.11,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.14,
+   "last_date": "2026-11-18",
    "max_gain_pct": 14.3,
    "max_dd_pct": -8.9,
-   "ret_pct": -5.4,
+   "ret_pct": -4.0,
    "t1_date": "2026-11-09"
   },
   {
@@ -17629,12 +17886,12 @@
    "stop": 3.7205,
    "t1": 4.8037,
    "t2": null,
-   "sessions": 7,
-   "last": 4.62,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.605,
+   "last_date": "2026-11-18",
    "max_gain_pct": 29.2,
    "max_dd_pct": 0.7,
-   "ret_pct": 9.0,
+   "ret_pct": 8.6,
    "t1_date": "2026-11-10"
   },
   {
@@ -18066,12 +18323,12 @@
    "stop": 5.6001,
    "t1": 7.2788,
    "t2": null,
-   "sessions": 7,
-   "last": 6.86,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.85,
+   "last_date": "2026-11-18",
    "max_gain_pct": 14.7,
    "max_dd_pct": -0.7,
-   "ret_pct": 12.6
+   "ret_pct": 12.5
   },
   {
    "id": "schools:PODC:2026-11-06:r0",
@@ -18086,13 +18343,14 @@
    "stop": 1.8171,
    "t1": 3.0144,
    "t2": null,
-   "sessions": 7,
-   "last": 1.895,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.835,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.3,
    "max_dd_pct": -16.3,
-   "ret_pct": -11.9,
+   "ret_pct": -14.7,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -18184,12 +18442,12 @@
    "stop": 1.0396,
    "t1": 1.596,
    "t2": null,
-   "sessions": 7,
-   "last": 1.13,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.09,
+   "last_date": "2026-11-18",
    "max_gain_pct": 16.2,
    "max_dd_pct": -16.3,
-   "ret_pct": -12.4
+   "ret_pct": -15.5
   },
   {
    "id": "schools:BIVI:2026-11-06:r2",
@@ -18204,13 +18462,14 @@
    "stop": 0.8381,
    "t1": 1.2867,
    "t2": null,
-   "sessions": 7,
-   "last": 0.8872,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8765,
+   "last_date": "2026-11-18",
    "max_gain_pct": 20.2,
    "max_dd_pct": -21.1,
-   "ret_pct": -14.7,
+   "ret_pct": -15.7,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -18234,12 +18493,12 @@
    "stop": 1.4678,
    "t1": 2.6125,
    "t2": null,
-   "sessions": 7,
-   "last": 2.06,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.0,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.3,
    "max_dd_pct": -6.7,
-   "ret_pct": 6.2
+   "ret_pct": 3.1
   },
   {
    "id": "schools:ZYBT:2026-11-06:r1",
@@ -18254,12 +18513,12 @@
    "stop": 0.976,
    "t1": 1.7372,
    "t2": null,
-   "sessions": 7,
-   "last": 1.13,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.09,
+   "last_date": "2026-11-18",
    "max_gain_pct": 16.2,
    "max_dd_pct": -16.3,
-   "ret_pct": -12.4
+   "ret_pct": -15.5
   },
   {
    "id": "schools:ZYBT:2026-11-06:r2",
@@ -18274,12 +18533,12 @@
    "stop": 1.1122,
    "t1": 1.9796,
    "t2": null,
-   "sessions": 7,
-   "last": 1.5,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.42,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.5,
    "max_dd_pct": -8.2,
-   "ret_pct": 2.0
+   "ret_pct": -3.4
   },
   {
    "id": "schools:TTRX:2026-11-06:r0",
@@ -18294,12 +18553,12 @@
    "stop": 1.3844,
    "t1": 2.5464,
    "t2": null,
-   "sessions": 7,
-   "last": 5.3,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.8005,
+   "last_date": "2026-11-18",
    "max_gain_pct": 233.3,
    "max_dd_pct": 0.0,
-   "ret_pct": 221.2,
+   "ret_pct": 190.9,
    "t1_date": "2026-11-12"
   },
   {
@@ -18335,12 +18594,12 @@
    "stop": 1.011,
    "t1": 1.8596,
    "t2": null,
-   "sessions": 7,
-   "last": 1.19,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 15.4,
    "max_dd_pct": -2.9,
-   "ret_pct": -1.2
+   "ret_pct": -0.4
   },
   {
    "id": "schools:QTEX:2026-11-06:r0",
@@ -18355,12 +18614,12 @@
    "stop": 1.2036,
    "t1": 2.3161,
    "t2": null,
-   "sessions": 7,
-   "last": 1.5,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.53,
+   "last_date": "2026-11-18",
    "max_gain_pct": 54.9,
    "max_dd_pct": -8.8,
-   "ret_pct": 5.6
+   "ret_pct": 7.7
   },
   {
    "id": "schools:QTEX:2026-11-06:r1",
@@ -18375,12 +18634,12 @@
    "stop": 6.5687,
    "t1": 12.6408,
    "t2": null,
-   "sessions": 7,
-   "last": 7.33,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 7.4,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.6,
    "max_dd_pct": -8.9,
-   "ret_pct": -5.4
+   "ret_pct": -4.5
   },
   {
    "id": "schools:QTEX:2026-11-06:r2",
@@ -18395,12 +18654,12 @@
    "stop": 0.8118,
    "t1": 1.5622,
    "t2": null,
-   "sessions": 7,
-   "last": 1.01,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.1,
+   "last_date": "2026-11-18",
    "max_gain_pct": 68.1,
    "max_dd_pct": -0.0,
-   "ret_pct": 5.4,
+   "ret_pct": 14.8,
    "t1_date": "2026-11-09"
   },
   {
@@ -18686,6 +18945,8 @@
     "2026-11-10",
     "2026-11-11",
     "2026-11-10",
+    "2026-11-11",
+    "2026-11-10",
     "2026-11-11"
    ]
   },
@@ -18765,12 +19026,12 @@
    "stop": 2.7912,
    "t1": 3.1639,
    "t2": null,
-   "sessions": 7,
-   "last": 3.01,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.95,
+   "last_date": "2026-11-18",
    "max_gain_pct": 36.8,
-   "max_dd_pct": -3.8,
-   "ret_pct": -2.0,
+   "max_dd_pct": -4.2,
+   "ret_pct": -3.9,
    "t1_date": "2026-11-09"
   },
   {
@@ -19179,12 +19440,12 @@
    "stop": 0.8344,
    "t1": 1.8968,
    "t2": null,
-   "sessions": 7,
-   "last": 1.0601,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.0023,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.3,
    "max_dd_pct": -29.1,
-   "ret_pct": -3.6,
+   "ret_pct": -8.9,
    "sweeps": [
     "2026-11-16",
     "2026-11-16",
@@ -19198,6 +19459,8 @@
     "2026-11-16",
     "2026-11-16",
     "2026-11-16",
+    "2026-11-16",
+    "2026-11-17",
     "2026-11-16",
     "2026-11-17",
     "2026-11-16",
@@ -19241,12 +19504,12 @@
    "stop": 1.4717,
    "t1": 3.3453,
    "t2": null,
-   "sessions": 7,
-   "last": 2.06,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.0,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.3,
    "max_dd_pct": -6.7,
-   "ret_pct": 6.2
+   "ret_pct": 3.1
   },
   {
    "id": "schools:ONEN:2026-11-06:r2",
@@ -19261,12 +19524,12 @@
    "stop": 0.7354,
    "t1": 1.6716,
    "t2": null,
-   "sessions": 7,
-   "last": 0.9,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.9199,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.9,
    "max_dd_pct": -7.2,
-   "ret_pct": -7.2
+   "ret_pct": -5.1
   },
   {
    "id": "schools:SUNE:2026-11-06:r0",
@@ -19420,12 +19683,12 @@
    "stop": 2.3202,
    "t1": 3.4278,
    "t2": null,
-   "sessions": 7,
-   "last": 3.02,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.04,
+   "last_date": "2026-11-18",
    "max_gain_pct": 16.1,
    "max_dd_pct": -2.2,
-   "ret_pct": 1.0,
+   "ret_pct": 1.7,
    "t1_date": "2026-11-10"
   },
   {
@@ -19441,12 +19704,12 @@
    "stop": 5.5096,
    "t1": 8.1396,
    "t2": null,
-   "sessions": 7,
-   "last": 7.85,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.0191,
+   "last_date": "2026-11-18",
    "max_gain_pct": 40.3,
    "max_dd_pct": 1.4,
-   "ret_pct": 10.6,
+   "ret_pct": 12.9,
    "t1_date": "2026-11-09"
   },
   {
@@ -19533,12 +19796,12 @@
    "stop": 0.9592,
    "t1": 1.3435,
    "t2": null,
-   "sessions": 7,
-   "last": 1.07,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.1,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.3,
    "max_dd_pct": -11.9,
-   "ret_pct": -1.8
+   "ret_pct": 0.9
   },
   {
    "id": "schools:RMCF:2026-11-06:r1",
@@ -19553,12 +19816,12 @@
    "stop": 1.2276,
    "t1": 1.7194,
    "t2": null,
-   "sessions": 7,
-   "last": 1.37,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.4294,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.5,
    "max_dd_pct": -4.4,
-   "ret_pct": -1.8
+   "ret_pct": 2.5
   },
   {
    "id": "schools:RMCF:2026-11-06:r2",
@@ -19594,13 +19857,14 @@
    "stop": 7.1772,
    "t1": 20.8048,
    "t2": null,
-   "sessions": 7,
-   "last": 7.33,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 7.4,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.6,
    "max_dd_pct": -8.9,
-   "ret_pct": -5.4,
+   "ret_pct": -4.5,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -19737,12 +20001,12 @@
    "stop": 1.3253,
    "t1": 2.5412,
    "t2": null,
-   "sessions": 7,
-   "last": 1.54,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.51,
+   "last_date": "2026-11-18",
    "max_gain_pct": 29.4,
    "max_dd_pct": 1.7,
-   "ret_pct": 7.7
+   "ret_pct": 5.6
   },
   {
    "id": "schools:DRK:2026-11-06:r1",
@@ -19757,12 +20021,12 @@
    "stop": 6.2375,
    "t1": 11.9597,
    "t2": null,
-   "sessions": 7,
-   "last": 6.975,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.955,
+   "last_date": "2026-11-18",
    "max_gain_pct": 32.2,
    "max_dd_pct": -1.6,
-   "ret_pct": 3.6
+   "ret_pct": 3.3
   },
   {
    "id": "schools:DRK:2026-11-06:r2",
@@ -19794,12 +20058,12 @@
    "stop": 3.1416,
    "t1": 4.4518,
    "t2": null,
-   "sessions": 7,
-   "last": 4.33,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.26,
+   "last_date": "2026-11-18",
    "max_gain_pct": 55.9,
    "max_dd_pct": 0.9,
-   "ret_pct": 24.1,
+   "ret_pct": 22.1,
    "t1_date": "2026-11-10"
   },
   {
@@ -19900,12 +20164,12 @@
    "stop": 1.3795,
    "t1": 2.3366,
    "t2": null,
-   "sessions": 7,
-   "last": 1.5,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.42,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.5,
    "max_dd_pct": -8.2,
-   "ret_pct": 2.0,
+   "ret_pct": -3.4,
    "sweeps": [
     "2026-11-11",
     "2026-11-11",
@@ -19936,6 +20200,8 @@
     "2026-11-11",
     "2026-11-11",
     "2026-11-11",
+    "2026-11-11",
+    "2026-11-13",
     "2026-11-11",
     "2026-11-13",
     "2026-11-11",
@@ -20142,12 +20408,12 @@
    "stop": 3.5508,
    "t1": 4.8403,
    "t2": null,
-   "sessions": 7,
-   "last": 4.83,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.986,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.0,
    "max_dd_pct": 1.0,
-   "ret_pct": 6.4,
+   "ret_pct": 9.8,
    "t1_date": "2026-11-09"
   },
   {
@@ -20163,12 +20429,12 @@
    "stop": 2.448,
    "t1": 3.337,
    "t2": null,
-   "sessions": 7,
-   "last": 3.08,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.12,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.4,
    "max_dd_pct": -7.0,
-   "ret_pct": -1.6
+   "ret_pct": -0.3
   },
   {
    "id": "schools:ANIX:2026-11-06:r2",
@@ -20204,12 +20470,12 @@
    "stop": 0.9164,
    "t1": 1.7469,
    "t2": null,
-   "sessions": 7,
-   "last": 1.3,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.26,
+   "last_date": "2026-11-18",
    "max_gain_pct": 26.1,
    "max_dd_pct": -2.7,
-   "ret_pct": 17.1
+   "ret_pct": 13.5
   },
   {
    "id": "schools:ATOM:2026-11-06:r1",
@@ -20262,12 +20528,12 @@
    "stop": 0.9742,
    "t1": 1.857,
    "t2": null,
-   "sessions": 7,
-   "last": 1.09,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.115,
+   "last_date": "2026-11-18",
    "max_gain_pct": 22.9,
    "max_dd_pct": -15.8,
-   "ret_pct": -7.6
+   "ret_pct": -5.5
   },
   {
    "id": "schools:NSLR:2026-11-06:r0",
@@ -20303,13 +20569,14 @@
    "stop": 3.8123,
    "t1": 5.6947,
    "t2": null,
-   "sessions": 7,
-   "last": 3.86,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.835,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.5,
    "max_dd_pct": -8.2,
-   "ret_pct": -7.0,
+   "ret_pct": -7.6,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -20334,9 +20601,9 @@
    "stop": 6.2375,
    "t1": 9.3174,
    "t2": null,
-   "sessions": 7,
+   "sessions": 8,
    "last": 6.87,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.4,
    "max_dd_pct": 0.0,
    "ret_pct": 1.2
@@ -20378,12 +20645,12 @@
    "stop": 3.9576,
    "t1": 5.246,
    "t2": null,
-   "sessions": 7,
-   "last": 4.62,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.605,
+   "last_date": "2026-11-18",
    "max_gain_pct": 29.2,
    "max_dd_pct": 0.7,
-   "ret_pct": 9.0,
+   "ret_pct": 8.6,
    "t1_date": "2026-11-11"
   },
   {
@@ -20394,17 +20661,18 @@
    "symbol": "XBIT",
    "date": "2026-11-06",
    "entry": 1.89,
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "stop": 1.7641,
    "t1": 2.3384,
    "t2": null,
-   "sessions": 7,
-   "last": 1.78,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.76,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.3,
-   "max_dd_pct": -5.8,
-   "ret_pct": -5.8
+   "max_dd_pct": -6.9,
+   "ret_pct": -6.9,
+   "closed": "2026-11-18"
   },
   {
    "id": "schools:ORIO:2026-11-06:r0",
@@ -20419,12 +20687,12 @@
    "stop": 2.4227,
    "t1": 3.3101,
    "t2": null,
-   "sessions": 7,
-   "last": 3.07,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.105,
+   "last_date": "2026-11-18",
    "max_gain_pct": 17.5,
    "max_dd_pct": -8.8,
-   "ret_pct": -6.4,
+   "ret_pct": -5.3,
    "t1_date": "2026-11-09"
   },
   {
@@ -20440,12 +20708,12 @@
    "stop": 2.3267,
    "t1": 3.1789,
    "t2": null,
-   "sessions": 7,
-   "last": 3.37,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.345,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.1,
    "max_dd_pct": -3.5,
-   "ret_pct": 7.0,
+   "ret_pct": 6.2,
    "t1_date": "2026-11-09"
   },
   {
@@ -20528,12 +20796,12 @@
    "stop": 1.7342,
    "t1": 4.9587,
    "t2": null,
-   "sessions": 7,
-   "last": 1.92,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.01,
+   "last_date": "2026-11-18",
    "max_gain_pct": 37.4,
    "max_dd_pct": -5.3,
-   "ret_pct": 1.1
+   "ret_pct": 5.8
   },
   {
    "id": "schools:ELUT:2026-11-06:r0",
@@ -20548,12 +20816,12 @@
    "stop": 0.9821,
    "t1": 1.3696,
    "t2": null,
-   "sessions": 7,
-   "last": 1.19,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.2,
+   "last_date": "2026-11-18",
    "max_gain_pct": 15.4,
    "max_dd_pct": -2.9,
-   "ret_pct": -1.2,
+   "ret_pct": -0.4,
    "t1_date": "2026-11-11"
   },
   {
@@ -20624,12 +20892,12 @@
    "stop": 2.2379,
    "t1": 2.9256,
    "t2": null,
-   "sessions": 7,
-   "last": 3.88,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.09,
+   "last_date": "2026-11-18",
    "max_gain_pct": 161.1,
    "max_dd_pct": -7.7,
-   "ret_pct": 57.1,
+   "ret_pct": 65.6,
    "t1_date": "2026-11-10"
   },
   {
@@ -20690,12 +20958,12 @@
    "stop": 0.6958,
    "t1": 1.2968,
    "t2": null,
-   "sessions": 7,
-   "last": 0.8021,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8001,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.9,
-   "max_dd_pct": -24.8,
-   "ret_pct": -20.6
+   "max_dd_pct": -25.7,
+   "ret_pct": -20.8
   },
   {
    "id": "schools:MTVA:2026-11-06:r1",
@@ -20730,12 +20998,12 @@
    "stop": 1.5639,
    "t1": 2.9145,
    "t2": null,
-   "sessions": 7,
-   "last": 2.42,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.33,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.3,
    "max_dd_pct": -0.9,
-   "ret_pct": 6.6
+   "ret_pct": 2.6
   },
   {
    "id": "schools:RUBI:2026-11-06:r0",
@@ -20947,12 +21215,12 @@
    "stop": 1.7652,
    "t1": 2.8216,
    "t2": null,
-   "sessions": 7,
-   "last": 1.97,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.961,
+   "last_date": "2026-11-18",
    "max_gain_pct": 15.5,
    "max_dd_pct": -10.0,
-   "ret_pct": -1.5
+   "ret_pct": -1.9
   },
   {
    "id": "schools:AAME:2026-11-06:r2",
@@ -20967,12 +21235,12 @@
    "stop": 4.3248,
    "t1": 6.913,
    "t2": null,
-   "sessions": 7,
-   "last": 4.9,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.97,
+   "last_date": "2026-11-18",
    "max_gain_pct": 19.0,
    "max_dd_pct": -10.2,
-   "ret_pct": 0.0
+   "ret_pct": 1.4
   },
   {
    "id": "schools:CLRO:2026-11-06:r0",
@@ -20987,12 +21255,12 @@
    "stop": 0.9652,
    "t1": 1.2479,
    "t2": null,
-   "sessions": 7,
-   "last": 1.31,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.3299,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.7,
    "max_dd_pct": 1.8,
-   "ret_pct": 17.0,
+   "ret_pct": 18.7,
    "t1_date": "2026-11-09"
   },
   {
@@ -21008,12 +21276,12 @@
    "stop": 0.7496,
    "t1": 0.9692,
    "t2": null,
-   "sessions": 7,
-   "last": 0.9081,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8902,
+   "last_date": "2026-11-18",
    "max_gain_pct": 58.7,
-   "max_dd_pct": 1.7,
-   "ret_pct": 4.4,
+   "max_dd_pct": 0.9,
+   "ret_pct": 2.3,
    "t1_date": "2026-11-09"
   },
   {
@@ -21238,12 +21506,12 @@
    "stop": 1.0552,
    "t1": 1.9592,
    "t2": null,
-   "sessions": 7,
-   "last": 1.43,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.44,
+   "last_date": "2026-11-18",
    "max_gain_pct": 17.2,
    "max_dd_pct": -9.3,
-   "ret_pct": -5.3
+   "ret_pct": -4.6
   },
   {
    "id": "schools:HCAI:2026-11-06:r2",
@@ -21258,12 +21526,12 @@
    "stop": 1.2229,
    "t1": 2.2706,
    "t2": null,
-   "sessions": 7,
-   "last": 1.75,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.7,
+   "last_date": "2026-11-18",
    "max_gain_pct": 26.3,
    "max_dd_pct": -4.0,
-   "ret_pct": 0.0
+   "ret_pct": -2.9
   },
   {
    "id": "schools:ILAG:2026-11-06:r0",
@@ -21564,12 +21832,12 @@
    "stop": 3.3963,
    "t1": 4.5999,
    "t2": null,
-   "sessions": 7,
-   "last": 3.86,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 3.835,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.5,
    "max_dd_pct": -8.2,
-   "ret_pct": -7.0
+   "ret_pct": -7.6
   },
   {
    "id": "schools:EGAN:2026-11-06:r1",
@@ -21584,12 +21852,12 @@
    "stop": 5.0085,
    "t1": 6.7834,
    "t2": null,
-   "sessions": 7,
-   "last": 6.37,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.36,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.8,
    "max_dd_pct": -0.2,
-   "ret_pct": 4.1
+   "ret_pct": 3.9
   },
   {
    "id": "schools:EGAN:2026-11-06:r2",
@@ -21604,12 +21872,12 @@
    "stop": 7.3246,
    "t1": 9.9202,
    "t2": null,
-   "sessions": 7,
-   "last": 8.29,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.12,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.6,
-   "max_dd_pct": -7.6,
-   "ret_pct": -7.4
+   "max_dd_pct": -9.3,
+   "ret_pct": -9.3
   },
   {
    "id": "schools:HUIZ:2026-11-06:r0",
@@ -21649,12 +21917,12 @@
    "stop": 0.7736,
    "t1": 1.0701,
    "t2": null,
-   "sessions": 7,
-   "last": 0.8489,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.8346,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.6,
    "max_dd_pct": -13.8,
-   "ret_pct": -8.5
+   "ret_pct": -10.0
   },
   {
    "id": "schools:HUIZ:2026-11-06:r2",
@@ -21693,12 +21961,12 @@
    "stop": 1.0403,
    "t1": 3.6489,
    "t2": null,
-   "sessions": 7,
-   "last": 1.31,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.3299,
+   "last_date": "2026-11-18",
    "max_gain_pct": 25.7,
    "max_dd_pct": 1.8,
-   "ret_pct": 17.0
+   "ret_pct": 18.7
   },
   {
    "id": "schools:SXTC:2026-11-06:r1",
@@ -21755,12 +22023,12 @@
    "stop": 0.8021,
    "t1": 1.171,
    "t2": null,
-   "sessions": 7,
-   "last": 0.9005,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 0.862,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.2,
-   "max_dd_pct": -9.1,
-   "ret_pct": -8.1
+   "max_dd_pct": -12.0,
+   "ret_pct": -12.0
   },
   {
    "id": "schools:VELO:2026-11-06:r1",
@@ -21795,12 +22063,12 @@
    "stop": 5.6577,
    "t1": 8.2598,
    "t2": null,
-   "sessions": 7,
-   "last": 6.49,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.6901,
+   "last_date": "2026-11-18",
    "max_gain_pct": 26.5,
    "max_dd_pct": -10.3,
-   "ret_pct": -6.1,
+   "ret_pct": -3.2,
    "t1_date": "2026-11-11"
   },
   {
@@ -21940,12 +22208,12 @@
    "stop": 6.1421,
    "t1": 10.4191,
    "t2": null,
-   "sessions": 7,
-   "last": 6.9,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 6.93,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.4,
    "max_dd_pct": -5.4,
-   "ret_pct": -1.8
+   "ret_pct": -1.4
   },
   {
    "id": "schools:GOSS:2026-11-06:r2",
@@ -22008,12 +22276,12 @@
    "stop": 2.1385,
    "t1": 3.5632,
    "t2": null,
-   "sessions": 7,
-   "last": 2.25,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 2.245,
+   "last_date": "2026-11-18",
    "max_gain_pct": 22.4,
    "max_dd_pct": -6.5,
-   "ret_pct": -2.2
+   "ret_pct": -2.4
   },
   {
    "id": "schools:HSDT:2026-11-06:r2",
@@ -22125,12 +22393,12 @@
    "stop": 6.7122,
    "t1": 9.2402,
    "t2": null,
-   "sessions": 7,
-   "last": 8.015,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 8.02,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.1,
    "max_dd_pct": -6.3,
-   "ret_pct": -4.5
+   "ret_pct": -4.4
   },
   {
    "id": "schools:SANG:2026-11-06:r1",
@@ -22145,12 +22413,12 @@
    "stop": 4.4001,
    "t1": 6.0573,
    "t2": null,
-   "sessions": 7,
-   "last": 4.91,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 4.88,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.5,
    "max_dd_pct": -14.7,
-   "ret_pct": -10.7
+   "ret_pct": -11.3
   },
   {
    "id": "schools:SANG:2026-11-06:r2",
@@ -22165,12 +22433,12 @@
    "stop": 1.168,
    "t1": 1.6079,
    "t2": null,
-   "sessions": 7,
-   "last": 1.34,
-   "last_date": "2026-11-17",
+   "sessions": 8,
+   "last": 1.31,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.0,
-   "max_dd_pct": -9.6,
-   "ret_pct": -8.2
+   "max_dd_pct": -13.7,
+   "ret_pct": -10.3
   },
   {
    "id": "schools:YJ:2026-11-09:r0",
@@ -22271,12 +22539,12 @@
    "stop": 0.8217,
    "t1": 1.0958,
    "t2": null,
-   "sessions": 6,
-   "last": 0.9126,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 0.8874,
+   "last_date": "2026-11-18",
    "max_gain_pct": 17.1,
    "max_dd_pct": -5.1,
-   "ret_pct": 1.8
+   "ret_pct": -1.0
   },
   {
    "id": "schools:INSG:2026-11-09:r2",
@@ -22384,12 +22652,12 @@
    "stop": 0.7746,
    "t1": 3.28,
    "t2": null,
-   "sessions": 6,
-   "last": 1.61,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.51,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.7,
    "max_dd_pct": -12.8,
-   "ret_pct": -1.8
+   "ret_pct": -7.9
   },
   {
    "id": "runners:JLHL:2026-11-09:r1",
@@ -22424,9 +22692,9 @@
    "stop": 4.5389,
    "t1": 19.22,
    "t2": null,
-   "sessions": 6,
+   "sessions": 7,
    "last": 13.05,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 45.4,
    "max_dd_pct": 1.4,
    "ret_pct": 35.8
@@ -22721,12 +22989,12 @@
    "stop": 1.294,
    "t1": 2.1715,
    "t2": null,
-   "sessions": 6,
-   "last": 1.47,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.45,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.9,
    "max_dd_pct": -18.1,
-   "ret_pct": -5.2,
+   "ret_pct": -6.5,
    "sweeps": [
     "2026-11-11",
     "2026-11-11",
@@ -22735,6 +23003,8 @@
     "2026-11-11",
     "2026-11-11",
     "2026-11-11",
+    "2026-11-11",
+    "2026-11-12",
     "2026-11-11",
     "2026-11-12",
     "2026-11-11",
@@ -22925,12 +23195,12 @@
    "stop": 3.4616,
    "t1": 14.96,
    "t2": null,
-   "sessions": 6,
-   "last": 4.51,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 4.5,
+   "last_date": "2026-11-18",
    "max_gain_pct": -0.8,
    "max_dd_pct": -39.8,
-   "ret_pct": -39.7
+   "ret_pct": -39.8
   },
   {
    "id": "runners:KMRK:2026-11-09:r1",
@@ -22945,12 +23215,12 @@
    "stop": 1.0181,
    "t1": 4.4,
    "t2": null,
-   "sessions": 6,
-   "last": 1.52,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.54,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.4,
-   "max_dd_pct": -33.0,
-   "ret_pct": -30.9
+   "max_dd_pct": -34.1,
+   "ret_pct": -30.0
   },
   {
    "id": "runners:KMRK:2026-11-09:r2",
@@ -22965,12 +23235,12 @@
    "stop": 0.7173,
    "t1": 3.1,
    "t2": null,
-   "sessions": 6,
-   "last": 1.47,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 1.45,
+   "last_date": "2026-11-18",
    "max_gain_pct": 1.9,
    "max_dd_pct": -18.1,
-   "ret_pct": -5.2
+   "ret_pct": -6.5
   },
   {
    "id": "schools:UPLD:2026-11-09:r0",
@@ -23027,12 +23297,12 @@
    "stop": 0.8626,
    "t1": 1.4661,
    "t2": null,
-   "sessions": 6,
-   "last": 0.8872,
-   "last_date": "2026-11-17",
+   "sessions": 7,
+   "last": 0.8765,
+   "last_date": "2026-11-18",
    "max_gain_pct": -2.6,
    "max_dd_pct": -30.4,
-   "ret_pct": -24.8,
+   "ret_pct": -25.7,
    "sweeps": [
     "2026-11-17",
     "2026-11-17",
@@ -23041,7 +23311,9 @@
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
-    "2026-11-17"
+    "2026-11-17",
+    "2026-11-17",
+    "2026-11-18"
    ]
   },
   {
@@ -23078,12 +23350,12 @@
    "stop": 1.9984,
    "t1": 2.6937,
    "t2": null,
-   "sessions": 5,
-   "last": 2.04,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 2.05,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.4,
    "max_dd_pct": -10.1,
-   "ret_pct": -6.0,
+   "ret_pct": -5.5,
    "sweeps": [
     "2026-11-11",
     "2026-11-11",
@@ -23177,7 +23449,10 @@
     "2026-11-11",
     "2026-11-17",
     "2026-11-11",
-    "2026-11-17"
+    "2026-11-17",
+    "2026-11-11",
+    "2026-11-17",
+    "2026-11-18"
    ]
   },
   {
@@ -23188,17 +23463,17 @@
    "symbol": "INHD",
    "date": "2026-11-10",
    "entry": 2.525,
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "stop": 2.3253,
    "t1": 3.1344,
    "t2": null,
-   "sessions": 5,
-   "last": 2.35,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 2.3,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.3,
-   "max_dd_pct": -8.1,
-   "ret_pct": -6.9,
+   "max_dd_pct": -8.9,
+   "ret_pct": -8.9,
    "sweeps": [
     "2026-11-17",
     "2026-11-17",
@@ -23207,8 +23482,10 @@
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
+    "2026-11-17",
     "2026-11-17"
-   ]
+   ],
+   "closed": "2026-11-18"
   },
   {
    "id": "runners:BVC:2026-11-10:r0",
@@ -23223,12 +23500,12 @@
    "stop": 0.4551,
    "t1": 2.0,
    "t2": null,
-   "sessions": 5,
-   "last": 0.995,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 0.9651,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.0,
    "max_dd_pct": -5.0,
-   "ret_pct": -0.5
+   "ret_pct": -3.5
   },
   {
    "id": "runners:BVC:2026-11-10:r1",
@@ -23243,12 +23520,12 @@
    "stop": 0.4779,
    "t1": 2.1,
    "t2": null,
-   "sessions": 5,
-   "last": 1.07,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 1.06,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.1,
    "max_dd_pct": -16.2,
-   "ret_pct": 1.9
+   "ret_pct": 1.0
   },
   {
    "id": "runners:BVC:2026-11-10:r2",
@@ -23263,12 +23540,12 @@
    "stop": 2.1437,
    "t1": 9.42,
    "t2": null,
-   "sessions": 5,
-   "last": 4.71,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 4.945,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.2,
    "max_dd_pct": -4.0,
-   "ret_pct": 0.0
+   "ret_pct": 5.0
   },
   {
    "id": "highrisk:HKIT:2026-11-10:r0",
@@ -23924,12 +24201,12 @@
    "stop": 1.018,
    "t1": 1.3391,
    "t2": null,
-   "sessions": 5,
-   "last": 1.23,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 1.2106,
+   "last_date": "2026-11-18",
    "max_gain_pct": 11.0,
    "max_dd_pct": -4.4,
-   "ret_pct": 4.2
+   "ret_pct": 2.6
   },
   {
    "id": "schools:RFIL:2026-11-10:r1",
@@ -24028,12 +24305,12 @@
    "stop": 5.7438,
    "t1": 8.8872,
    "t2": null,
-   "sessions": 5,
-   "last": 5.89,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 5.9643,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.3,
    "max_dd_pct": -11.9,
-   "ret_pct": -10.6
+   "ret_pct": -9.4
   },
   {
    "id": "schools:XCUR:2026-11-10:r0",
@@ -24048,12 +24325,12 @@
    "stop": 3.8732,
    "t1": 7.2345,
    "t2": null,
-   "sessions": 5,
-   "last": 4.79,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 4.76,
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.2,
-   "max_dd_pct": -13.9,
-   "ret_pct": -13.7
+   "max_dd_pct": -14.2,
+   "ret_pct": -14.2
   },
   {
    "id": "schools:XCUR:2026-11-10:r1",
@@ -24068,12 +24345,12 @@
    "stop": 0.5709,
    "t1": 1.0663,
    "t2": null,
-   "sessions": 5,
-   "last": 0.699,
-   "last_date": "2026-11-17",
+   "sessions": 6,
+   "last": 0.705,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.8,
    "max_dd_pct": -21.5,
-   "ret_pct": -14.5
+   "ret_pct": -13.8
   },
   {
    "id": "schools:XCUR:2026-11-10:r2",
@@ -24108,9 +24385,9 @@
    "stop": 0.7946,
    "t1": 1.3188,
    "t2": null,
-   "sessions": 4,
+   "sessions": 5,
    "last": 1.0,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 49.0,
    "max_dd_pct": -6.9,
    "ret_pct": 16.4
@@ -24505,12 +24782,12 @@
    "stop": 1.3773,
    "t1": 4.387,
    "t2": null,
-   "sessions": 3,
-   "last": 1.61,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.51,
+   "last_date": "2026-11-18",
    "max_gain_pct": -3.0,
    "max_dd_pct": -14.9,
-   "ret_pct": -4.2
+   "ret_pct": -10.1
   },
   {
    "id": "schools:SMX:2026-11-12:r2",
@@ -24653,12 +24930,12 @@
    "stop": 2.0903,
    "t1": 4.2845,
    "t2": null,
-   "sessions": 3,
-   "last": 2.34,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 2.3,
+   "last_date": "2026-11-18",
    "max_gain_pct": 9.8,
    "max_dd_pct": -7.7,
-   "ret_pct": -4.5
+   "ret_pct": -6.1
   },
   {
    "id": "schools:LCFY:2026-11-12:r0",
@@ -24777,12 +25054,12 @@
    "stop": 1.6843,
    "t1": 3.5083,
    "t2": null,
-   "sessions": 3,
-   "last": 2.33,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 2.29,
+   "last_date": "2026-11-18",
    "max_gain_pct": 53.2,
    "max_dd_pct": -13.2,
-   "ret_pct": -7.5,
+   "ret_pct": -9.1,
    "t1_date": "2026-11-16"
   },
   {
@@ -24798,12 +25075,12 @@
    "stop": 1.1496,
    "t1": 2.3945,
    "t2": null,
-   "sessions": 3,
-   "last": 1.44,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.352,
+   "last_date": "2026-11-18",
    "max_gain_pct": -1.2,
-   "max_dd_pct": -20.9,
-   "ret_pct": -16.3
+   "max_dd_pct": -21.5,
+   "ret_pct": -21.4
   },
   {
    "id": "schools:SNAL:2026-11-12:r0",
@@ -24818,12 +25095,12 @@
    "stop": 2.0365,
    "t1": 2.953,
    "t2": null,
-   "sessions": 3,
-   "last": 2.35,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 2.3,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.7,
-   "max_dd_pct": -11.8,
-   "ret_pct": -10.6
+   "max_dd_pct": -12.5,
+   "ret_pct": -12.5
   },
   {
    "id": "schools:SNAL:2026-11-12:r1",
@@ -24923,13 +25200,14 @@
    "stop": 1.5704,
    "t1": 2.2647,
    "t2": null,
-   "sessions": 3,
-   "last": 1.72,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.69,
+   "last_date": "2026-11-18",
    "max_gain_pct": 13.7,
    "max_dd_pct": -12.0,
-   "ret_pct": -1.7,
+   "ret_pct": -3.4,
    "sweeps": [
+    "2026-11-13",
     "2026-11-13",
     "2026-11-13",
     "2026-11-13",
@@ -25100,12 +25378,12 @@
    "stop": 1.962,
    "t1": 3.246,
    "t2": null,
-   "sessions": 2,
-   "last": 2.42,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 2.33,
+   "last_date": "2026-11-18",
    "max_gain_pct": 6.0,
-   "max_dd_pct": 0.4,
-   "ret_pct": 3.4
+   "max_dd_pct": -0.4,
+   "ret_pct": -0.4
   },
   {
    "id": "schools:CIIT:2026-11-13:r2",
@@ -25225,12 +25503,12 @@
    "stop": 1.6455,
    "t1": 2.8368,
    "t2": null,
-   "sessions": 2,
-   "last": 1.82,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 1.78,
+   "last_date": "2026-11-18",
    "max_gain_pct": 5.3,
    "max_dd_pct": -6.3,
-   "ret_pct": -4.2
+   "ret_pct": -6.3
   },
   {
    "id": "schools:INHD:2026-11-13:r1",
@@ -25310,12 +25588,12 @@
    "stop": 2.7238,
    "t1": 12.04,
    "t2": null,
-   "sessions": 2,
-   "last": 4.3,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 4.335,
+   "last_date": "2026-11-18",
    "max_gain_pct": -7.1,
    "max_dd_pct": -33.9,
-   "ret_pct": -28.6
+   "ret_pct": -28.0
   },
   {
    "id": "runners:SLSN:2026-11-13:r2",
@@ -25330,12 +25608,12 @@
    "stop": 5.4883,
    "t1": 24.26,
    "t2": null,
-   "sessions": 2,
-   "last": 14.73,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 14.54,
+   "last_date": "2026-11-18",
    "max_gain_pct": 29.1,
    "max_dd_pct": -6.5,
-   "ret_pct": 21.4
+   "ret_pct": 19.9
   },
   {
    "id": "schools:LGCL:2026-11-13:r0",
@@ -25409,9 +25687,9 @@
    "stop": 4.4051,
    "t1": 6.5391,
    "t2": null,
-   "sessions": 2,
+   "sessions": 3,
    "last": 4.98,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": 3.9,
    "max_dd_pct": -1.1,
    "ret_pct": 2.5
@@ -25467,12 +25745,12 @@
    "stop": 0.5698,
    "t1": 1.0451,
    "t2": null,
-   "sessions": 2,
-   "last": 0.8539,
-   "last_date": "2026-11-17",
+   "sessions": 3,
+   "last": 0.819,
+   "last_date": "2026-11-18",
    "max_gain_pct": 12.0,
    "max_dd_pct": -2.7,
-   "ret_pct": 4.1
+   "ret_pct": -0.1
   },
   {
    "id": "schools:CRGO:2026-11-13:r1",
@@ -25528,12 +25806,12 @@
    "stop": 0.7436,
    "t1": 1.6721,
    "t2": null,
-   "sessions": 1,
-   "last": 0.8711,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 0.9187,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.1,
    "max_dd_pct": -10.2,
-   "ret_pct": -10.2
+   "ret_pct": -5.3
   },
   {
    "id": "schools:TGL:2026-11-16:r1",
@@ -25569,12 +25847,12 @@
    "stop": 1.8477,
    "t1": 4.1547,
    "t2": null,
-   "sessions": 1,
-   "last": 2.42,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 2.33,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.7,
-   "max_dd_pct": -2.5,
-   "ret_pct": 0.4
+   "max_dd_pct": -3.3,
+   "ret_pct": -3.3
   },
   {
    "id": "schools:NOMA:2026-11-16:r0",
@@ -25609,12 +25887,12 @@
    "stop": 0.7595,
    "t1": 1.2493,
    "t2": null,
-   "sessions": 1,
-   "last": 0.8193,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 0.7978,
+   "last_date": "2026-11-18",
    "max_gain_pct": -4.2,
    "max_dd_pct": -18.3,
-   "ret_pct": -13.9
+   "ret_pct": -16.2
   },
   {
    "id": "schools:NOMA:2026-11-16:r2",
@@ -25629,12 +25907,12 @@
    "stop": 3.7513,
    "t1": 6.1703,
    "t2": null,
-   "sessions": 1,
-   "last": 4.1,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 4.12,
+   "last_date": "2026-11-18",
    "max_gain_pct": -4.3,
-   "max_dd_pct": -12.8,
-   "ret_pct": -12.8
+   "max_dd_pct": -13.0,
+   "ret_pct": -12.3
   },
   {
    "id": "schools:OBAI:2026-11-16:r0",
@@ -25649,12 +25927,12 @@
    "stop": 0.693,
    "t1": 1.1753,
    "t2": null,
-   "sessions": 1,
-   "last": 0.974,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 0.9402,
+   "last_date": "2026-11-18",
    "max_gain_pct": 35.6,
    "max_dd_pct": -5.2,
-   "ret_pct": 21.2
+   "ret_pct": 17.0
   },
   {
    "id": "schools:OBAI:2026-11-16:r1",
@@ -25734,12 +26012,12 @@
    "stop": 0.9707,
    "t1": 4.314,
    "t2": null,
-   "sessions": 1,
-   "last": 2.04,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 2.05,
+   "last_date": "2026-11-18",
    "max_gain_pct": -0.3,
    "max_dd_pct": -9.6,
-   "ret_pct": -5.4
+   "ret_pct": -5.0
   },
   {
    "id": "runners:OMH:2026-11-16:r2",
@@ -25774,9 +26052,9 @@
    "stop": 1.8703,
    "t1": 3.802,
    "t2": null,
-   "sessions": 1,
+   "sessions": 2,
    "last": 2.56,
-   "last_date": "2026-11-17",
+   "last_date": "2026-11-18",
    "max_gain_pct": -0.2,
    "max_dd_pct": -13.4,
    "ret_pct": -7.6
@@ -25794,12 +26072,12 @@
    "stop": 3.2274,
    "t1": 6.5608,
    "t2": null,
-   "sessions": 1,
-   "last": 4.72,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 9.8,
+   "sessions": 2,
+   "last": 5.6,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 23.4,
    "max_dd_pct": -9.6,
-   "ret_pct": -1.3
+   "ret_pct": 17.2
   },
   {
    "id": "schools:FGL:2026-11-16:r2",
@@ -25814,12 +26092,12 @@
    "stop": 1.1208,
    "t1": 2.2784,
    "t2": null,
-   "sessions": 1,
-   "last": 1.48,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 0.0,
-   "max_dd_pct": -12.6,
-   "ret_pct": -10.8
+   "max_dd_pct": -14.5,
+   "ret_pct": -12.0
   },
   {
    "id": "schools:PTLE:2026-11-12:r0",
@@ -25834,12 +26112,12 @@
    "stop": 2.234,
    "t1": 2.8504,
    "t2": null,
-   "sessions": 3,
-   "last": 2.37,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 2.46,
+   "last_date": "2026-11-18",
    "max_gain_pct": 10.8,
    "max_dd_pct": -7.5,
-   "ret_pct": -6.7
+   "ret_pct": -3.1
   },
   {
    "id": "schools:PTLE:2026-11-12:r1",
@@ -25854,13 +26132,14 @@
    "stop": 3.4653,
    "t1": 4.4216,
    "t2": null,
-   "sessions": 3,
-   "last": 4.69,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 4.53,
+   "last_date": "2026-11-18",
    "max_gain_pct": 24.4,
    "max_dd_pct": -15.0,
-   "ret_pct": 19.0,
+   "ret_pct": 15.0,
    "sweeps": [
+    "2026-11-13",
     "2026-11-13",
     "2026-11-13",
     "2026-11-13",
@@ -25896,12 +26175,12 @@
    "stop": 0.8488,
    "t1": 1.0831,
    "t2": null,
-   "sessions": 3,
-   "last": 1.07,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 1.06,
+   "last_date": "2026-11-18",
    "max_gain_pct": 17.6,
    "max_dd_pct": -8.8,
-   "ret_pct": 10.9,
+   "ret_pct": 9.8,
    "t1_date": "2026-11-17"
   },
   {
@@ -25932,17 +26211,17 @@
    "symbol": "OFAL",
    "date": "2026-11-16",
    "entry": 2.76,
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "stop": 2.2934,
    "t1": 65.602,
    "t2": null,
-   "sessions": 1,
-   "last": 2.33,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 2.29,
+   "last_date": "2026-11-18",
    "max_gain_pct": -8.0,
    "max_dd_pct": -19.9,
-   "ret_pct": -15.6,
+   "ret_pct": -17.0,
    "sweeps": [
     "2026-11-17",
     "2026-11-17",
@@ -25957,8 +26236,10 @@
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
+    "2026-11-17",
     "2026-11-17"
-   ]
+   ],
+   "closed": "2026-11-18"
   },
   {
    "id": "schools:OMH:2026-11-16:r2",
@@ -25973,12 +26254,12 @@
    "stop": 3.1991,
    "t1": 91.5101,
    "t2": null,
-   "sessions": 1,
-   "last": 3.36,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 3.57,
+   "last_date": "2026-11-18",
    "max_gain_pct": 7.5,
    "max_dd_pct": -12.7,
-   "ret_pct": -12.7
+   "ret_pct": -7.3
   },
   {
    "id": "schools:CAMP:2026-11-16:r0",
@@ -26014,12 +26295,12 @@
    "stop": 1.4397,
    "t1": 2.176,
    "t2": null,
-   "sessions": 1,
-   "last": 1.65,
-   "last_date": "2026-11-17",
+   "sessions": 2,
+   "last": 1.66,
+   "last_date": "2026-11-18",
    "max_gain_pct": 2.4,
    "max_dd_pct": -3.0,
-   "ret_pct": -2.4
+   "ret_pct": -1.8
   },
   {
    "id": "schools:CAMP:2026-11-16:r2",
@@ -26034,12 +26315,12 @@
    "stop": 1.6357,
    "t1": 2.4721,
    "t2": null,
-   "sessions": 1,
-   "last": 2.0,
-   "last_date": "2026-11-17",
-   "max_gain_pct": 6.8,
+   "sessions": 2,
+   "last": 2.12,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 11.5,
    "max_dd_pct": -5.2,
-   "ret_pct": 4.2
+   "ret_pct": 10.4
   },
   {
    "id": "schools:ADXN:2026-11-17:r0",
@@ -26054,9 +26335,12 @@
    "stop": 2.7734,
    "t1": 5.4705,
    "t2": null,
-   "sessions": 0,
-   "last": 3.09,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 3.155,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -0.3,
+   "max_dd_pct": -3.9,
+   "ret_pct": -1.9
   },
   {
    "id": "schools:ADXN:2026-11-17:r1",
@@ -26071,9 +26355,12 @@
    "stop": 1.57,
    "t1": 3.0969,
    "t2": null,
-   "sessions": 0,
-   "last": 1.86,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 1.87,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 2.7,
+   "max_dd_pct": 2.7,
+   "ret_pct": 2.7
   },
   {
    "id": "schools:ADXN:2026-11-17:r2",
@@ -26088,9 +26375,12 @@
    "stop": 1.8417,
    "t1": 3.6329,
    "t2": null,
-   "sessions": 0,
-   "last": 1.935,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 1.94,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -8.7,
+   "max_dd_pct": -10.1,
+   "ret_pct": -9.1
   },
   {
    "id": "schools:EDHL:2026-11-17:r0",
@@ -26105,9 +26395,12 @@
    "stop": 5.2325,
    "t1": 6.347,
    "t2": null,
-   "sessions": 0,
-   "last": 6.22,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 6.29,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 1.6,
+   "max_dd_pct": -0.2,
+   "ret_pct": 1.5
   },
   {
    "id": "schools:NWTG:2026-11-17:r0",
@@ -26117,14 +26410,18 @@
    "symbol": "TREO",
    "date": "2026-11-17",
    "entry": 3.17,
-   "result": "open",
+   "result": "stop",
    "horizon": 10,
    "stop": 2.7195,
    "t1": 4.0566,
    "t2": null,
-   "sessions": 0,
-   "last": 2.81,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 2.4,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -14.2,
+   "max_dd_pct": -24.3,
+   "ret_pct": -24.3,
+   "closed": "2026-11-18"
   },
   {
    "id": "schools:NWTG:2026-11-17:r1",
@@ -26139,9 +26436,12 @@
    "stop": 0.777,
    "t1": 1.159,
    "t2": null,
-   "sessions": 0,
-   "last": 0.8711,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.9187,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 1.4,
+   "max_dd_pct": 1.4,
+   "ret_pct": 1.4
   },
   {
    "id": "schools:NWTG:2026-11-17:r2",
@@ -26156,9 +26456,12 @@
    "stop": 0.8134,
    "t1": 1.2134,
    "t2": null,
-   "sessions": 0,
-   "last": 1.13,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 1.11,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 17.1,
+   "max_dd_pct": 10.7,
+   "ret_pct": 17.1
   },
   {
    "id": "schools:ELVA:2026-11-17:r0",
@@ -26173,9 +26476,12 @@
    "stop": 0.6946,
    "t1": 1.0405,
    "t2": null,
-   "sessions": 0,
-   "last": 0.7304,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.731,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -2.1,
+   "max_dd_pct": -2.1,
+   "ret_pct": -2.1
   },
   {
    "id": "schools:ELVA:2026-11-17:r1",
@@ -26190,9 +26496,12 @@
    "stop": 2.9132,
    "t1": 4.364,
    "t2": null,
-   "sessions": 0,
-   "last": 3.09,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 3.155,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 2.4,
+   "max_dd_pct": -1.3,
+   "ret_pct": 0.8
   },
   {
    "id": "schools:ELVA:2026-11-17:r2",
@@ -26207,9 +26516,12 @@
    "stop": 4.4117,
    "t1": 6.6088,
    "t2": null,
-   "sessions": 0,
-   "last": 4.7,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 4.74,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 0.0,
+   "max_dd_pct": -1.3,
+   "ret_pct": 0.0
   },
   {
    "id": "schools:AGRZ:2026-11-17:r0",
@@ -26224,9 +26536,12 @@
    "stop": 3.1295,
    "t1": 4.4437,
    "t2": null,
-   "sessions": 0,
-   "last": 3.835,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 3.74,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -1.4,
+   "max_dd_pct": -2.7,
+   "ret_pct": -2.5
   },
   {
    "id": "schools:AGRZ:2026-11-17:r1",
@@ -26241,9 +26556,12 @@
    "stop": 2.8316,
    "t1": 4.0208,
    "t2": null,
-   "sessions": 0,
-   "last": 3.47,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 3.25,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -2.4,
+   "max_dd_pct": -7.2,
+   "ret_pct": -6.3
   },
   {
    "id": "schools:AGRZ:2026-11-17:r2",
@@ -26258,9 +26576,12 @@
    "stop": 0.6686,
    "t1": 0.9493,
    "t2": null,
-   "sessions": 0,
-   "last": 0.8193,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.7978,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -2.4,
+   "max_dd_pct": -2.9,
+   "ret_pct": -2.6
   },
   {
    "id": "schools:CLGN:2026-11-12:r0",
@@ -26275,12 +26596,12 @@
    "stop": 2.1605,
    "t1": 3.461,
    "t2": null,
-   "sessions": 3,
-   "last": 3.18,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 3.24,
+   "last_date": "2026-11-18",
    "max_gain_pct": 29.2,
    "max_dd_pct": -2.5,
-   "ret_pct": 0.0,
+   "ret_pct": 1.9,
    "t1_date": "2026-11-13"
   },
   {
@@ -26296,12 +26617,12 @@
    "stop": 2.0654,
    "t1": 3.3086,
    "t2": null,
-   "sessions": 3,
-   "last": 3.04,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 3.19,
+   "last_date": "2026-11-18",
    "max_gain_pct": 10.9,
    "max_dd_pct": -23.7,
-   "ret_pct": 0.0,
+   "ret_pct": 4.9,
    "t1_date": "2026-11-17"
   },
   {
@@ -26317,12 +26638,12 @@
    "stop": 0.4498,
    "t1": 0.7205,
    "t2": null,
-   "sessions": 3,
-   "last": 0.662,
-   "last_date": "2026-11-17",
+   "sessions": 4,
+   "last": 0.6701,
+   "last_date": "2026-11-18",
    "max_gain_pct": 8.0,
    "max_dd_pct": -6.9,
-   "ret_pct": 0.0
+   "ret_pct": 1.2
   },
   {
    "id": "schools:BNAI:2026-11-17:r0",
@@ -26337,9 +26658,12 @@
    "stop": 3.868,
    "t1": 6.9578,
    "t2": null,
-   "sessions": 0,
-   "last": 4.53,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 4.97,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 15.5,
+   "max_dd_pct": 1.8,
+   "ret_pct": 9.7
   },
   {
    "id": "schools:BNAI:2026-11-17:r1",
@@ -26354,9 +26678,12 @@
    "stop": 1.3747,
    "t1": 2.4728,
    "t2": null,
-   "sessions": 0,
-   "last": 1.61,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 1.51,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -6.2,
+   "max_dd_pct": -6.2,
+   "ret_pct": -6.2
   },
   {
    "id": "schools:BNAI:2026-11-17:r2",
@@ -26371,9 +26698,12 @@
    "stop": 6.9761,
    "t1": 12.5485,
    "t2": null,
-   "sessions": 0,
-   "last": 8.17,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 8.44,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 3.3,
+   "max_dd_pct": -1.8,
+   "ret_pct": 3.3
   },
   {
    "id": "schools:PAVS:2026-11-17:r0",
@@ -26388,9 +26718,12 @@
    "stop": 0.7522,
    "t1": 1.4889,
    "t2": null,
-   "sessions": 0,
-   "last": 1.08,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 1.1,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 1.9,
+   "max_dd_pct": 1.9,
+   "ret_pct": 1.9
   },
   {
    "id": "schools:PAVS:2026-11-17:r1",
@@ -26405,9 +26738,12 @@
    "stop": 1.0099,
    "t1": 1.9989,
    "t2": null,
-   "sessions": 0,
-   "last": 1.45,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 1.4504,
+   "last_date": "2026-11-18",
+   "max_gain_pct": 0.7,
+   "max_dd_pct": 0.0,
+   "ret_pct": 0.0
   },
   {
    "id": "schools:PAVS:2026-11-17:r2",
@@ -26422,9 +26758,12 @@
    "stop": 0.5006,
    "t1": 0.9908,
    "t2": null,
-   "sessions": 0,
-   "last": 0.7187,
-   "last_date": "2026-11-17"
+   "sessions": 1,
+   "last": 0.5631,
+   "last_date": "2026-11-18",
+   "max_gain_pct": -14.8,
+   "max_dd_pct": -27.4,
+   "ret_pct": -21.7
   }
  ],
  "hr_purge_v1": true
