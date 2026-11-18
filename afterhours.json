@@ -650,7 +650,13 @@
    "t1": 1.1553,
    "t2": 1.2078,
    "stop": 0.9453,
-   "pm_min_vol": 5593
+   "pm_min_vol": 5593,
+   "N": "2026-11-18",
+   "pm_high_pct": -13.0,
+   "close_next_pct": -27.6,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   },
   {
    "symbol": "AZI",
@@ -698,7 +704,13 @@
    "t1": 1.1322,
    "t2": 1.1837,
    "stop": 0.9264,
-   "pm_min_vol": 835341
+   "pm_min_vol": 835341,
+   "N": "2026-11-18",
+   "pm_high_pct": 11.4,
+   "close_next_pct": -15.0,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   }
  ],
  "fire_sent": [
