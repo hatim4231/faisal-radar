@@ -5,11 +5,11 @@
       "NASDAQ"
     ],
     "_exchanges_help": "أضف \"NYSE_AMERICAN\" أو \"NYSE\" لو تبي توسع البحث",
-    "min_price": 0.7,
+    "min_price": 0.5,
     "max_price": 10.0,
     "max_market_cap": 300000000,
     "max_float": 50000000,
-    "min_avg_volume": 100000,
+    "min_avg_volume": 60000,
     "_price_help": "قرار المستخدم (نوفمبر 2026): المجال 0.7$ إلى 10$ لكل الرادارات"
   },
   "irtikaz": {
@@ -116,7 +116,7 @@
     "max_price": 5.0,
     "max_market_cap": 300000000,
     "max_float": 20000000,
-    "min_avg_volume": 100000,
+    "min_avg_volume": 60000,
     "support_near": 8,
     "support_watch": 15,
     "entry_zone_pct": 8,

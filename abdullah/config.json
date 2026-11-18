@@ -4,11 +4,11 @@
     "exchanges": [
       "NASDAQ"
     ],
-    "min_price": 0.7,
+    "min_price": 0.5,
     "max_price": 10.0,
     "max_market_cap": 300000000,
     "max_float": 50000000,
-    "min_avg_volume": 100000
+    "min_avg_volume": 60000
   },
   "abdullah": {
     "min_wave_mult": 2.0,
