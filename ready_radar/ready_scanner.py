@@ -168,6 +168,22 @@ def run(cfg, tickers=None) -> dict:
     shown = list({id(x): x for x in steady + runner + scored}.values())[:60]
     rows = [build_row(x, ib) for x in shown]
     enrich(rows)
+    _sh = {x["t"]: x for x in shown}
+    import stock_detail
+    for r in rows:
+        x = _sh.get(r["symbol"])
+        if not x:
+            continue
+        try:
+            fa = stock_detail.build(
+                r["symbol"], x["d"], x["inf"] or {}, rcfg,
+                news=r.get("news"), dilution=r.get("dilution"),
+                short_available=r.get("short_available"),
+                flag=r.get("flag"), country_ar=r.get("country_ar"))
+            if fa:
+                r["faisal"] = fa
+        except Exception as e:
+            log(f"  [المدمج] فيصل {r['symbol']}:", repr(e)[:90])
     by_sym = {r["symbol"]: r for r in rows}
     out_steady = [by_sym[x["t"]] for x in steady if x["t"] in by_sym]
     out_runner = [by_sym[x["t"]] for x in runner if x["t"] in by_sym]
@@ -277,7 +293,8 @@ def main():
     payload = run(cfg, a.tickers.split(",") if a.tickers else None)
     if os.environ.get("GITHUB_REPOSITORY"):
         payload["actions_url"] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/scan.yml"
-    html = (HERE / "template.html").read_text(encoding="utf-8")
+    import stock_detail
+    html = stock_detail.inject((HERE / "template.html").read_text(encoding="utf-8"))
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html.replace("/*__DATA__*/null", json.dumps(payload, ensure_ascii=False, default=str).replace("</", "<\\/")),

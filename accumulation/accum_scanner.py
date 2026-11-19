@@ -134,6 +134,21 @@ def run(cfg, tickers=None) -> dict:
     rows.sort(key=lambda r: (order.get(r["status"], 3), -r["score"]))
     from collections import Counter
     c = Counter(r["status"] for r in rows)
+    import stock_detail
+    for r in rows:
+        d = pre.get(r["symbol"])
+        if d is None:
+            continue
+        try:
+            fa = stock_detail.build(
+                r["symbol"], d, infos.get(r["symbol"]) or {}, cfg,
+                news=r.get("news"), dilution=r.get("dilution"),
+                short_available=r.get("short_available"),
+                flag=r.get("flag"), country_ar=r.get("country_ar"))
+            if fa:
+                r["faisal"] = fa
+        except Exception as e:
+            log(f"  [التجميع] فيصل {r['symbol']}:", repr(e)[:90])
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "الأسعار: Alpaca + الشركة: Yahoo + Interactive Brokers + SEC", "scanned": len(pre), "moved": moved,
                "excluded_hrt": excluded_hrt,
@@ -154,7 +169,8 @@ def main():
     payload = run(cfg, a.tickers.split(",") if a.tickers else None)
     if os.environ.get("GITHUB_REPOSITORY"):
         payload["actions_url"] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/scan.yml"
-    html = (HERE / "template.html").read_text(encoding="utf-8")
+    import stock_detail
+    html = stock_detail.inject((HERE / "template.html").read_text(encoding="utf-8"))
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html.replace("/*__DATA__*/null", json.dumps(payload, ensure_ascii=False, default=str).replace("</", "<\\/")),

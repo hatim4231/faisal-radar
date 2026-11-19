@@ -188,6 +188,23 @@ def run(cfg, tickers=None, deep=True) -> dict:
             rows, excluded_hrt = holders.exclude(rows, log)
         except Exception as e:
             log("فحص HRT تعطل:", repr(e)[:150])
+    # تحليل فيصل الكامل لكل سهم معروض (طلب أبوفرح — نفس بطاقة صفحة فيصل)
+    import stock_detail
+    for r in rows:
+        d = pre.get(r["symbol"])
+        if d is None:
+            continue
+        try:
+            fa = stock_detail.build(
+                r["symbol"], d, infos.get(r["symbol"]) or {}, cfg,
+                news=r.get("news"), dilution=r.get("dilution"),
+                short_available=r.get("short_available"),
+                flag=r.get("flag"), country_ar=r.get("country_ar"))
+            if fa:
+                r["faisal"] = fa
+        except Exception as e:
+            log(f"  [عبدالله] فيصل {r['symbol']}:", repr(e)[:90])
+
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"), "excluded_hrt": excluded_hrt,
                "source": "الأسعار: Alpaca · الشركة والأخبار: Yahoo · الشورت المتاح: Interactive Brokers",
                "scanned": len(daily), "with_wave": len(results),
@@ -264,7 +281,8 @@ def summary(rows):
 
 
 def write_html(payload, out: Path):
-    html = (HERE / "template.html").read_text(encoding="utf-8")
+    import stock_detail
+    html = stock_detail.inject((HERE / "template.html").read_text(encoding="utf-8"))
     js = json.dumps(payload, ensure_ascii=False, default=str).replace("</", "<\\/")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html.replace("/*__DATA__*/null", js), encoding="utf-8")

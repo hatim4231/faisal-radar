@@ -237,7 +237,8 @@ function toggle(el){
     <div class="note" style="margin-top:6px">أوامر التجميع: <b class="num">${(p.tranches||[]).map(fp).join(" · ")}</b><br>${esc(p.note)}</div>
     <div class="setupbox"><div class="t">قراءة السلوك (نظرية الارتكاز)</div><ul class="clean note" style="margin-top:4px">${(s.why||[]).map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>
     ${s.dilution ? `<div style="margin-top:8px;color:${s.dilution==="high"?"var(--bad)":s.dilution==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: فيه ملفات تخفيف — تأكد بنفسك</div>` : ""}
-    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار (المحفّز)</h3>${newsHTML(s.news)}`;
+    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار (المحفّز)</h3>${newsHTML(s.news)}
+    ${s.faisal && window.FDETAIL ? FDETAIL(s.faisal) : ""}`;
   el.appendChild(d);
 }
 $("#sort").onchange = render;

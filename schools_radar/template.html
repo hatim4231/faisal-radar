@@ -309,6 +309,7 @@ function toggle(el){
       <div class="note">دخول <span class="num">${fp(x.entry)}</span> · وقف <span class="num">${fp(x.stop)}</span> · هدف 1 <span class="num">${fp(x.t1)}</span>${x.t2 ? ` · هدف 2 <span class="num">${fp(x.t2)}</span>` : ""}</div></div>`).join("")}
     ${s.dilution ? `<div style="margin-top:8px;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: ${(s.dilution.hits||[]).slice(0,4).map(h => esc(h.form+" "+h.date+" — "+h.label)).join(" · ") || "ما لقى الفحص الآلي ملفات طرح — تأكد بنفسك"}</div>` : ""}
     <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}`;
+  d.insertAdjacentHTML("beforeend", s && s.faisal && window.FDETAIL ? FDETAIL(s.faisal) : "");
   el.appendChild(d);
 }
 $("#sort").onchange = render; $("#schoolf").onchange = render;

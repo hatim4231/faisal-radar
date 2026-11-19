@@ -43,6 +43,7 @@ import news_tools  # noqa: E402
 import flags  # noqa: E402
 import holders  # noqa: E402
 import highrisk as HR  # noqa: E402
+import stock_detail  # noqa: E402  # عرض «تحليل فيصل الكامل» المشترك
 
 log = data.log
 OUT = ROOT / "output"
@@ -479,6 +480,7 @@ def run(cfg, tickers=None) -> dict:
         if px < 1:
             row["flags"].append("🏛 تحت 1$ — خطر إنذار ناسداك/تقسيم عكسي")
         rows.append(row)
+    dfmap = {x["t"]: x["d"] for x in shown if x["d"] is not None}
     # معلومات وتحذيرات (ما تشيل شي — قرار المستخدم: كل شي مفتوح)
     import yfinance as yf
 
@@ -508,6 +510,22 @@ def run(cfg, tickers=None) -> dict:
         holders.annotate(rows, log)
     except Exception as e:
         log("[عالي مخاطرة] HRT تعطل:", repr(e)[:120])
+    # تحليل فيصل الكامل لكل سهم معروض (طلب أبوفرح)
+    for r in rows:
+        d = dfmap.get(r["symbol"])
+        if d is None:
+            continue
+        try:
+            fa = stock_detail.build(
+                r["symbol"], d, infos.get(r["symbol"]) or {}, cfg,
+                news=r.get("news"), dilution=r.get("dilution"),
+                short_available=({"available": r["short"]} if r.get("short") is not None else None),
+                flag=r.get("flag"), country_ar=r.get("country_ar"))
+            if fa:
+                r["faisal"] = fa
+        except Exception as e:
+            log(f"  [عالي مخاطرة] فيصل {r['symbol']}:", repr(e)[:90])
+
     # 🔎 كل الأسهم بشكل مضغوط — للفاحص ومحفظتي (أي سهم حتى لو مو بالقائمة)
     SC = {None: 0, "fire": 1, "ready": 2, "near": 3, "watch": 4}
     cols = ["s", "n", "c", "ch", "p", "pb", "ny", "ds", "dd", "dv", "st", "rs", "sh", "j", "r20", "ac"]
@@ -564,7 +582,7 @@ def main():
     payload = run(cfg, a.tickers.split(",") if a.tickers else None)
     if os.environ.get("GITHUB_REPOSITORY"):
         payload["actions_url"] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/scan.yml"
-    html = (HERE / "template.html").read_text(encoding="utf-8")
+    html = stock_detail.inject((HERE / "template.html").read_text(encoding="utf-8"))
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html.replace("/*__DATA__*/null", json.dumps(payload, ensure_ascii=False, default=str).replace("</", "<\\/")),

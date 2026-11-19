@@ -264,7 +264,8 @@ function toggle(el){
     ${(s.jumps||[]).length ? `<div class="setupbox"><div class="t">أيام الطيران خلال سنة</div><div class="note num" style="margin-top:4px">${s.jumps.map(j => `${esc(j.date)}: +${j.pct}%`).join(" · ")}</div></div>` : ""}
     ${s.weekly_lows ? `<div class="note" style="margin-top:6px">قيعان كل 10 جلسات: <span class="num">${s.weekly_lows.map(fp).join(" → ")}</span></div>` : ""}
     ${s.dilution ? `<div style="margin-top:8px;color:${s.dilution.level==="high"?"var(--bad)":s.dilution.level==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: ${(s.dilution.hits||[]).slice(0,4).map(h => esc(h.form+" "+h.date+" — "+h.label)).join(" · ") || "ما لقى الفحص الآلي ملفات طرح — تأكد بنفسك"}</div>` : ""}
-    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}`;
+    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}
+    ${s.faisal && window.FDETAIL ? FDETAIL(s.faisal) : ""}`;
   el.appendChild(d);
 }
 $("#sort").onchange = render;

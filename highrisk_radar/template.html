@@ -574,6 +574,7 @@ function toggle(el){
     <div class="links" style="margin-top:8px"><a href="https://finviz.com/quote.ashx?t=${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">Finviz</a>
       <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(s.symbol)}" target="_blank" rel="noopener">TradingView</a>
       <a href="https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${encodeURIComponent(s.symbol)}&type=&dateb=&owner=include&count=40" target="_blank" rel="noopener">ملفات SEC</a></div>`;
+  d.insertAdjacentHTML("beforeend", s && s.faisal && window.FDETAIL ? FDETAIL(s.faisal) : "");
   el.appendChild(d);
 }
 $("#sort").onchange = render; $("#q").oninput = render;

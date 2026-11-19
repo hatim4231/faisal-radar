@@ -372,6 +372,7 @@ function openDetail(sym){
       <div class="note" style="margin-top:6px">424B = طرح تسعّر · 424B3 = إعادة بيع · 6-K/8-K + EX-1/EX-4/EX-10 = اتفاقية طرح أو Warrants أو تمويل · S-3/F-3 = رف طرح (ممكن ATM يبيع أثناء الجلسة) · S-1/F-1 = طرح أو إعادة بيع · EFFECT = التسجيل صار فعّال</div></div>` : ""}
     <div class="card"><h3>📰 الأخبار</h3>${news}
       ${s.dilution_news ? `<div style="margin-top:8px;color:var(--bad)"><b>أخبار تمويل/تخفيف:</b><ul class="clean">${s.dilution_news.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>` : ""}</div>`;
+  $("#dbody").insertAdjacentHTML("beforeend", s.faisal && window.FDETAIL ? FDETAIL(s.faisal) : "");
   $("#ov").classList.add("on"); $("#dr").classList.add("on"); $("#dr").scrollTop = 0;
 }
 function closeDetail(){ openSym = null; $("#ov").classList.remove("on"); $("#dr").classList.remove("on"); }

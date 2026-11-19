@@ -255,7 +255,8 @@ function toggle(el){
     <div class="note" style="margin-top:6px">دفعات التجميع: <b class="num">${(p.tranches||[]).map(fp).join(" · ")}</b> · ${esc(p.stop_note)}<br>${esc(p.hold)}</div>
     <div class="setupbox"><div class="t">تفاصيل النمط</div><ul class="clean note" style="margin-top:4px">${(s.why||[]).map(w => `<li>${esc(w)}</li>`).join("")}</ul></div>
     ${s.dilution ? `<div style="margin-top:8px;color:${s.dilution==="high"?"var(--bad)":s.dilution==="medium"?"var(--warn)":"var(--muted)"}">🏛 SEC: ${(s.dilution_hits||[]).slice(0,4).map(h => esc((h.form||"")+" "+(h.date||"")+" — "+(h.label||""))).join(" · ") || "فيه ملفات تخفيف — تأكد بنفسك"}</div>` : ""}
-    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}`;
+    <h3 style="margin:12px 0 6px;font-size:14px">📰 الأخبار</h3>${newsHTML(s.news)}
+    ${s.faisal && window.FDETAIL ? FDETAIL(s.faisal) : ""}`;
   el.appendChild(d);
 }
 $("#sort").onchange = render;

@@ -298,6 +298,21 @@ def run(cfg, tickers=None) -> dict:
             log("فحص HRT تعطل:", repr(e)[:150])
     order = {"ready": 0, "near": 1, "radar": 2}
     rows.sort(key=lambda r: (order[r["status"]], -r["score"]))
+    import stock_detail
+    for r in rows:
+        d = pre.get(r["symbol"])
+        if d is None:
+            continue
+        try:
+            fa = stock_detail.build(
+                r["symbol"], d, infos.get(r["symbol"]) or {}, cfg,
+                news=r.get("news"), dilution=r.get("dilution"),
+                short_available=r.get("short_available"),
+                flag=r.get("flag"), country_ar=r.get("country_ar"))
+            if fa:
+                r["faisal"] = fa
+        except Exception as e:
+            log(f"  [المطّلعين] فيصل {r['symbol']}:", repr(e)[:90])
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "SEC EDGAR (Form 4) + الأسعار: Alpaca + الشركة: Yahoo", "scanned": len(pre), "found": len(found),
                "excluded_hrt": excluded_hrt,
@@ -322,7 +337,8 @@ def main():
     payload = run(cfg, a.tickers.split(",") if a.tickers else None)
     if os.environ.get("GITHUB_REPOSITORY"):
         payload["actions_url"] = f"https://github.com/{os.environ['GITHUB_REPOSITORY']}/actions/workflows/scan.yml"
-    html = (HERE / "template.html").read_text(encoding="utf-8")
+    import stock_detail
+    html = stock_detail.inject((HERE / "template.html").read_text(encoding="utf-8"))
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html.replace("/*__DATA__*/null", json.dumps(payload, ensure_ascii=False, default=str).replace("</", "<\\/")),
