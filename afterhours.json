@@ -711,6 +711,67 @@
    "r10": "fail",
    "r15": "fail",
    "result": "stop"
+  },
+  {
+   "symbol": "GMM",
+   "D": "2026-11-18",
+   "close": 1.545,
+   "ah_high": 1.79,
+   "ah_last": 1.73,
+   "ah_vwap": 1.6459,
+   "jump_pct": 15.9,
+   "hold_pct": 76,
+   "ah_vol": 2505454,
+   "rth_vol": 21023602,
+   "limit": 1.6459,
+   "name": "Global Mofy AI Limited",
+   "price": 1.73,
+   "float": 559949,
+   "short": 55000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "الشورت 55,000 فوق 50,000",
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "China",
+   "flag": "🇨🇳",
+   "country_ar": "الصين",
+   "tags": [
+    "⛔ تخفيف SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-09-01",
+     "what": "SEC 424B5"
+    },
+    {
+     "date": "2026-11-02",
+     "what": "SEC 424B5"
+    }
+   ],
+   "dilution_level": "high",
+   "eligible": false,
+   "t1": 1.8105,
+   "t2": 1.8928,
+   "stop": 1.4813,
+   "pm_min_vol": 175381,
+   "second_leg": {
+    "E": "2026-11-16",
+    "k": 2,
+    "jump_E": 372,
+    "hiE": 4.81,
+    "pre": 1.02,
+    "above_base": 1.52,
+    "n_exp": 4
+   },
+   "fire": true,
+   "fire_plan": {
+    "t1": 1.8928,
+    "t2": 4.81,
+    "stop": 1.4813,
+    "t2_is_high": true
+   }
   }
  ],
  "fire_sent": [
