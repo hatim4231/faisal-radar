@@ -772,7 +772,8 @@
     "stop": 1.4813,
     "t2_is_high": true
    },
-   "fire_max_pct": 28.2
+   "fire_max_pct": 28.2,
+   "fire_result": "stop"
   }
  ],
  "fire_sent": [
