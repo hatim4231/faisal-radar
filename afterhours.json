@@ -773,7 +773,11 @@
     "t2_is_high": true
    },
    "fire_max_pct": 28.2,
-   "fire_result": "stop"
+   "fire_result": "stop",
+   "N": "2026-11-19",
+   "pm_high_pct": 28.3,
+   "close_next_pct": 11.0,
+   "result": "nofill"
   }
  ],
  "fire_sent": [
