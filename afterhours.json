@@ -778,6 +778,54 @@
    "pm_high_pct": 28.3,
    "close_next_pct": 11.0,
    "result": "nofill"
+  },
+  {
+   "symbol": "MEDS",
+   "D": "2026-11-19",
+   "close": 0.7167,
+   "ah_high": 1.26,
+   "ah_last": 1.13,
+   "ah_vwap": 1.0868,
+   "jump_pct": 75.8,
+   "hold_pct": 76,
+   "ah_vol": 22235876,
+   "rth_vol": 512460,
+   "limit": 1.0868,
+   "name": "DataMeds AI, Inc.",
+   "price": 1.13,
+   "float": 1455606,
+   "short": 0,
+   "short_src": "غير متاح للشورت عند IB",
+   "flags": [
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "tags": [
+    "⛔ تخفيف SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-10-09",
+     "what": "SEC S-1/A"
+    },
+    {
+     "date": "2026-11-10",
+     "what": "SEC S-1/A"
+    },
+    {
+     "date": "2026-11-16",
+     "what": "SEC 424B5 + SEC 424B5"
+    }
+   ],
+   "dilution_level": "high",
+   "eligible": false,
+   "t1": 1.1955,
+   "t2": 1.2498,
+   "stop": 0.9781,
+   "pm_min_vol": 1556511
   }
  ],
  "fire_sent": [
