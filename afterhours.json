@@ -832,6 +832,45 @@
    "r10": "hit",
    "r15": "fail",
    "result": "t1"
+  },
+  {
+   "symbol": "METC",
+   "D": "2026-11-20",
+   "close": 5.4,
+   "ah_high": 6.3198,
+   "ah_last": 6.3198,
+   "ah_vwap": 5.4113,
+   "jump_pct": 17.0,
+   "hold_pct": 100,
+   "ah_vol": 330075,
+   "rth_vol": 2787838,
+   "limit": 5.4113,
+   "name": "Ramaco Resources, Inc.",
+   "price": 6.3198,
+   "float": 43768794,
+   "short": 450000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "الشورت 450,000 فوق 50,000",
+    "⛔ HRT من الملاك (2026-09-30)"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "hrt": {
+    "shares": 330904,
+    "name13f": "RAMACO RES INC",
+    "period": "2026-09-30",
+    "filed": "2026-11-13"
+   },
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 5.9524,
+   "t2": 6.223,
+   "stop": 4.8702,
+   "pm_min_vol": 23105
   }
  ],
  "fire_sent": [
