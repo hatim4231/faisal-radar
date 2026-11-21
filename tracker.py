@@ -33,7 +33,7 @@ SITE_URL = "https://hatim4231.github.io/faisal-radar"
 MAX_SESSIONS = 20
 # قرار المستخدم (نوفمبر 2026، من اختبار طرق الخروج): توصية فيصل المطوّر مدتها 10 جلسات —
 # إذا ما وصل الهدف الأول خلال 10 جلسات تنقفل (أفضل وأثبت طريقة خروج في الاختبار)
-HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 60, "highrisk": 3, "merged": 10, "hunt": 7}
+HORIZON = {"faisal_dev": 10, "faisal_dil": 10, "schools": 10, "runners": 20, "highrisk": 3, "merged": 10, "hunt": 7}
 # قرار المستخدم: الوقف الجديد وقواعد القياس الجديدة لفيصل المطوّر وعبدالله فقط
 # (+ التجميع والمدارس: نفس قواعد اختبارهم التاريخي — الهدف يُفحص أول، والوقف بإغلاق اليوم تحته)
 NEW_RULES = {"faisal_dev", "faisal_dil", "abdullah", "accumulation", "schools", "runners", "highrisk", "merged", "hunt"}
@@ -614,7 +614,9 @@ def vs_random(trades: list[dict], twins: list[dict], key: str = "schools", days:
     H = HORIZON.get(key, MAX_SESSIONS)
     days = days or (H * 7 + 4) // 5 + 2
     cut = (date.today() - timedelta(days=days)).isoformat()
-    m = [t for t in trades if t["radar"] == key and str(t.get("date")) <= cut and t.get("sessions") and t["result"] != "no_fill"]
+    # توصيات بمدة غير مدة الرادار الحالية (مثل طيارات 60 قبل التقصير لـ 20) ما تدخل المقارنة — نتيجتها «مفتوحة» مو فشل
+    m = [t for t in trades if t["radar"] == key and str(t.get("date")) <= cut and t.get("sessions") and t["result"] != "no_fill"
+         and int(t.get("horizon") or H) == H]
     ids = {t["id"] for t in m}
     tw = [x for x in twins if x.get("of") in ids and x.get("sessions") and x["result"] != "no_fill"]
     rp = [t["rand_p"] for t in m if t.get("rand_p") is not None]
