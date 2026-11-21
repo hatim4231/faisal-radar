@@ -64,7 +64,7 @@ def process(job):
         if not (0.5 <= px <= 15) or not (dv20[t] >= 50_000) or not (v20[t] >= 20_000):
             continue
         if rnd.random() < RAND_P:
-            rands.append({"atr20": atr20[t], "P": path(t)})
+            rands.append({"atr20": atr20[t], "date": str(dates[t].date()), "px": px, "P": path(t)})
         w0 = max(0, t - 119)
         b = t - int(np.argmin(l[w0:t + 1][::-1]))
         if t - b < 15:
