@@ -96,7 +96,7 @@ def process(job):
     return sig, rands
 
 
-def simulate(P, lr, s, kind):
+def simulate(P, lr, s, kind, H=H, tgt=2.0):
     """P: dict (n, NC). lr: مستوى الأمر (نسبة من إغلاق الإشارة). s: بعد الوقف كنسبة من سعر الدخول.
     يرجع (filled, hit, stop, ret) — ret = 0 لو ما انملأ. الهدف يُفحص قبل الوقف بنفس اليوم."""
     ph, pl, po, pc = P["ph"], P["pl"], P["po"], P["pc"]
@@ -123,11 +123,11 @@ def simulate(P, lr, s, kind):
         hs = ph[idx, f + 1:f + 1 + H] / p0
         cs = pc[idx, f:f + H] / p0
         big = H + 5
-        tj = np.where((hs >= 2).any(1), (hs >= 2).argmax(1), big)
+        tj = np.where((hs >= tgt).any(1), (hs >= tgt).argmax(1), big)
         sk = np.where((cs < (1 - s[idx])[:, None]).any(1), (cs < (1 - s[idx])[:, None]).argmax(1), big)
         win = (tj < big) & (tj + 1 <= sk)
         los = ~win & (sk < big)
-        rr = np.where(win, 1.0, np.where(los, cs[np.arange(len(idx)), np.minimum(sk, H - 1)] - 1, cs[:, H - 1] - 1))
+        rr = np.where(win, tgt - 1.0, np.where(los, cs[np.arange(len(idx)), np.minimum(sk, H - 1)] - 1, cs[:, H - 1] - 1))
         hit[idx], stp[idx], ret[idx] = win, los, rr
     return has, hit, stp, ret
 
