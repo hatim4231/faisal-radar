@@ -22,7 +22,7 @@ import pandas as pd
 import alpaca_data as A
 from backtest_runners2 import universe, geo, UG, SG
 
-H = 60
+H = int(__import__("os").environ.get("DATA_RUN") or 60)   # مدة المسار بالجلسات (الافتراضي 60؛ 20 للطيارات بعد قرار أبوفرح)
 RAND_P = 0.05
 TARGETS = (1.5, 2.0, 3.0)
 
@@ -84,7 +84,7 @@ def main():
         print(f"  شريحة {k + 1}: +100% قبل وقف −20%: {hit[k][1][19] / 10:.1f}% · قبل −40%: {hit[k][1][39] / 10:.1f}% · "
               f"متوسط عائد (+100%/−40%): {ret[k][1][39] * 100:+.1f}%")
     out = {"version": datetime.now().strftime("%Y-%m-%d"), "horizon": H, "targets": list(TARGETS),
-           "rule": "target touched before close<stop within 60 sessions (random entries, same volatility quintile)",
+           "rule": f"target touched before close<stop within {H} sessions (random entries, same volatility quintile)",
            "s_pct": list(range(1, 61)), "atr20_q": [round(float(x), 4) for x in qs], "n": ns,
            "hit_permille": hit, "ret": ret}
     js = json.dumps(out, separators=(",", ":"))
