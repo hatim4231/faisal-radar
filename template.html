@@ -167,6 +167,7 @@ ul.clean{margin:0;padding-right:18px}
       <a class="btn" href="revsplit/" style="text-decoration:none">🔄 التقسيم</a>
       <a class="btn" href="rahib/" style="text-decoration:none">🔥 الرهيب</a>
       <a class="btn" id="lnk-hr" href="highrisk/" style="text-decoration:none">🧨 عالي مخاطرة</a>
+      <a class="btn" id="lnk-dl" href="delisting/" style="text-decoration:none">⛔ الشطب</a>
       <a class="btn" id="lnk-track" href="track/" style="text-decoration:none">📈 السجل</a>
       <button class="btn primary" id="rescan" style="display:none">🔄 تحديث المسح</button>
       <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
@@ -247,6 +248,7 @@ if (DATA && DATA.variant === "original"){
   document.getElementById("lnk-sch").href = "../schools/";
   document.getElementById("lnk-run").href = "../runners/";
   document.getElementById("lnk-hr").href = "../highrisk/";
+  document.getElementById("lnk-dl").href = "../delisting/";
 } else if (DATA) {
   document.getElementById("h1").textContent = "📡 رادار فيصل — المطوّر";
 }

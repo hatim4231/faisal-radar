@@ -105,6 +105,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 12
 
+      - name: رادار الشطب (إنذارات البورصة من SEC ← تيليجرام أول بأول)
+        run: python delist_radar/delist_scanner.py --out site/delisting/index.html || echo "رادار الشطب تعطل — نكمل"
+        continue-on-error: true
+        timeout-minutes: 10
+
       - name: متابعة التوصيات + تيليجرام
         run: python tracker.py
 
@@ -154,6 +159,9 @@ jobs:
           fi
           if [ -f site/runners/index.html ]; then
             npx --yes staticrypt@3.5.4 site/runners/index.html "${OPTS[@]}" --template-title "🚀 رادار الطيارات" -d site/runners
+          fi
+          if [ -f site/delisting/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/delisting/index.html "${OPTS[@]}" --template-title "⛔ رادار الشطب" -d site/delisting
           fi
           if [ -f site/highrisk/index.html ]; then
             npx --yes staticrypt@3.5.4 site/highrisk/index.html "${OPTS[@]}" --template-title "🧨 رادار عالي مخاطرة" -d site/highrisk
