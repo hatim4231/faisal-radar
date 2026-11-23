@@ -68,6 +68,7 @@ SEV2 = (r"(?:requested|has requested|intends to request|will request|timely requ
 REGAIN = r"regained compliance|has regained|evidenced compliance|now in compliance"
 MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
 DEADLINE = re.compile(rf"(?:until|through|by|on or before)\s+((?:{MONTHS})\s+\d{{1,2}},\s+20\d\d)", re.I)
+HEADING = re.compile(r"notice of delisting or failure to satisfy a continued listing rule or standard;?\s*(?:transfer of listing)?", re.I)
 SEV_AR = {3: "🔴 قرار شطب / تعليق", 2: "🟠 جلسة استماع / بدون مهلة", 1: "🟡 إنذار مع مهلة", 0: "✅ رجع ممتثل"}
 
 
@@ -190,9 +191,13 @@ def collect(days: int) -> list[dict]:
         if not t:
             f.update({"sev": 1, "reasons": [], "deadline": None, "snippet": "", "exchange": "؟", "unread": True})
         else:
+            t = re.sub(HEADING, " ", t)                     # عنوان بند 3.01 فيه «Failure to Satisfy» بكل ملف — نشيله
             if not re.search(r"Nasdaq|NYSE|New York Stock Exchange", t, re.I) or not re.search(VIOL, t, re.I):
                 continue                                   # ما له علاقة بمخالفة إدراج (اندماج/نقل إدراج/خبر عام)
-            f.update(classify(t, str(f["form"])))
+            c = classify(t, str(f["form"]))
+            if not c["reasons"] and c["sev"] != 0:
+                continue                                   # شطب بسبب اندماج/استحواذ أو نقل إدراج = مو مخالفة
+            f.update(c)
         out.append(f)
     ciks = {f["cik"] for f in out}
     out += [f for f in f25 if f["cik"] in ciks]
@@ -231,12 +236,20 @@ def prices(rows: list[dict]) -> None:
     import alpaca_data as A
     if not A.available():
         return
-    raw = {}
-    for i in range(0, len(syms), 50):
+    raw, start, bad = {}, datetime.now() - timedelta(days=60), []
+
+    def get(batch):                       # رمز مو موجود بـ Alpaca (OTC) يخرب الدفعة كلها (400) ← نقسمها
         try:
-            raw.update(A.bars(syms[i:i + 50], "1Day", datetime.now() - timedelta(days=60)))
-        except Exception as e:
-            log("  أسعار Alpaca تعطلت لدفعة:", repr(e)[:120])
+            raw.update(A.bars(batch, "1Day", start))
+        except Exception:
+            if len(batch) == 1:
+                bad.append(batch[0])
+            else:
+                get(batch[:len(batch) // 2]); get(batch[len(batch) // 2:])
+    for i in range(0, len(syms), 50):
+        get(syms[i:i + 50])
+    if bad:
+        log(f"  ما لها سعر بـ Alpaca ({len(bad)}): {', '.join(bad[:15])}")
     for r in rows:
         d = raw.get(r["symbol"])
         if d is None or not len(d):
@@ -263,7 +276,15 @@ def alerts(rows: list[dict], send: bool) -> None:
         msgs.append(f"⛔ <b>رادار الشطب اشتغل</b>\nحالياً من ملفات SEC آخر 45 يوم: 🔴 قرار شطب/تعليق {n3} · 🟠 جلسة استماع/بدون مهلة {n2} · 🟡 إنذار مع مهلة {n1}"
                     f"\nمن الحين بيوصلك كل إنذار جديد أول بأول.\n{SITE}")
     else:
-        for r, e in sorted(new, key=lambda x: -x[1]["sev"]):
+        minor = [(r, e) for r, e in new if e["sev"] <= 1]
+        if minor:
+            ln = [f"{'✅' if e['sev'] == 0 else '🟡'} <b>{H.escape(r['symbol'] or r['name'][:20])}</b>"
+                  + (f" ${r['price']}" if r.get("price") is not None else "")
+                  + f" — {'رجع ممتثل' if e['sev'] == 0 else ('، '.join(a for _, a in (e.get('reasons') or [])[:1]) or 'إنذار')}"
+                  + (f" · مهلة {e['deadline']}" if e.get("deadline") and e["sev"] else "") for r, e in minor[:30]]
+            msgs.append("📋 <b>إنذارات شطب جديدة (مع مهلة) / رجع ممتثل</b>\n" + "\n".join(ln)
+                        + (f"\n… و {len(minor) - 30} ثاني" if len(minor) > 30 else "") + f"\n{SITE}")
+        for r, e in sorted([x for x in new if x[1]["sev"] >= 2], key=lambda x: -x[1]["sev"]):
             sym = H.escape(r["symbol"] or r["name"])
             px = f" · السعر ${r['price']}" if r.get("price") is not None else ""
             why = "، ".join(a for _, a in (e.get("reasons") or [])[:2]) or "السبب ما انقرا آلياً — افتح الملف"
