@@ -870,7 +870,11 @@
    "t1": 5.9524,
    "t2": 6.223,
    "stop": 4.8702,
-   "pm_min_vol": 23105
+   "pm_min_vol": 23105,
+   "N": "2026-11-23",
+   "pm_high_pct": -5.7,
+   "close_next_pct": -11.5,
+   "result": "nofill"
   }
  ],
  "fire_sent": [
