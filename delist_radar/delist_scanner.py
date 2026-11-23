@@ -36,11 +36,15 @@ OUT = ROOT / "output"
 STATE = Path(os.environ.get("TRACK_DIR", ROOT / "trackdata")) / "delist_sent.json"
 SITE = "https://hatim4231.github.io/faisal-radar/delisting/"
 
-Q_6K = ('"minimum bid price" OR "Listing Rule 5550" OR "Listing Rule 5450" OR "Listing Rule 5250" OR "Listing Rule 5810" '
-        'OR "delisting determination" OR "Hearings Panel" OR "continued listing standard" OR "continued listing requirement" '
-        'OR "Section 802.01" OR "Section 1003"')
-QUERIES = [("8-K", '"Item 3.01"', "8-K,8-K/A"), ("6-K", Q_6K, "6-K,6-K/A"), ("25", '"25-NSE" OR "Form 25" OR "delist"', "25-NSE")]
-
+# بحث نص SEC ما يدعم OR بين العبارات (جرّبناها: 3 نتايج بس) ← كل عبارة استعلام لحاله ونجمعها
+PHRASES = ['"minimum bid price"', '"Listing Rule 5550"', '"Listing Rule 5450"', '"Listing Rule 5250"', '"Listing Rule 5810"',
+           '"delisting determination"', '"Hearings Panel"', '"deficiency letter"', '"Notice of Delisting"', '"regained compliance"',
+           '"continued listing standard"', '"Section 802.01"', '"Section 1003"']
+QUERIES = [(f"{f}:{q}", q, f) for q in PHRASES for f in ("8-K", "6-K")]
+# لازم النص يذكر مخالفة فعلية (Item 3.01 يشمل نقل الإدراج والاندماج — مو مخالفة)
+VIOL = (r"deficiency|not in compliance|no longer (?:in )?compl|fail(?:ed|ure|s)? to (?:satisfy|comply|meet)|did not (?:comply|meet)|"
+        r"below the minimum|delisting determination|determined to delist|hearings? panel|regain(?:ed)? compliance|"
+        r"5550\(|5450\(|5250\(|5810\(|802\.01|1003\(")
 # السبب: (مفتاح، عربي، أنماط)
 REASONS = [
     ("bid", "السعر تحت 1$ لـ 30 جلسة (الحد الأدنى للسعر)", r"minimum bid price|bid price requirement|5550\(a\)\(2\)|5450\(a\)\(1\)|802\.01C|\$1\.00 per share"),
@@ -55,8 +59,12 @@ REASONS = [
     ("public_interest", "قرار البورصة لمصلحة عامة (أخطر الأسباب)", r"public interest|5101"),
 ]
 # الخطورة: 3 = قرار شطب/تعليق/طلب Form 25 · 2 = جلسة استماع أو بدون مهلة · 1 = إنذار مع مهلة · 0 = رجع ممتثل
-SEV3 = r"delisting determination|determined to delist|will be suspended|trading .{0,40}suspended|suspension of trading|form 25|staff determination|panel determined to delist|delisted from"
-SEV2 = r"hearings? panel|request(ed)? a hearing|not eligible for (an? )?(additional|second) .{0,20}(compliance )?period|ineligible for .{0,30}compliance period|reverse stock split.{0,120}(prior|within).{0,30}(one|1|two|2)[- ]year|5810\(c\)\(3\)\(a\)\(iv\)"
+SEV3 = (r"(?:received|receipt of|issued) (?:a |the )?(?:written )?(?:staff )?(?:delisting determination|determination letter)|determined to delist|"
+        r"(?:trading|securities|shares)[^.]{0,80}will be suspended|suspended[^.]{0,40}(?:effective|at the opening)|panel[^.]{0,40}(?:denied|determined to delist)|"
+        r"has been delisted|will be delisted (?:from|effective)")
+SEV2 = (r"(?:requested|has requested|intends to request|will request|timely requested) a hearing|hearing (?:is |was |has been )?scheduled|"
+        r"not eligible for (?:an? )?(?:additional|second|any) [^.]{0,30}(?:compliance )?period|ineligible for [^.]{0,30}compliance period|"
+        r"reverse stock split[^.]{0,120}(?:prior|within)[^.]{0,30}(?:one|1|two|2)[- ]year|5810\(c\)\(3\)\(A\)\(iv\)")
 REGAIN = r"regained compliance|has regained|evidenced compliance|now in compliance"
 MONTHS = "January|February|March|April|May|June|July|August|September|October|November|December"
 DEADLINE = re.compile(rf"(?:until|through|by|on or before)\s+((?:{MONTHS})\s+\d{{1,2}},\s+20\d\d)", re.I)
@@ -147,14 +155,12 @@ def collect(days: int) -> list[dict]:
     end, start = date.today(), date.today() - timedelta(days=days)
     seen, filings = set(), []
     for kind, q, forms in QUERIES:
-        hits = search(q, forms, start.isoformat(), end.isoformat())
+        hits = search(q, forms, start.isoformat(), end.isoformat(), max_pages=5)
         log(f"  SEC {kind}: {len(hits)} ملف")
         for h in hits:
             s = h.get("_source") or {}
             adsh = s.get("adsh") or (h.get("_id") or "").split(":")[0]
             if not adsh or adsh in seen:
-                continue
-            if kind == "8-K" and "3.01" not in (s.get("items") or ["3.01"]):
                 continue
             seen.add(adsh)
             cik = int((s.get("ciks") or ["0"])[0])
@@ -162,19 +168,34 @@ def collect(days: int) -> list[dict]:
             url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{adsh.replace('-', '')}/{fn}"
             filings.append({"adsh": adsh, "cik": cik, "form": s.get("form") or s.get("file_type") or kind, "date": s.get("file_date"),
                             "ticker": _ticker(s), "name": _name(s), "url": url})
+    # Form 25-NSE (البورصة قدمت الشطب) — يشمل سندات واندماجات، فناخذه بس تأكيد لشركة عندها مخالفة بالقائمة
+    f25 = []
+    for h in search('"25-NSE" OR delist', "25-NSE", start.isoformat(), end.isoformat(), max_pages=5) + \
+            search("Nasdaq", "25-NSE", start.isoformat(), end.isoformat(), max_pages=5):
+        s = h.get("_source") or {}
+        adsh = s.get("adsh") or (h.get("_id") or "").split(":")[0]
+        if adsh and adsh not in seen:
+            seen.add(adsh)
+            cik = int((s.get("ciks") or ["0"])[0])
+            fn = (h.get("_id") or ":").split(":", 1)[1]
+            f25.append({"adsh": adsh, "cik": cik, "form": "25-NSE", "date": s.get("file_date"), "ticker": _ticker(s), "name": _name(s),
+                        "url": f"https://www.sec.gov/Archives/edgar/data/{cik}/{adsh.replace('-', '')}/{fn}",
+                        "sev": 3, "reasons": [], "deadline": None, "snippet": "البورصة قدمت طلب الشطب (Form 25-NSE)", "exchange": "؟"})
+    log(f"  Form 25-NSE: {len(f25)} (ينحسب بس للشركات اللي عندها مخالفة)")
     log(f"  ملفات فريدة: {len(filings)} — نقرا نصوصها")
     with ThreadPoolExecutor(4) as ex:
         texts = list(ex.map(lambda f: fetch_text(f["url"]), filings))
     out = []
     for f, t in zip(filings, texts):
         if not t:
-            f.update({"sev": 3 if str(f["form"]).startswith("25") else 1, "reasons": [], "deadline": None, "snippet": "", "exchange": "؟",
-                      "unread": True})
+            f.update({"sev": 1, "reasons": [], "deadline": None, "snippet": "", "exchange": "؟", "unread": True})
         else:
-            if not str(f["form"]).startswith("25") and not re.search(r"Nasdaq|NYSE|New York Stock Exchange|listing", t, re.I):
-                continue                                   # 6-K ما له علاقة بالإدراج
+            if not re.search(r"Nasdaq|NYSE|New York Stock Exchange", t, re.I) or not re.search(VIOL, t, re.I):
+                continue                                   # ما له علاقة بمخالفة إدراج (اندماج/نقل إدراج/خبر عام)
             f.update(classify(t, str(f["form"])))
         out.append(f)
+    ciks = {f["cik"] for f in out}
+    out += [f for f in f25 if f["cik"] in ciks]
     return out
 
 
@@ -204,17 +225,18 @@ def by_company(filings: list[dict]) -> list[dict]:
 
 
 def prices(rows: list[dict]) -> None:
-    syms = sorted({r["symbol"] for r in rows if r["symbol"]})
+    syms = sorted({r["symbol"] for r in rows if r["symbol"] and re.fullmatch(r"[A-Z]{1,5}", r["symbol"])})
     if not syms:
         return
-    try:
-        import alpaca_data as A
-        if not A.available():
-            return
-        raw = A.bars(syms, "1Day", datetime.now() - timedelta(days=60))
-    except Exception as e:
-        log("  أسعار Alpaca تعطلت:", repr(e)[:120])
+    import alpaca_data as A
+    if not A.available():
         return
+    raw = {}
+    for i in range(0, len(syms), 50):
+        try:
+            raw.update(A.bars(syms[i:i + 50], "1Day", datetime.now() - timedelta(days=60)))
+        except Exception as e:
+            log("  أسعار Alpaca تعطلت لدفعة:", repr(e)[:120])
     for r in rows:
         d = raw.get(r["symbol"])
         if d is None or not len(d):
