@@ -40,6 +40,9 @@ import compliance_rule  # noqa: E402
 import runners as RN  # noqa: E402
 import flags  # noqa: E402
 import holders  # noqa: E402
+sys.path.insert(0, str(ROOT / "highrisk_radar"))
+import highrisk as HR  # noqa: E402
+import delist as DL  # noqa: E402
 
 log = data.log
 OUT = ROOT / "output"
@@ -83,6 +86,75 @@ def rand_p(B: dict | None, atr: float, stop_pct: float | None, target: float = 2
     x = min(max(stop_pct - 1, 0.0), len(T) - 1.0001)
     a = int(x)
     return round(float(T[a] * (1 - (x - a)) + T[a + 1] * (x - a)), 3)
+
+
+SEEN_PATH = ROOT / "cache" / "runners_seen.json"
+MAX_TICKETS, BLEED_MAX, CHASE_MAX, RISK_PCT, POS_CAP = 5, 0.40, 15.0, 1.0, 3.0
+
+
+def tickets(rows: list[dict], pre: dict, today: str) -> dict:
+    """🎟 تذاكر اليوم (طلب أبوفرح 2026-11-23): 5 بوابات فوق الكاشف — ما تغيّر الحالة ولا السجل، عرض واختيار بس.
+    1) الحالة 🚀/🟡 · 2) ما فيه طرح «عالي» بـ SEC (424B/EFFECT خلال 30 يوم) · 3) 🩸 خطر النزيف < 0.40
+    · 4) ما طار فوق سعر أول ظهور بأكثر من 15% (لا تلحق) · 5) الحجم: خسارة الوقف = 1% من المحفظة (سقف 3%). أقصى 5 تذاكر."""
+    try:
+        seen = json.loads(SEEN_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        seen = {}
+    t0 = datetime.strptime(today, "%Y-%m-%d")
+    seen = {k: v for k, v in seen.items() if (t0 - datetime.strptime(v.get("last", today), "%Y-%m-%d")).days <= 30}
+    picked = []
+    for r in rows:
+        if r["status"] not in ("ready", "near"):
+            continue
+        sym, px = r["symbol"], float(r["price"])
+        e = seen.get(sym)
+        if not e:
+            e = seen[sym] = {"date": r["date"], "price": px}
+        e["last"] = r["date"]
+        d = pre.get(sym)
+        pb, dl = None, None
+        if d is not None:
+            try:
+                sc = HR.score(HR.features(d).iloc[-1])
+                pb = sc.get("pb") if sc else None
+            except Exception:
+                pb = None
+            try:
+                dl = DL.assess(d)
+            except Exception:
+                dl = None
+        r["bleed"], r["delist"] = _r(pb, 3), dl
+        lvl = (r.get("dilution") or {}).get("level")
+        drift = (px / e["price"] - 1) * 100 if e.get("price") else 0.0
+        stop = r["plan"].get("stop_pct") or 50
+        pos = min(POS_CAP, RISK_PCT * 100 / stop)
+        gates = [
+            {"k": "status", "t": "الحالة 🚀 جاهز أو 🟡 قريب", "ok": True, "d": {"ready": "🚀 جاهز", "near": "🟡 قريب"}[r["status"]]},
+            {"k": "sec", "t": "ما فيه طرح عالي (SEC)", "ok": lvl is not None and lvl != "high",
+             "d": {"high": "⛔ 424B/EFFECT خلال 30 يوم", "medium": "⚠ ملف تخفيف أقدم (تنبيه بس)", "low": "منخفض", "none": "ما فيه ملفات"}.get(lvl, "ما انفحص — ما نخاطر")},
+            {"k": "bleed", "t": "🩸 خطر النزيف أقل من 40%", "ok": pb is not None and pb < BLEED_MAX,
+             "d": "غير معروف — ما نخاطر" if pb is None else f"{pb * 100:.0f}% يلمس −30% خلال 20 جلسة"},
+            {"k": "chase", "t": "ما طار فوق سعر الإشارة +15%", "ok": drift <= CHASE_MAX,
+             "d": f"أول ظهور {e['date']} بسعر {e['price']} · الآن {drift:+.1f}%"},
+            {"k": "size", "t": "حجم الصفقة", "ok": True, "d": f"{pos:.1f}% من المحفظة (الوقف −{stop:.0f}% = خسارة 1%)"},
+        ]
+        ok = all(g["ok"] for g in gates)
+        r["ticket"] = {"ok": ok, "gates": gates, "pos_pct": round(pos, 2), "first_date": e["date"], "first_price": e["price"],
+                       "drift_pct": round(drift, 1), "rank": None}
+        if ok:
+            picked.append(r)
+    for i, r in enumerate(picked):
+        r["ticket"]["rank"] = i + 1 if i < MAX_TICKETS else None
+    try:
+        SEEN_PATH.parent.mkdir(exist_ok=True)
+        SEEN_PATH.write_text(json.dumps(seen, ensure_ascii=False), encoding="utf-8")
+    except Exception:
+        pass
+    sel = [r["symbol"] for r in picked[:MAX_TICKETS]]
+    log(f"[الطيارات] 🎟 تذاكر اليوم: {len(sel)} ({', '.join(sel) or '-'}) · عدّت البوابات {len(picked)} من "
+        f"{sum(1 for r in rows if r['status'] in ('ready', 'near'))} جاهز/قريب")
+    return {"symbols": sel, "passed": len(picked), "max": MAX_TICKETS, "bleed_max": BLEED_MAX, "chase_max": CHASE_MAX,
+            "risk_pct": RISK_PCT, "pos_cap": POS_CAP}
 
 
 def run(cfg, tickers=None) -> dict:
@@ -217,6 +289,11 @@ def run(cfg, tickers=None) -> dict:
             pick = random.Random(f"{r['symbol']}:{r['date']}").sample(pool, min(N_TWINS, len(pool)))
             r["twins"] = [[t, _r(pre[t]["Close"].iloc[-1])] for t in pick]
     cnt = Counter(r["status"] for r in rows)
+    try:
+        tk = tickets(rows, pre, max((r["date"] for r in rows), default=datetime.now().strftime("%Y-%m-%d")))
+    except Exception as e:
+        log("[الطيارات] تذاكر اليوم تعطلت:", repr(e)[:150])
+        tk = None
     import stock_detail
     for r in rows:
         d = pre.get(r["symbol"])
@@ -234,7 +311,7 @@ def run(cfg, tickers=None) -> dict:
             log(f"  [الطيارات] فيصل {r['symbol']}:", repr(e)[:90])
     payload = {"generated_at": datetime.now().strftime("%Y-%m-%d %H:%M"),
                "source": "الأسعار: Alpaca + الشركة: Yahoo + SEC", "scanned": len(pre), "seconds": round(time.time() - t0),
-               "stocks": rows, "excluded_dilution": excluded, "excluded_hrt": excluded_hrt, "hist": HIST,
+               "stocks": rows, "tickets": tk, "excluded_dilution": excluded, "excluded_hrt": excluded_hrt, "hist": HIST,
                "liquidity": {"vol20": MIN_VOL20, "dv20": MIN_DV20}, "max_short": max_sh, "price_range": [pmin, pmax],
                "baseline": {k: B.get(k) for k in ("version", "horizon", "n")} if B else None}
     log(f"## رادار الطيارات: جاهز {cnt['ready']} · قريب {cnt['near']} · مراقبة {cnt['watch']} · خلص في {payload['seconds']} ثانية")

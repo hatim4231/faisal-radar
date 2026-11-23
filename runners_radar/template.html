@@ -194,7 +194,7 @@ ul.clean{margin:0;padding-right:18px}
         <b>بعيد جداً: وسيطه حوالي −43% تحت السعر</b>، يعني نزول −30% بعد الشراء عادي ومتوقع ما يعني إن الوقف انضرب.</li>
       <li><b>حجم الصفقة:</b> الوقف بعيد، فخل الخسارة لو ضرب = 1% من محفظتك (النسبة مكتوبة بكل بطاقة، غالباً 2-3% من المحفظة).</li>
       <li><b>وزّع:</b> 8-12 سهم بنفس الوقت — ما تدري أي واحد بيطير.</li>
-      <li><b>الخروج:</b> أمر بيع نص الكمية جاهز عند +100% (البري والأفتر بعد). القفزات ترجع بسرعة (OMH 18.23 ← 7.36 بيومين).</li>
+      <li><b>الخروج:</b> أمر بيع نص الكمية جاهز عند +50% (الأفضلية الأثبت بالدراسة) والباقي عند +100% (البري والأفتر بعد). القفزات ترجع بسرعة (OMH 18.23 ← 7.36 بيومين).</li>
       <li><b>المدة:</b> أقصى <b>20 جلسة (شهر تقريباً)</b>؛ ما وصل الهدف = اطلع وبدّل. (كانت 60 — قصّرناها لأن الأفضلية تظهر من 20 جلسة، والوقف شبه ما ينضرب بهالمدة: 5% مقابل 25% عند 60.)</li>
     </ol>
     <div class="note">⚠ الأفضلية متواضعة: 4 من 5 ما تدبّل، والصفقة الوسطية خسرت ~12% بالاختبار، والربح من القلة اللي تطير. لا تكبّر المبلغ عشان تعوض. ليس توصية شراء أو بيع.</div>
@@ -210,6 +210,14 @@ ul.clean{margin:0;padding-right:18px}
       </ul>
       <div class="note">الباقي من الأفضلية: احتمال الطيران خلال 20 جلسة أعلى من العشوائي (+50%: 20% مقابل 15.9% · +100%: 8.6% مقابل 5.8% للجاهز)، بس عائد خطة التداول ما يفرّق عن العشوائي بأي مدة (+1.4 ± 2.3 عند 20 جلسة). تعامل معه كقائمة مراقبة بحجم صغير: واحد من كل 5 يوصل +50%، وواحد من كل 12 يوصل +100%، والباقي غالباً يطلع بخسارة صغيرة أو يمشي جانبي.</div></div>
   </details>
+  <div class="card" id="tk" style="margin-bottom:12px;border-color:var(--accent);display:none">
+    <div style="font-weight:700;font-size:16px">🎟 تذاكر اليوم <span class="note" id="tk-sub"></span></div>
+    <div class="note" style="margin-top:4px">5 بوابات فوق الكاشف (ما تغيّر الحالة ولا السجل): <b>①</b> 🚀 جاهز أو 🟡 قريب · <b>②</b> ما فيه طرح «عالي» بـ SEC (424B/EFFECT خلال 30 يوم)
+      · <b>③</b> 🩸 خطر النزيف أقل من <span id="tk-bl"></span> · <b>④</b> ما طار فوق سعر أول ظهور بأكثر من <span id="tk-ch"></span> (لا تلحق) · <b>⑤</b> الحجم: خسارة الوقف = <span id="tk-rk"></span> من المحفظة (سقف <span id="tk-cap"></span>). أقصى <span id="tk-max"></span> تذاكر مع بعض.</div>
+    <div class="list" id="tk-list" style="margin-top:10px"></div>
+    <div class="note" style="margin-top:8px"><b>الخروج (إدارة خطر، مو طريقة مثبتة للربح):</b> نص الكمية عند <b>+50%</b> (هنا الأفضلية الأثبت بالدراسة) والباقي عند <b>+100%</b> أو نهاية <b>20 جلسة</b> · الوقف إغلاق تحت القاع −10%.
+      <br>⚠ هذي <b>تذاكر صغيرة كثيرة</b>: أغلبها يخسر شوي وقلة تطير. البوابات تبعدك عن الطرح والنزيف، وما تضمن ربح. ليس توصية شراء أو بيع.</div>
+  </div>
   <details id="excl" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="excl-body" style="margin-top:8px"></div></details>
   <details id="exclhrt" class="card" style="display:none;margin-bottom:12px"><summary style="cursor:pointer;font-weight:600"></summary><div id="exclhrt-body" style="margin-top:8px"></div></details>
   <div class="tiles" id="tiles" style="grid-template-columns:repeat(3,1fr)"></div>
@@ -286,6 +294,28 @@ function chart(s){
   [[0,"start"],[Math.floor(n/2),"middle"],[n-1,"end"]].forEach(([i,a]) => g += `<text x="${x(i)}" y="${H-6}" fill="${muted}" font-size="11" text-anchor="${a}">${c.d[i]}</text>`);
   return `<svg style="direction:ltr;width:100%;height:auto" viewBox="0 0 ${W} ${H}">${g}</svg>`;
 }
+function gatesHTML(s){
+  const T = s.ticket; if (!T) return "";
+  const head = T.rank ? `<b style="color:var(--good)">🎟 تذكرة #${T.rank}</b>` : T.ok ? `<b style="color:var(--good)">🎟 عدّى البوابات (احتياط — فوق الحد ${esc((DATA.tickets||{}).max)})</b>` : `<b style="color:var(--bad)">✋ مو تذكرة اليوم</b>`;
+  return `<div class="left" style="margin-top:6px">${head} · ${T.gates.filter(g => g.k !== "status").map(g => `<span class="tag ${g.ok ? "" : "b"}" title="${esc(g.d)}">${g.ok ? "✓" : "✗"} ${esc(g.t)}: ${esc(g.d)}</span>`).join(" ")}</div>`
+    + ((s.delist||{}).level === 2 ? `<div class="left" style="color:var(--bad)">⛔ خطر شطب عالي — ${esc(((s.delist.reasons)||[])[0]||"")} (تحذير بس)</div>` : "");
+}
+function ticketsCard(){
+  const K = DATA && DATA.tickets; if (!K) return;
+  $("#tk").style.display = "";
+  $("#tk-bl").textContent = Math.round(K.bleed_max*100) + "%"; $("#tk-ch").textContent = K.chase_max + "%";
+  $("#tk-rk").textContent = K.risk_pct + "%"; $("#tk-cap").textContent = K.pos_cap + "%"; $("#tk-max").textContent = K.max;
+  const nRN = stocks.filter(s => s.status === "ready" || s.status === "near").length;
+  $("#tk-sub").textContent = `— ${K.symbols.length} تذكرة · عدّى البوابات ${K.passed} من ${nRN} جاهز/قريب`;
+  const L = K.symbols.map(t => stocks.find(s => s.symbol === t)).filter(Boolean);
+  if (!L.length){ $("#tk-list").innerHTML = `<div class="empty">ما فيه تذكرة اليوم — ولا سهم جاهز/قريب عدّى البوابات الخمس. <b>عدم الدخول قرار صحيح.</b></div>`; return; }
+  $("#tk-list").innerHTML = L.map(s => { const p = s.plan, T = s.ticket;
+    return `<div class="setupbox"><div class="t"><span class="ltr">${s.flag||""} ${esc(s.symbol)}</span> · ${esc((ST[s.status]||["-"])[0])} · $${fp(s.price)}</div>
+      <div class="facts" style="margin-top:4px"><span>الحجم: <b class="num">${T.pos_pct}%</b> من المحفظة</span>
+      <span>الوقف (إغلاق): <b class="num" style="color:var(--bad)">${fp(p.stop)}</b> (−${p.stop_pct}%)</span>
+      <span>نص عند: <b class="num" style="color:var(--good)">${fp(p.entry*1.5)}</b> (+50%)</span><span>الباقي: <b class="num" style="color:var(--good)">${fp(p.t1)}</b> (+100%)</span>
+      <span>🩸 النزيف: <b class="num">${s.bleed != null ? Math.round(s.bleed*100)+"%" : "؟"}</b></span><span>أول ظهور: <span class="num">${esc(T.first_date)}</span> بـ <span class="num">${fp(T.first_price)}</span> (${T.drift_pct>0?"+":""}${T.drift_pct}%)</span></div></div>`; }).join("");
+}
 function render(){
   tiles();
   const key = $("#sort").value, order = {ready:0, near:1, watch:2};
@@ -303,6 +333,7 @@ function render(){
         <div style="text-align:left"><span class="badge ${cls}">${lab}</span> <span class="note">${esc(s.level_ar||"")}</span></div>
       </div>
       ${chk(s)}
+      ${gatesHTML(s)}
       <div class="facts" style="margin-top:8px">
         <span>انهار: <b class="num">${s.crash_pct}%</b></span><span>القاع: <b class="num">${fp(s.bottom)}</b> (قبل <span class="num">${s.age}</span> جلسة)</span>
         <span>قاع أعلى: <b class="num">${fp(s.last_low)}</b> (+${s.hl_pct}%)</span><span>RSI: <b class="num">${s.rsi_bottom} → ${s.rsi_last_low}</b></span>
@@ -344,6 +375,7 @@ $("#sort").onchange = render;
 (function(){ const ex = (DATA && DATA.excluded_hrt) || []; if (!ex.length) return;
   const box = $("#exclhrt"); box.style.display = ""; box.querySelector("summary").textContent = "⛔ مستبعد لأن صندوق HRT من الملاك: " + ex.length + " سهم";
   $("#exclhrt-body").innerHTML = ex.map(x => `<span style="display:inline-block;margin:3px 8px 3px 0"><b class="ltr">${esc(x.symbol)}</b></span>`).join("") + '<div class="note">قرار المستخدم: الأسهم اللي يملك فيها HRT Financial LP (Hudson River Trading) ما تترشح — تقرير 13F في SEC.</div>'; })();
+ticketsCard();
 render();
 </script>
 </body>
