@@ -930,7 +930,13 @@
     "t2_is_high": true
    },
    "fire_max_pct": 12.1,
-   "fire_result": "stop"
+   "fire_result": "stop",
+   "N": "2026-11-24",
+   "pm_high_pct": 8.3,
+   "close_next_pct": -24.7,
+   "r10": "hit",
+   "r15": "hit",
+   "result": "t2"
   },
   {
    "symbol": "WETO",
@@ -960,7 +966,13 @@
    "t1": 0.6839,
    "t2": 0.715,
    "stop": 0.5595,
-   "pm_min_vol": 1245519
+   "pm_min_vol": 1245519,
+   "N": "2026-11-24",
+   "pm_high_pct": 3.2,
+   "close_next_pct": -7.5,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   }
  ],
  "fire_sent": [
