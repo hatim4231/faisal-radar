@@ -69,6 +69,11 @@ jobs:
           python faisal_original/run_original.py --out site/original/index.html
           cp output/latest.json output/sig_faisal_orig.json
 
+      - name: رادار المصفّر (شورت صفر من فيصل المطوّر/الأصلي وعبدالله — صامت)
+        run: python zero_radar/zero_scanner.py --out site/zero/index.html || echo "رادار المصفّر تعطل — نكمل"
+        continue-on-error: true
+        timeout-minutes: 8
+
       - name: رادار المطّلعين
         run: python insiders/insiders_scanner.py --out site/insiders/index.html
 
@@ -159,6 +164,9 @@ jobs:
           fi
           if [ -f site/runners/index.html ]; then
             npx --yes staticrypt@3.5.4 site/runners/index.html "${OPTS[@]}" --template-title "🚀 رادار الطيارات" -d site/runners
+          fi
+          if [ -f site/zero/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/zero/index.html "${OPTS[@]}" --template-title "0️⃣ رادار المصفّر" -d site/zero
           fi
           if [ -f site/delisting/index.html ]; then
             npx --yes staticrypt@3.5.4 site/delisting/index.html "${OPTS[@]}" --template-title "⛔ رادار الشطب" -d site/delisting
