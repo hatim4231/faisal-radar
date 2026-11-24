@@ -875,6 +875,90 @@
    "pm_high_pct": -5.7,
    "close_next_pct": -11.5,
    "result": "nofill"
+  },
+  {
+   "symbol": "MSS",
+   "D": "2026-11-23",
+   "close": 1.2,
+   "ah_high": 1.46,
+   "ah_last": 1.44,
+   "ah_vwap": 1.3118,
+   "jump_pct": 21.7,
+   "hold_pct": 92,
+   "ah_vol": 334020,
+   "rth_vol": 2942058,
+   "limit": 1.3118,
+   "name": "Maison Solutions Inc.",
+   "price": 1.44,
+   "float": 389834,
+   "short": 500,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "⛔ HRT من الملاك (2026-09-30)"
+   ],
+   "news": [],
+   "country": "United States",
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "hrt": {
+    "shares": 10185,
+    "name13f": "MAISON SOLUTIONS INC",
+    "period": "2026-09-30",
+    "filed": "2026-11-13"
+   },
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 1.443,
+   "t2": 1.5086,
+   "stop": 1.1806,
+   "pm_min_vol": 23381,
+   "second_leg": {
+    "E": "2026-11-20",
+    "k": 1,
+    "jump_E": 151,
+    "hiE": 1.69,
+    "pre": 0.674,
+    "above_base": 1.78,
+    "n_exp": 2
+   },
+   "fire": true,
+   "fire_plan": {
+    "t1": 1.5086,
+    "t2": 1.69,
+    "stop": 1.1806,
+    "t2_is_high": true
+   }
+  },
+  {
+   "symbol": "WETO",
+   "D": "2026-11-23",
+   "close": 0.5339,
+   "ah_high": 0.69,
+   "ah_last": 0.65,
+   "ah_vwap": 0.6217,
+   "jump_pct": 29.2,
+   "hold_pct": 74,
+   "ah_vol": 17793130,
+   "rth_vol": 150250598,
+   "limit": 0.6217,
+   "name": "WETO",
+   "price": 0.65,
+   "float": null,
+   "short": 30000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [],
+   "news": [],
+   "country": null,
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_level": "medium",
+   "eligible": true,
+   "t1": 0.6839,
+   "t2": 0.715,
+   "stop": 0.5595,
+   "pm_min_vol": 1245519
   }
  ],
  "fire_sent": [
