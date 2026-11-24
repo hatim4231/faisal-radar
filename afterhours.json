@@ -928,7 +928,8 @@
     "t2": 1.69,
     "stop": 1.1806,
     "t2_is_high": true
-   }
+   },
+   "fire_max_pct": 12.1
   },
   {
    "symbol": "WETO",
