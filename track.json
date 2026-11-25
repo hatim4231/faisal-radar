@@ -12518,6 +12518,7 @@
     "2026-11-24",
     "2026-11-24",
     "2026-11-24",
+    "2026-11-24",
     "2026-11-24"
    ]
   },
@@ -14717,6 +14718,7 @@
     "2026-11-24",
     "2026-11-24",
     "2026-11-24",
+    "2026-11-24",
     "2026-11-24"
    ]
   },
@@ -14822,6 +14824,7 @@
    "ret_pct": -1.0,
    "t1_date": "2026-11-18",
    "sweeps": [
+    "2026-11-24",
     "2026-11-24",
     "2026-11-24",
     "2026-11-24",
@@ -16027,6 +16030,7 @@
     "2026-11-19",
     "2026-11-19",
     "2026-11-19",
+    "2026-11-19",
     "2026-11-19"
    ],
    "stop_warned": "2026-11-19"
@@ -16088,6 +16092,7 @@
    "max_dd_pct": -17.1,
    "ret_pct": -6.3,
    "sweeps": [
+    "2026-11-17",
     "2026-11-17",
     "2026-11-17",
     "2026-11-17",
@@ -16378,6 +16383,7 @@
    "ret_pct": 3.4,
    "stop_warned": "2026-11-20",
    "sweeps": [
+    "2026-11-20",
     "2026-11-20",
     "2026-11-20",
     "2026-11-20",
@@ -17425,6 +17431,7 @@
     "2026-11-18",
     "2026-11-18",
     "2026-11-18",
+    "2026-11-18",
     "2026-11-18"
    ]
   },
@@ -17546,6 +17553,7 @@
    "max_dd_pct": -25.4,
    "ret_pct": -4.5,
    "sweeps": [
+    "2026-11-18",
     "2026-11-18",
     "2026-11-18",
     "2026-11-18",
@@ -19196,6 +19204,7 @@
     "2026-11-20",
     "2026-11-20",
     "2026-11-20",
+    "2026-11-20",
     "2026-11-20"
    ],
    "t1_date": "2026-11-23"
@@ -20637,6 +20646,7 @@
    "max_dd_pct": -13.8,
    "ret_pct": -2.7,
    "sweeps": [
+    "2026-11-20",
     "2026-11-20",
     "2026-11-20",
     "2026-11-20",
@@ -23006,6 +23016,7 @@
     "2026-11-24",
     "2026-11-24",
     "2026-11-24",
+    "2026-11-24",
     "2026-11-24"
    ]
   },
@@ -24245,6 +24256,177 @@
    "why": "🎯 ثبات · أعلى 2% · RSI 61.8 · دعم 4.18 (عنه 41.6%) · منطقة الطلب 4.18–4.598 · ارتكاز، Former Runner، Gap Fill، W، تقسيم عكسي",
    "sessions": 0,
    "last": 5.92,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "faisal_dev:TC:2026-11-24",
+   "radar": "faisal_dev",
+   "radar_name": "📡 فيصل المطوّر",
+   "sub1": true,
+   "opened_at": "2026-11-25 14:04",
+   "result": "open",
+   "horizon": 10,
+   "symbol": "TC",
+   "status": "ready",
+   "label": "✅ مطابق",
+   "entry": 0.6531,
+   "stop": 0.5757,
+   "t1": 0.749,
+   "zone": [
+    0.6397,
+    0.7037
+   ],
+   "t2": 1.3316,
+   "score": 80.8,
+   "date": "2026-11-24",
+   "name": "Token Cat Limited",
+   "why": "RSI 17.1 · دعم 0.640 (عنه 2.1%) · منطقة الطلب 0.640–0.704",
+   "dilution": "none",
+   "accum": null,
+   "conf": 0.545,
+   "conf_label": "عالية",
+   "conf_base": 0.3193234238851871,
+   "conf_similar": {
+    "n": 488,
+    "hit": 0.586,
+    "lose": 0.371,
+    "mean": -0.001,
+    "median": 0.044,
+    "avg_win": 0.08,
+    "avg_miss": -0.114
+   },
+   "flag": "🇨🇳",
+   "country_ar": "الصين",
+   "sessions": 0,
+   "last": 0.6531,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "faisal_orig:TC:2026-11-24",
+   "radar": "faisal_orig",
+   "radar_name": "📜 فيصل الأصلي",
+   "sub1": true,
+   "opened_at": "2026-11-25 14:04",
+   "result": "open",
+   "horizon": 20,
+   "symbol": "TC",
+   "status": "near",
+   "label": "🟡 قريب",
+   "entry": 0.6531,
+   "stop": 0.6205,
+   "t1": 0.749,
+   "zone": [
+    0.6397,
+    0.7037
+   ],
+   "t2": 1.3316,
+   "score": 68.5,
+   "date": "2026-11-24",
+   "name": "Token Cat Limited",
+   "why": "RSI 17.1 · دعم 0.640 (عنه 2.1%) · منطقة الطلب 0.640–0.704",
+   "dilution": "none",
+   "accum": null,
+   "conf": null,
+   "conf_label": null,
+   "conf_base": null,
+   "conf_similar": null,
+   "flag": "🇨🇳",
+   "country_ar": "الصين",
+   "sessions": 0,
+   "last": 0.6531,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "faisal_orig:NTHI:2026-11-24",
+   "radar": "faisal_orig",
+   "radar_name": "📜 فيصل الأصلي",
+   "sub1": false,
+   "opened_at": "2026-11-25 14:04",
+   "result": "open",
+   "horizon": 20,
+   "symbol": "NTHI",
+   "status": "near",
+   "label": "🟡 قريب",
+   "entry": 3.19,
+   "stop": 2.8227,
+   "t1": 3.662,
+   "zone": [
+    2.91,
+    3.201
+   ],
+   "t2": 6.095,
+   "score": 56.5,
+   "date": "2026-11-24",
+   "name": "NeOnc Technologies Holdings, In",
+   "why": "RSI 43.0 · دعم 2.91 (عنه 9.6%) · منطقة الطلب 2.91–3.20",
+   "dilution": "medium",
+   "accum": null,
+   "conf": null,
+   "conf_label": null,
+   "conf_base": null,
+   "conf_similar": null,
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "sessions": 0,
+   "last": 3.19,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "insiders:CTSO:2026-11-24",
+   "radar": "insiders",
+   "radar_name": "🟢 المطّلعين",
+   "sub1": false,
+   "opened_at": "2026-11-25 14:04",
+   "result": "open",
+   "horizon": 20,
+   "symbol": "CTSO",
+   "status": "ready",
+   "label": "🟢 شراء داخلي قوي",
+   "entry": 4.37,
+   "stop": 3.7145,
+   "t1": 5.244,
+   "t2": 6.118,
+   "score": 85,
+   "date": "2026-11-24",
+   "name": "Cytosorbents Corporation",
+   "why": "7 مطّلع اشترى بـ $499,984 (متوسط 5.18) · Chan Phillip P. — عضو مجلس إدارة، Chief Executive Officer · آخر شراء 2026-11-20",
+   "dilution": "high",
+   "accum": null,
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "sessions": 0,
+   "last": 4.37,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "runners:SILO:2026-11-24",
+   "radar": "runners",
+   "radar_name": "🚀 الطيارات",
+   "sub1": false,
+   "opened_at": "2026-11-25 14:04",
+   "result": "open",
+   "horizon": 20,
+   "symbol": "SILO",
+   "status": "near",
+   "label": "🟡 قريب",
+   "entry": 1.8,
+   "stop": 0.99,
+   "t1": 3.6,
+   "t2": 5.4,
+   "zone": [
+    1.47,
+    1.5876
+   ],
+   "score": 1,
+   "date": "2026-11-24",
+   "name": "Silo Pharma, Inc.",
+   "why": "انهار 89.5% · قاع 1.10 قبل 30 جلسة · قاع أعلى +33.6% · RSI 17.5→52.0 · طار 1 مرة · اكتملت الأساسية",
+   "dilution": "medium",
+   "rand_p": 0.082,
+   "flag": "🇺🇸",
+   "country_ar": "أمريكا",
+   "sessions": 0,
+   "last": 1.8,
    "last_date": "2026-11-24"
   }
  ],
@@ -33270,6 +33452,7 @@
     "2026-11-19",
     "2026-11-19",
     "2026-11-19",
+    "2026-11-19",
     "2026-11-19"
    ]
   },
@@ -34749,6 +34932,7 @@
     "2026-11-13",
     "2026-11-13",
     "2026-11-13",
+    "2026-11-13",
     "2026-11-13"
    ],
    "t1_date": "2026-11-16"
@@ -35310,6 +35494,7 @@
     "2026-11-18",
     "2026-11-18",
     "2026-11-18",
+    "2026-11-18",
     "2026-11-18"
    ],
    "t1_date": "2026-11-19"
@@ -35437,6 +35622,7 @@
    "max_dd_pct": -14.9,
    "ret_pct": 2.5,
    "sweeps": [
+    "2026-11-19",
     "2026-11-19",
     "2026-11-19",
     "2026-11-19",
@@ -37006,6 +37192,57 @@
    "t2": null,
    "sessions": 0,
    "last": 1.65,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "runners:SILO:2026-11-24:r0",
+   "of": "runners:SILO:2026-11-24",
+   "radar": "runners",
+   "radar_name": "🎲 عشوائي مماثل",
+   "symbol": "YMT",
+   "date": "2026-11-24",
+   "entry": 1.15,
+   "result": "open",
+   "horizon": 20,
+   "stop": 0.6325,
+   "t1": 2.3,
+   "t2": null,
+   "sessions": 0,
+   "last": 1.15,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "runners:SILO:2026-11-24:r1",
+   "of": "runners:SILO:2026-11-24",
+   "radar": "runners",
+   "radar_name": "🎲 عشوائي مماثل",
+   "symbol": "CTSO",
+   "date": "2026-11-24",
+   "entry": 4.37,
+   "result": "open",
+   "horizon": 20,
+   "stop": 2.4035,
+   "t1": 8.74,
+   "t2": null,
+   "sessions": 0,
+   "last": 4.37,
+   "last_date": "2026-11-24"
+  },
+  {
+   "id": "runners:SILO:2026-11-24:r2",
+   "of": "runners:SILO:2026-11-24",
+   "radar": "runners",
+   "radar_name": "🎲 عشوائي مماثل",
+   "symbol": "XOS",
+   "date": "2026-11-24",
+   "entry": 1.54,
+   "result": "open",
+   "horizon": 20,
+   "stop": 0.847,
+   "t1": 3.08,
+   "t2": null,
+   "sessions": 0,
+   "last": 1.54,
    "last_date": "2026-11-24"
   }
  ],
