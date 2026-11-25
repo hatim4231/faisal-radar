@@ -1010,7 +1010,13 @@
    "t1": 1.2306,
    "t2": 1.2865,
    "stop": 1.0068,
-   "pm_min_vol": 24314
+   "pm_min_vol": 24314,
+   "N": "2026-11-25",
+   "pm_high_pct": -7.2,
+   "close_next_pct": 10.4,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   }
  ],
  "fire_sent": [
