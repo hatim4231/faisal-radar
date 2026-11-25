@@ -973,6 +973,44 @@
    "r10": "fail",
    "r15": "fail",
    "result": "stop"
+  },
+  {
+   "symbol": "GLXG",
+   "D": "2026-11-24",
+   "close": 1.04,
+   "ah_high": 1.25,
+   "ah_last": 1.25,
+   "ah_vwap": 1.1187,
+   "jump_pct": 20.2,
+   "hold_pct": 100,
+   "ah_vol": 347356,
+   "rth_vol": 7558406,
+   "limit": 1.1187,
+   "name": "Galaxy Payroll Group Limited",
+   "price": 1.25,
+   "float": 5241543,
+   "short": 0,
+   "short_src": "غير متاح للشورت عند IB",
+   "flags": [
+    "⛔ HRT من الملاك (2026-09-30)"
+   ],
+   "news": [],
+   "country": "Hong Kong",
+   "flag": "🇭🇰",
+   "country_ar": "هونغ كونغ",
+   "hrt": {
+    "shares": 25081,
+    "name13f": "GALAXY PAYROLL GROUP LTD",
+    "period": "2026-09-30",
+    "filed": "2026-11-13"
+   },
+   "tags": [],
+   "dilution_level": "none",
+   "eligible": false,
+   "t1": 1.2306,
+   "t2": 1.2865,
+   "stop": 1.0068,
+   "pm_min_vol": 24314
   }
  ],
  "fire_sent": [
