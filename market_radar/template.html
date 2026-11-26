@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار الماركت</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --panel2:#f0f2f5; --line:#e2e5ea; --text:#15181d; --muted:#667085;
+  --accent:#2f6fde; --good:#13955c; --good-bg:#e5f6ee; --warn:#b7791f; --warn-bg:#fdf3e1;
+  --bad:#d23c3c; --bad-bg:#fdeaea; --info:#5b5bd6; --info-bg:#ececfd;
+  --up:#16a36a; --down:#e04848; --ma20:#e39a1c; --ma50:#7c5cd6; --zone:rgba(19,149,92,.13);
+  --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+    --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+    --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+    --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1013; --panel:#161a1f; --panel2:#1d2228; --line:#2a3038; --text:#e9edf2; --muted:#94a0b0;
+  --accent:#5b93f0; --good:#35c486; --good-bg:#12291f; --warn:#e3a63c; --warn-bg:#2c2312;
+  --bad:#f06464; --bad-bg:#2e1717; --info:#9a9af5; --info-bg:#1f1f3a;
+  --up:#2fc07f; --down:#f05a5a; --zone:rgba(53,196,134,.14); --shadow:none;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:"Twemoji Country Flags","IBM Plex Sans Arabic",system-ui,-apple-system,"Segoe UI",Tahoma,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+.num,.ltr{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+h1{font-size:22px;margin:0;font-weight:700}
+.sub{color:var(--muted);font-size:13px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 12px;font:inherit;font-size:14px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.demo{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn);border-radius:10px;padding:8px 12px;margin-bottom:12px;font-weight:600}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0 16px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer}
+.tile b{font-size:26px;display:block;line-height:1.2}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{outline:2px solid var(--accent)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+.tabs{display:flex;background:var(--panel2);border-radius:10px;padding:3px}
+.tabs button{border:0;background:transparent;color:var(--muted);font:inherit;padding:6px 14px;border-radius:8px;cursor:pointer}
+.tabs button.on{background:var(--panel);color:var(--text);box-shadow:var(--shadow);font-weight:600}
+input[type=search],select{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;padding:7px 10px;font:inherit;font-size:14px}
+input[type=search]{flex:1;min-width:140px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 10px;font-size:12.5px;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.list{display:flex;flex-direction:column;gap:8px}
+.row{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;box-shadow:var(--shadow);cursor:pointer;display:grid;grid-template-columns:150px 1fr 210px;gap:14px;align-items:center}
+.row:hover{border-color:var(--accent)}
+.sym{font-weight:700;font-size:17px}
+.name{color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.px{font-size:14px}
+.up{color:var(--up)} .down{color:var(--down)}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted)}
+.facts b{color:var(--text);font-weight:600}
+.left{font-size:13px;margin-top:5px}
+.left .k{color:var(--warn);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.tag{font-size:11.5px;padding:1px 8px;border-radius:999px;background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.tag.g{background:var(--good-bg);color:var(--good);border-color:transparent}
+.tag.w{background:var(--warn-bg);color:var(--warn);border-color:transparent}
+.tag.b{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag.i{background:var(--info-bg);color:var(--info);border-color:transparent}
+.score{display:flex;flex-direction:column;gap:5px}
+.score .top{display:flex;justify-content:space-between;align-items:center}
+.badge{font-size:12px;font-weight:600;padding:2px 9px;border-radius:999px}
+.badge.ready{background:var(--good-bg);color:var(--good)}
+.badge.near{background:var(--warn-bg);color:var(--warn)}
+.badge.radar{background:var(--info-bg);color:var(--info)}
+.badge.no{background:var(--panel2);color:var(--muted)}
+.pct{font-size:20px;font-weight:700}
+.bar{height:7px;background:var(--panel2);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px}
+.empty{padding:40px;text-align:center;color:var(--muted);background:var(--panel);border-radius:12px;border:1px dashed var(--line)}
+/* detail */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;z-index:20}
+.overlay.on{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(860px,100%);background:var(--bg);z-index:21;overflow-y:auto;transform:translateX(-102%);transition:transform .2s ease;border-right:1px solid var(--line)}
+.drawer.on{transform:none}
+.dhead{position:sticky;top:0;background:var(--bg);padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:2}
+#dtitle{min-width:0;flex:1} #dtitle .name{white-space:normal} #dclose{flex-shrink:0}
+.dbody{padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:13.5px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-weight:500}
+.check{display:grid;grid-template-columns:22px 1fr 60px;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);align-items:start}
+.check:last-child{border-bottom:0}
+.check .ic{font-size:15px;line-height:1.4}
+.check .t{font-weight:600;font-size:14px}
+.check .d{color:var(--muted);font-size:13px}
+.check .r{color:var(--warn);font-size:13px;font-weight:500}
+.check .p{font-size:12px;color:var(--muted);text-align:left}
+.mini{height:5px;background:var(--panel2);border-radius:99px;margin-top:4px;overflow:hidden}
+.mini i{display:block;height:100%}
+.plan{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pbox{background:var(--panel2);border-radius:10px;padding:9px 10px}
+.pbox span{display:block;color:var(--muted);font-size:12px}
+.pbox b{font-size:16px}
+.chart svg{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-left:4px;border-radius:2px}
+.newsitem{padding:9px 0;border-bottom:1px solid var(--line)} .newsitem:last-of-type{border-bottom:0}
+.newsitem .nt{font-weight:600;font-size:14px} .newsitem .ns{font-size:13.5px;margin:3px 0;line-height:1.7}
+.news a{color:var(--accent);text-decoration:none}
+.news li{margin-bottom:6px;font-size:13.5px}
+.links a{color:var(--accent);margin-left:14px;font-size:13.5px;text-decoration:none}
+.note{font-size:12.5px;color:var(--muted)}
+.disc{margin-top:26px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:12px}
+ul.clean{margin:0;padding-right:18px}
+@media (max-width:820px){
+  .row{grid-template-columns:1fr;gap:8px}
+  .name{max-width:none}
+  .tiles{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .plan{grid-template-columns:repeat(2,1fr)}
+}
+.sent{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;white-space:nowrap}
+.sent.positive{background:var(--good-bg);color:var(--good)} .sent.negative{background:var(--bad-bg);color:var(--bad)} .sent.neutral{background:var(--panel2);color:var(--muted)}
+.newsfull{font-size:13.5px;line-height:1.8;white-space:pre-line;margin:6px 0;max-height:420px;overflow-y:auto;padding-left:6px}
+.newsitem .why{font-size:12px;color:var(--muted);margin-top:2px}
+
+.sch{display:inline-block;font-size:11.5px;font-weight:600;padding:1px 8px;border-radius:999px;margin:2px 4px 2px 0}
+.sch.classic{background:var(--info-bg);color:var(--info)} .sch.wyckoff{background:var(--warn-bg);color:var(--warn)} .sch.elliott{background:var(--good-bg);color:var(--good)}
+.badge.strong{background:var(--good-bg);color:var(--good)} .badge.good{background:var(--warn-bg);color:var(--warn)} .badge.watch{background:var(--info-bg);color:var(--info)}
+.conf{font-size:13px;font-weight:700}
+.setupbox{border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px}
+.setupbox .t{font-weight:700;font-size:14px}
+.badge.ready{background:var(--good-bg);color:var(--good)} .badge.near{background:var(--warn-bg);color:var(--warn)} .badge.watch{background:var(--info-bg);color:var(--info)}
+.chk{display:flex;flex-wrap:wrap;gap:4px 6px;margin-top:6px}
+.chk span{font-size:11.5px;padding:1px 8px;border-radius:999px;border:1px solid var(--line)}
+.chk .y{background:var(--good-bg);color:var(--good);border-color:transparent} .chk .n{background:var(--panel2);color:var(--muted)}
+.rules{margin:6px 0 0;padding-right:18px;font-size:13.5px;line-height:1.75}
+</style>
+<script>
+/* أعلام الدول: ويندوز (كروم/إيدج) يعرض العلم حرفين مثل «US» ← خط أعلام Twemoji (CC-BY 4.0، country-flag-emoji-polyfill)
+   يتحمّل بس على الأجهزة اللي ما تعرض الأعلام. الملف في assets/ والاحتياط من jsDelivr. */
+(function(){try{
+  var F='"Twemoji Mozilla","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","EmojiOne Color","Android Emoji",sans-serif';
+  function px(t,s,c){t.clearRect(0,0,100,100);t.fillStyle=c;t.fillText(s,0,0);return t.getImageData(0,0,1,1).data.join(",");}
+  function ok(s){var c=document.createElement("canvas");c.width=c.height=1;var t=c.getContext("2d",{willReadFrequently:true});
+    t.textBaseline="top";t.font="100px "+F;t.scale(.01,.01);var w=px(t,s,"#fff"),b=px(t,s,"#000");return b===w&&b.indexOf("0,0,0,")!==0;}
+  if(window.FORCE_FLAG_FONT||(ok("\uD83D\uDE0A")&&!ok("\uD83C\uDDE8\uD83C\uDDED"))){
+    var p="../",st=document.createElement("style");
+    st.textContent='@font-face{font-family:"Twemoji Country Flags";unicode-range:U+1F1E6-1F1FF,U+1F3F4,U+E0062-E0063,U+E0065,U+E0067,U+E006C,U+E006E,U+E0073-E0074,U+E0077,U+E007F;'+
+      'src:url("'+p+'assets/TwemojiCountryFlags.woff2") format("woff2"),url("https://cdn.jsdelivr.net/npm/country-flag-emoji-polyfill@0.1.10/dist/TwemojiCountryFlags.woff2") format("woff2");font-display:swap}';
+    document.head.appendChild(st);
+  }
+}catch(e){}})();
+</script>
+<style>
+.st{font-size:12.5px;font-weight:700;padding:2px 10px;border-radius:999px}
+.st.held{background:var(--good-bg);color:var(--good)} .st.testing,.st.market{background:var(--warn-bg);color:var(--warn)}
+.st.wait_pm{background:var(--info-bg);color:var(--info)} .st.fail,.st.cancel_pm,.st.cancel_ah{background:var(--panel2);color:var(--muted)}
+.lv{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin-top:6px}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px}
+.step{border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12.5px}
+.step b{display:block;font-size:13px;margin-bottom:2px}
+@media (max-width:700px){ .steps{grid-template-columns:1fr 1fr} .tiles{grid-template-columns:repeat(2,1fr)!important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div><h1>🕘 رادار الماركت</h1><div class="sub" id="meta"></div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <a class="btn primary" href="../ready/" style="text-decoration:none">🎯 الجاهزة</a>
+      <a class="btn" href="../" style="text-decoration:none">📡 فيصل المطوّر</a>
+      <a class="btn" href="../original/" style="text-decoration:none">📜 فيصل الأصلي</a>
+      <a class="btn" href="../abdullah/" style="text-decoration:none">🌊 عبدالله</a>
+      <a class="btn" href="../insiders/" style="text-decoration:none">🟢 المطّلعين</a>
+      <a class="btn" href="../accumulation/" style="text-decoration:none">🔍 التجميع</a>
+      <a class="btn" href="../afterhours/" style="text-decoration:none">🌙 الأفتر</a>
+      <a class="btn" href="../schools/" style="text-decoration:none">🧭 المدارس</a>
+      <a class="btn" href="../hunt/" style="text-decoration:none">🏹 الصيد</a>
+      <a class="btn" href="../revsplit/" style="text-decoration:none">🔄 التقسيم</a>
+      <a class="btn" href="../rahib/" style="text-decoration:none">🔥 الرهيب</a>
+      <a class="btn" href="../highrisk/" style="text-decoration:none">🧨 عالي مخاطرة</a>
+      <a class="btn" href="../delisting/" style="text-decoration:none">⛔ الشطب</a>
+      <a class="btn" href="../zero/" style="text-decoration:none">0️⃣ المصفّر</a>
+      <a class="btn" href="../market/" style="text-decoration:none">🕘 الماركت</a>
+      <a class="btn" href="../runners/" style="text-decoration:none">🚀 الطيارات</a>
+      <a class="btn" href="../track/" style="text-decoration:none">📈 السجل</a>
+      <a class="btn primary" id="ghrun" style="display:none;text-decoration:none" target="_blank" rel="noopener">🔄 تحديث الآن</a>
+      <button class="btn" id="theme">🌓</button>
+    </div>
+  </header>
+  <div class="card" style="margin-bottom:12px;border-color:var(--accent)">
+    <b>نظرية «سهم الماركت»</b> — شرح عبدالإله (@z_v11v) ومثال فيصل على APUS. الأوقات بتوقيت السعودية:
+    <div class="steps">
+      <div class="step"><b>1) الأفتر (أمس)</b>صعد +15% أو أكثر. لو جنى ربحه ورجّع أكثر من 70% من القفزة ← <b>يُلغى</b></div>
+      <div class="step"><b>2) البري</b>لو كسر دعم الأفتر ← <b>يُلغى</b>. لو حافظ على أدنى شمعة لين <b>3 عصراً</b> ← 🟡 <b>سهم الماركت</b></div>
+      <div class="step"><b>3) أول نص ساعة (5:30–6:00 م)</b>يختبر دعم البري. ثبت ← ✅ <b>دخول</b> بسعر 6:00 م. أغلق تحته أو تحت دعم الأفتر ← ❌ <b>فشل</b></div>
+      <div class="step"><b>4) الهدف والوقف</b>الهدف <b>+20%</b>. الوقف = إغلاق تحت <b>دعم الأفتر</b>. جلسة لندن بعد 8 م توضح هل يكمل للأفتر</div>
+    </div>
+    <div class="note" style="margin-top:8px">⚠ الأسعار متأخرة 15 دقيقة (Alpaca المجاني) والرادار يتحدث كل 30 دقيقة وقت السوق — التحقق اللحظي عليك.
+      النظرية <b>ما انختبرت</b> عندنا كاملة بعد (الدراسة شغالة)، و«📒 سجل الصدق» تحت يسجل كل ✅ ونتيجته. صامت: بدون تيليجرام. ليس توصية شراء أو بيع.</div>
+    <div class="note" id="meta2" style="margin-top:6px"></div>
+  </div>
+  <div class="tiles" id="tiles" style="grid-template-columns:repeat(4,1fr)"></div>
+  <div class="list" id="list"></div>
+  <details class="card" id="logbox" style="margin-top:14px"><summary style="cursor:pointer;font-weight:700">📒 سجل الصدق — كل ✅ ونتيجته (الهدف +20% قبل الوقف خلال يومين)</summary><div id="logbody" style="margin-top:8px"></div></details>
+  <div class="disc">القواعد بالضبط في market.py: قفزة الأفتر = أعلى سعر الأفتر ÷ إغلاق الجلسة ≥ 15% (فوليوم أفتر ≥ 50 ألف والجلسة ≥ 100 ألف) ·
+    دعم الأفتر = أدنى سعر بعد قمة الأفتر · كسر دعم الأفتر بالبري = أدنى منه بـ 2% أو آخر سعر تحته · دعم البري = أدنى سعر بالبري لين 7:00 نيويورك.</div>
+</div>
+<script>
+const DATA = /*__DATA__*/null;
+try{ const t = localStorage.getItem("fr-theme"); if(t) document.documentElement.dataset.theme = t; }catch(e){}
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const fp = p => p == null ? "-" : (p < 1 ? (+p).toFixed(3) : (+p).toFixed(2));
+const fM = n => n == null ? "-" : n >= 1e6 ? (n/1e6).toFixed(2)+"M" : n >= 1e3 ? (n/1e3).toFixed(0)+"K" : String(Math.round(n));
+const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const stocks = (DATA && DATA.stocks) || [];
+const GROUPS = [["live","✅ ⏳ 🟡 حيّة",["held","testing","market"]],["wait","⌛ ينتظر",["wait_pm"]],["fail","❌ فشل بالماركت",["fail"]],["cancel","❌ مُلغى",["cancel_pm","cancel_ah"]]];
+let filt = "live";
+$("#theme").onclick = () => { const cur = document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+  const nx = cur === "dark" ? "light" : "dark"; document.documentElement.dataset.theme = nx; try{ localStorage.setItem("fr-theme", nx); }catch(e){} };
+if (DATA){
+  $("#meta").textContent = `آخر تحديث ${DATA.generated_at} (نيويورك ${DATA.ny_time || "-"}) · أفتر ${DATA.D || "-"} ← جلسة ${DATA.N || "الجاية"}`;
+  const S = DATA.stats || {};
+  $("#meta2").textContent = S.n ? `سجل الصدق: ${S.n} صفقة اكتملت · وصلت الهدف ${S.target} · ضربت الوقف ${S.stop} · متوسط النتيجة ${S.avg_ret}%` : "سجل الصدق: ما فيه صفقات مكتملة للحين.";
+  if (DATA.actions_url){ const g = $("#ghrun"); g.href = DATA.actions_url; g.style.display = ""; }
+  if (DATA.error) $("#list").innerHTML = `<div class="empty">${esc(DATA.error)}</div>`;
+}
+function chart(s){
+  const C = s.chart; if (!C || !C.c.length) return "";
+  const W = 760, H = 220, P = {l:6, r:56, t:8, b:16}, n = C.c.length;
+  const lv = [[s.ah_support,"--bad","دعم الأفتر"],[s.pm_support,"--warn","دعم البري"],[s.entry,"--info","الدخول"],[s.target,"--good","+20%"],[s.close,"--muted","إغلاق أمس"]].filter(x => x[0] != null);
+  let lo = Math.min(...C.l, ...lv.map(x=>x[0])) * 0.98, hi = Math.max(...C.h, ...lv.map(x=>x[0])) * 1.02;
+  const y = v => P.t + (hi - v) / (hi - lo) * (H - P.t - P.b), x = i => P.l + i * (W - P.l - P.r) / Math.max(1, n - 1);
+  let g = `<polyline fill="none" stroke="${cssv("--accent")}" stroke-width="1.6" points="${C.c.map((v,i)=>x(i).toFixed(1)+","+y(v).toFixed(1)).join(" ")}"/>`;
+  lv.forEach(([v,c,t]) => { g += `<line x1="${P.l}" x2="${W-P.r}" y1="${y(v)}" y2="${y(v)}" stroke="${cssv(c)}" stroke-dasharray="5 4"/><text x="${W-P.r+3}" y="${y(v)+4}" font-size="10.5" fill="${cssv(c)}">${fp(v)}</text>`; });
+  let prev = ""; C.t.forEach((t,i) => { const d = t.slice(0,5); if (d !== prev){ prev = d; g += `<text x="${x(i)}" y="${H-3}" font-size="10" fill="${cssv("--muted")}">${d}</text><line x1="${x(i)}" x2="${x(i)}" y1="${P.t}" y2="${H-P.b}" stroke="${cssv("--line")}"/>`; } });
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;margin-top:8px" role="img" aria-label="شارت 5 دقايق">${g}</svg>
+    <div class="legend note">شموع 5 دقايق (الأفتر أمس + البري + الماركت) · أحمر دعم الأفتر · برتقالي دعم البري · أزرق الدخول · أخضر الهدف</div>`;
+}
+function tiles(){
+  $("#tiles").innerHTML = GROUPS.map(([k,l,st]) => `<div class="tile ${filt===k?"on":""}" data-k="${k}"><b class="num">${stocks.filter(s => st.includes(s.status)).length}</b><span>${l}</span></div>`).join("");
+  document.querySelectorAll(".tile").forEach(el => el.onclick = () => { filt = el.dataset.k; render(); });
+}
+function render(){
+  tiles();
+  const st = (GROUPS.find(g => g[0] === filt) || GROUPS[0])[2];
+  const L = stocks.filter(s => st.includes(s.status));
+  if (!L.length){ $("#list").innerHTML = `<div class="empty">ما فيه أسهم بهالمرحلة حالياً.</div>`; return; }
+  $("#list").innerHTML = L.map(s => `<div class="card" style="cursor:pointer" data-s="${esc(s.symbol)}">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center">
+        <div><span class="sym ltr">${s.flag ? s.flag + " " : ""}${esc(s.symbol)}</span> <span class="num">$${fp(s.price)}</span>
+          <div class="name" style="max-width:none">${esc(s.name || "")}</div></div>
+        <span class="st ${esc(s.status)}">${esc(s.label)}</span>
+      </div>
+      <div class="lv">
+        <span>إغلاق أمس: <b class="num">${fp(s.close)}</b></span><span>قمة الأفتر: <b class="num">${fp(s.ah_high)}</b> (+${s.jump_pct}%)</span>
+        <span>رجّع: <b class="num">${s.giveback_pct}%</b></span><span>دعم الأفتر (الوقف): <b class="num" style="color:var(--bad)">${fp(s.ah_support)}</b></span>
+        ${s.pm_support != null ? `<span>دعم البري: <b class="num" style="color:var(--warn)">${fp(s.pm_support)}</b></span>` : ""}
+        ${s.entry != null ? `<span>الدخول (6:00 م): <b class="num">${fp(s.entry)}</b> · الهدف: <b class="num" style="color:var(--good)">${fp(s.target)}</b></span>` : ""}
+        ${s.after === "target" ? `<span style="color:var(--good)"><b>🎯 وصل الهدف اليوم</b></span>` : s.after === "stop" ? `<span style="color:var(--bad)"><b>🛑 أغلق تحت دعم الأفتر</b></span>` : ""}
+        <span>فوليوم الأفتر: <b class="num">${fM(s.ah_vol)}</b></span><span>الفلووت: <b class="num">${fM(s.float)}</b></span><span>الشورت: <b class="num">${s.short != null ? fM(s.short) : "؟"}</b></span>
+      </div>
+      <ul class="clean note" style="margin-top:6px">${(s.why||[]).map(w => `<li>${esc(w)}</li>`).join("")}</ul>
+      ${(s.warn||[]).map(w => `<div class="left" style="color:var(--bad)">${esc(w)}</div>`).join("")}
+      <div class="note">اضغط للشارت وتحليل فيصل ▾</div>
+    </div>`).join("");
+  document.querySelectorAll("#list .card").forEach(el => el.onclick = () => toggle(el));
+}
+function toggle(el){
+  const ex = el.querySelector(".more"); if (ex){ ex.remove(); return; }
+  const s = stocks.find(x => x.symbol === el.dataset.s), d = document.createElement("div"); d.className = "more"; d.onclick = e => e.stopPropagation();
+  let fa = ""; try { fa = s.faisal && window.FDETAIL ? FDETAIL(s.faisal) : ""; } catch(e){}
+  d.innerHTML = chart(s) + fa;
+  el.appendChild(d);
+}
+(function(){ const L = (DATA && DATA.log) || []; if (!L.length){ $("#logbody").innerHTML = `<div class="note">ما فيه ✅ للحين.</div>`; return; }
+  const R = {target:"🎯 الهدف", stop:"🛑 الوقف", flat:"➖ ما وصل"};
+  $("#logbody").innerHTML = `<div style="overflow-x:auto"><table class="mtbl" style="width:100%;font-size:13px;border-collapse:collapse"><tr><th>السهم</th><th>اليوم</th><th>الدخول</th><th>الهدف</th><th>الوقف</th><th>النتيجة</th><th>العائد</th><th>أعلى</th></tr>` +
+    L.map(e => `<tr><td class="ltr">${esc(e.symbol)}</td><td class="num">${esc(e.N)}</td><td class="num">${fp(e.entry)}</td><td class="num">${fp(e.target)}</td><td class="num">${fp(e.stop)}</td><td>${e.res ? R[e.res] : "⏳"}</td><td class="num">${e.ret_pct != null ? e.ret_pct + "%" : "-"}</td><td class="num">${e.max_pct != null ? "+" + e.max_pct + "%" : "-"}</td></tr>`).join("") + `</table></div>`; })();
+render();
+</script>
+</body>
+</html>
