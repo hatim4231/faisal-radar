@@ -115,6 +115,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 10
 
+      - name: رادار الارتكاز (منشور نايف — صامت)
+        run: python irtikaz_radar/irtikaz_scanner.py --out site/irtikaz/index.html || echo "رادار الارتكاز تعطل — نكمل"
+        continue-on-error: true
+        timeout-minutes: 10
+
       - name: رادار الشطب (إنذارات البورصة من SEC ← تيليجرام أول بأول)
         run: python delist_radar/delist_scanner.py --out site/delisting/index.html || echo "رادار الشطب تعطل — نكمل"
         continue-on-error: true
@@ -175,6 +180,9 @@ jobs:
           fi
           if [ -f site/market/index.html ]; then
             npx --yes staticrypt@3.5.4 site/market/index.html "${OPTS[@]}" --template-title "🕘 رادار الماركت" -d site/market
+          fi
+          if [ -f site/irtikaz/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/irtikaz/index.html "${OPTS[@]}" --template-title "⚓ رادار الارتكاز" -d site/irtikaz
           fi
           if [ -f site/delisting/index.html ]; then
             npx --yes staticrypt@3.5.4 site/delisting/index.html "${OPTS[@]}" --template-title "⛔ رادار الشطب" -d site/delisting
