@@ -1,3 +1,14 @@
 {
- "entries": []
+ "entries": [
+  {
+   "symbol": "NXAT",
+   "D": "2026-11-25",
+   "N": "2026-11-27",
+   "entry": 0.9025,
+   "target": 1.083,
+   "stop": 0.76,
+   "tested": true,
+   "jump_pct": 50.0
+  }
+ ]
 }
