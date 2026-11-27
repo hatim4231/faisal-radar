@@ -1048,7 +1048,13 @@
    "t1": 2.5658,
    "t2": 2.6824,
    "stop": 2.0993,
-   "pm_min_vol": 25852
+   "pm_min_vol": 25852,
+   "N": "2026-11-27",
+   "pm_high_pct": -8.6,
+   "close_next_pct": -25.1,
+   "r10": "fail",
+   "r15": "fail",
+   "result": "stop"
   },
   {
    "symbol": "RAYA",
@@ -1078,7 +1084,13 @@
    "t1": 0.7979,
    "t2": 0.8342,
    "stop": 0.6529,
-   "pm_min_vol": 209600
+   "pm_min_vol": 209600,
+   "N": "2026-11-27",
+   "pm_high_pct": 11.6,
+   "close_next_pct": 4.9,
+   "r10": "hit",
+   "r15": "hit",
+   "result": "t2"
   }
  ],
  "fire_sent": [
