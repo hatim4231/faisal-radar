@@ -1091,6 +1091,48 @@
    "r10": "hit",
    "r15": "hit",
    "result": "t2"
+  },
+  {
+   "symbol": "VESI",
+   "D": "2026-11-27",
+   "close": 1.1798,
+   "ah_high": 1.45,
+   "ah_last": 1.42,
+   "ah_vwap": 1.3508,
+   "jump_pct": 22.9,
+   "hold_pct": 89,
+   "ah_vol": 4202394,
+   "rth_vol": 4060090,
+   "limit": 1.3508,
+   "name": "VESI",
+   "price": 1.42,
+   "float": null,
+   "short": 40000,
+   "short_src": "المتاح للاقتراض (IB)",
+   "flags": [
+    "⛔ تخفيف/طرح متكرر"
+   ],
+   "news": [],
+   "country": null,
+   "tags": [
+    "⚠ تخفيف محتمل SEC"
+   ],
+   "dilution_events": [
+    {
+     "date": "2026-09-17",
+     "what": "SEC EFFECT"
+    },
+    {
+     "date": "2026-09-22",
+     "what": "SEC 424B4"
+    }
+   ],
+   "dilution_level": "medium",
+   "eligible": false,
+   "t1": 1.4859,
+   "t2": 1.5534,
+   "stop": 1.2157,
+   "pm_min_vol": 294167
   }
  ],
  "fire_sent": [
