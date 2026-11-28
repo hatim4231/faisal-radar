@@ -120,6 +120,11 @@ jobs:
         continue-on-error: true
         timeout-minutes: 10
 
+      - name: قائمة الأسبوع (أعلى 10 احتمال طيران ← تيليجرام نهاية كل أسبوع)
+        run: python weekly_radar/weekly_scanner.py --out site/weekly/index.html || echo "قائمة الأسبوع تعطلت — نكمل"
+        continue-on-error: true
+        timeout-minutes: 8
+
       - name: رادار الشطب (إنذارات البورصة من SEC ← تيليجرام أول بأول)
         run: python delist_radar/delist_scanner.py --out site/delisting/index.html || echo "رادار الشطب تعطل — نكمل"
         continue-on-error: true
@@ -183,6 +188,9 @@ jobs:
           fi
           if [ -f site/irtikaz/index.html ]; then
             npx --yes staticrypt@3.5.4 site/irtikaz/index.html "${OPTS[@]}" --template-title "⚓ رادار الارتكاز" -d site/irtikaz
+          fi
+          if [ -f site/weekly/index.html ]; then
+            npx --yes staticrypt@3.5.4 site/weekly/index.html "${OPTS[@]}" --template-title "📅 قائمة الأسبوع" -d site/weekly
           fi
           if [ -f site/delisting/index.html ]; then
             npx --yes staticrypt@3.5.4 site/delisting/index.html "${OPTS[@]}" --template-title "⛔ رادار الشطب" -d site/delisting

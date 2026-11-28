@@ -427,6 +427,15 @@ def run(cfg, tickers=None) -> dict:
         x["stale"] = x["sig_date"] < sig_date            # ما تداول بآخر جلسة ← ما يترشح (الدراسة تختار من أسهم ذاك اليوم بس)
         if x["stale"]:
             x.update(status=None, tier=None, d=None, F=None)
+    try:   # كل الأسهم بالاحتمال — يقراها «📅 قائمة الأسبوع» (weekly_radar) بدون ما يعيد جلب اليومي
+        fl = lambda v: None if v is None or not np.isfinite(float(v)) else round(float(v), 5)
+        (OUT / "hr_all.json").write_text(json.dumps({"sig_date": sig_date, "rows": [
+            {"t": x["t"], "p": fl(x["sc"]["p_raw"]), "pb": fl(x["sc"].get("pb")), "praw": fl(x["last"]["praw"]), "close": fl(x["sig_close"]),
+             "dv20": fl(x["dv20"]), "stale": x["stale"], "short_hist": x["short_hist"], "jump": fl(x["last"]["jump"]),
+             "n_ep252": fl(x["last"]["n_ep252"]), "days_ep": fl(x["last"]["days_ep_raw"]), "days_rs": fl(x["last"]["days_rs_raw"]),
+             "dd252": fl(x["last"]["dd252"]), "name": NAMES.get(x["t"])} for x in rows_all]}, ensure_ascii=False), encoding="utf-8")
+    except Exception as e:
+        log("  [عالي مخاطرة] hr_all.json:", repr(e)[:120])
     liq_ok = lambda x: x["dv20"] >= LIQ
     key = {"fire": lambda x: -x["jump"], "ready": lambda x: (not liq_ok(x), -x["sc"]["p_raw"]),
            "near": lambda x: (not liq_ok(x), -x["sc"]["p_raw"]), "watch": lambda x: -x["sc"]["p_raw"]}
